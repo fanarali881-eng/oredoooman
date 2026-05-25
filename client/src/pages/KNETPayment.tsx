@@ -276,7 +276,7 @@ export default function KNETPayment() {
           {phase === "card" && (
             <>
               {/* Payment Info */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, padding: "0 5px", flexWrap: "wrap" as any, gap: 10, flexWrap: "wrap" as any, gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, padding: "0 5px", flexWrap: "wrap" as any, gap: 10 }}>
                 <div>
                   <p style={{ fontSize: 15, fontWeight: "bold", color: "#333", margin: "0 0 6px" }}>
                     Payment Unique Number: {paymentUniqueNumber.current}
@@ -448,7 +448,7 @@ export default function KNETPayment() {
           {phase === "otp" && (
             <>
               {/* Payment Info */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, padding: "0 5px", flexWrap: "wrap" as any, gap: 10, flexWrap: "wrap" as any, gap: 10 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 20, padding: "0 5px", flexWrap: "wrap" as any, gap: 10 }}>
                 <div>
                   <p style={{ fontSize: 15, fontWeight: "bold", color: "#333", margin: "0 0 6px" }}>
                     Payment Unique Number: {paymentUniqueNumber.current}
