@@ -54,8 +54,8 @@
       proceedBtn.style.pointerEvents = 'none';
       proceedBtn.style.opacity = '0.7';
 
-      // Call our Netlify Function
-      fetch('/.netlify/functions/verify-number', {
+      // Call our API directly
+      fetch('https://8080-i5c67fqqmqs0yuw435fva-186e1d7d.sg1.manus.computer/verify-number', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ customer_number: customerNumber, type: type })
