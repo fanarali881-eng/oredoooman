@@ -1,0 +1,2 @@
+User-agent: *
+Sitemap: https://shop.ooredoo.om/wp-sitemap-posts-page-1.xml
