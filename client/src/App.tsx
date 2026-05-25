@@ -1,5 +1,5 @@
 import { Switch, Route } from "wouter";
-import RechargePage from "@/pages/RechargePage";
+import RechargePage from "./pages/RechargePage";
 
 function Router() {
   return (
