@@ -33,72 +33,90 @@
   }
 }
 
-/* Pixel-Perfect Ooredoo Styles */
+/* Carbon Copy Ooredoo Styles */
+.plan-header-section {
+  font-size: 24px;
+  font-weight: 500;
+  color: rgb(34, 30, 32);
+  background-color: rgba(255, 255, 255, 0);
+  padding: 0px 0px 10px;
+  margin: 0px;
+  font-family: NotoKufiArabic-Bold, Rubik-SemiBold;
+  border-radius: 0px;
+  border: 0px none rgb(34, 30, 32);
+  text-align: right;
+  line-height: 30px;
+  display: block;
+}
+
+.plan-header-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(34, 30, 32);
+  background-color: rgba(255, 255, 255, 0);
+  padding: 0px;
+  margin: 0px;
+  font-family: NotoKufiArabic-Regular, "Noto Sans Regular";
+  border-radius: 0px;
+  border: 0px none rgb(34, 30, 32);
+  text-align: right;
+  line-height: 20px;
+  display: block;
+}
+
+.type-radio-btn-section {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgb(34, 30, 32);
+  background-color: rgba(255, 255, 255, 0);
+  padding: 0px;
+  margin: 0px;
+  font-family: NotoKufiArabic-Regular, "Noto Sans Regular";
+  border-radius: 0px;
+  border: 0px none rgb(34, 30, 32);
+  text-align: right;
+  line-height: 20px;
+  display: block;
+}
+
+.customer-number {
+  font-size: 14px;
+  font-weight: 400;
+  color: rgb(34, 30, 32);
+  background-color: rgb(255, 255, 255);
+  padding: 10px;
+  margin: 0px;
+  font-family: NotoKufiArabic-Regular, "Noto Sans Regular";
+  border-radius: 4px;
+  border: 1px solid rgb(204, 204, 204);
+  text-align: right;
+  line-height: 20px;
+  display: inline-block;
+  width: 100%;
+  max-width: 300px;
+}
+
+.recharge-btn {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgb(255, 255, 255);
+  background-color: rgb(237, 28, 36);
+  padding: 4.2px 14px;
+  margin: 0px;
+  font-family: NotoKufiArabic-Bold;
+  border-radius: 25px;
+  border: 0px solid rgb(255, 255, 255);
+  text-align: center;
+  line-height: 30px;
+  display: inline-block;
+  min-width: 120px;
+}
+
+/* Container and Layout */
 .ooredoo-container {
   max-width: 1140px;
   margin: 0 auto;
   padding: 0 15px;
-}
-
-.ooredoo-header-text {
-  font-size: 24px;
-  font-weight: 500;
-  color: #221e20;
-  line-height: 30px;
-  margin-bottom: 10px;
-  text-align: right;
-}
-
-.ooredoo-sub-text {
-  font-size: 14px;
-  font-weight: 500;
-  color: #221e20;
-  line-height: 20px;
-  text-align: right;
-}
-
-.ooredoo-radio-label {
-  font-size: 14px;
-  font-weight: 700;
-  color: #221e20;
-  padding: 0 30px 0 10px;
-  line-height: 30px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.ooredoo-btn-red {
-  background-color: #ed1c24;
-  color: white;
-  font-size: 14px;
-  font-weight: 500;
-  padding: 4.2px 14px;
-  border-radius: 25px;
-  line-height: 30px;
-  text-align: center;
-  display: inline-block;
-  min-width: 120px;
-  transition: opacity 0.3s ease;
-}
-
-.ooredoo-btn-red:hover {
-  opacity: 0.9;
-}
-
-.ooredoo-input {
-  border: 1px solid #ccc;
-  padding: 10px;
-  font-size: 14px;
-  width: 100%;
-  max-width: 300px;
-  border-radius: 4px;
-  outline: none;
-}
-
-.ooredoo-input:focus {
-  border-color: #ed1c24;
 }
 
 .ooredoo-top-bar {
