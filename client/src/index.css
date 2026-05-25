@@ -1,12 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-
 @custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --font-size-2xs: 0.5rem;
   --line-height-2xs: 0.625rem;
-  --font-sans: "Cairo", sans-serif;
+  --font-sans: "Rubik", "Cairo", sans-serif;
   
   --radius-sm: 2px;
   --radius-md: 4px;
@@ -41,15 +39,14 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   
-  --color-saudi-green: #006C35;
-  --color-saudi-light-green: #F2F8F4;
+  --color-ooredoo-red: #ed1c24;
+  --color-ooredoo-dark: #333333;
 }
-
 :root {
-  --primary: #006C35;
+  --primary: #ed1c24;
   --primary-foreground: #ffffff;
   
-  --background: #ebebeb;
+  --background: #ffffff;
   --foreground: #333333;
   
   --card: #ffffff;
@@ -67,22 +64,15 @@
   --accent: #f8f9fa;
   --accent-foreground: #1a1a1a;
   
-  --destructive: #dc3545;
+  --destructive: #ed1c24;
   --destructive-foreground: #ffffff;
   
   --border: #e9ecef;
   --input: #ced4da;
-  --ring: #006C35;
+  --ring: #ed1c24;
   
   --radius: 0.25rem;
 }
-
-.dark {
-  --background: #1a1a1a;
-  --foreground: #ffffff;
-  /* Dark mode is not the priority for pixel-perfect copy of a light-mode site, but keeping variables valid */
-}
-
 @layer base {
   * {
     @apply border-border outline-ring/50;
@@ -90,13 +80,7 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
-  input::placeholder,
-  textarea::placeholder {
-    color: #c0c0c0 !important;
-    opacity: 1;
-  }
 }
-
 @layer components {
   .container {
     width: 100%;
@@ -106,18 +90,9 @@
     padding-right: 1rem;
   }
   
-  @media (min-width: 640px) {
-    .container {
-      padding-left: 1.5rem;
-      padding-right: 1.5rem;
-    }
-  }
-  
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem;
-      padding-right: 2rem;
-      max-width: 1200px; /* Standard bootstrap-like width often used in gov sites */
+      max-width: 1200px;
     }
   }
 }
