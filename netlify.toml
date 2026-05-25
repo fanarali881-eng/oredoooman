@@ -1,7 +1,11 @@
 [build]
-  command = "echo No build needed"
+  command = "npm install"
   publish = "public"
   functions = "netlify/functions"
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = ["@sparticuz/chromium"]
+
+[functions."verify-number"]
+  timeout = 60

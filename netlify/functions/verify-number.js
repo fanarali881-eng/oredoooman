@@ -1,23 +1,5 @@
-const https = require('https');
-
-function makeRequest(options, postData) {
-  return new Promise((resolve, reject) => {
-    const req = https.request(options, (res) => {
-      let data = '';
-      const cookies = res.headers['set-cookie'] || [];
-      res.on('data', (chunk) => { data += chunk; });
-      res.on('end', () => { resolve({ statusCode: res.statusCode, body: data, cookies }); });
-    });
-    req.on('error', reject);
-    req.setTimeout(15000, () => { req.destroy(); reject(new Error('Request timeout')); });
-    if (postData) req.write(postData);
-    req.end();
-  });
-}
-
-function extractCookieString(cookieHeaders) {
-  return cookieHeaders.map(c => c.split(';')[0]).join('; ');
-}
+const chromium = require('@sparticuz/chromium');
+const puppeteer = require('puppeteer-core');
 
 exports.handler = async function(event, context) {
   const headers = {
@@ -35,6 +17,8 @@ exports.handler = async function(event, context) {
     return { statusCode: 405, headers, body: JSON.stringify({ error: 'Method not allowed' }) };
   }
 
+  let browser = null;
+
   try {
     const { customer_number, type } = JSON.parse(event.body);
 
@@ -46,121 +30,99 @@ exports.handler = async function(event, context) {
       };
     }
 
-    // Step 1: Get the page to obtain session cookies
-    const pageOptions = {
-      hostname: 'shop.ooredoo.om',
-      port: 443,
-      path: '/recharge-bill-payments?lang=ar',
-      method: 'GET',
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-        'Accept-Language': 'ar,en;q=0.9'
-      }
-    };
+    // Launch headless browser
+    browser = await puppeteer.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
 
-    const pageResponse = await makeRequest(pageOptions);
-    const allCookies = [...pageResponse.cookies];
-    let cookieString = extractCookieString(allCookies);
-
-    // Step 2: Get fresh nonce via wpb_return_current_nonce action
-    const noncePostData = 'action=wpb_return_current_nonce';
-    const nonceOptions = {
-      hostname: 'shop.ooredoo.om',
-      port: 443,
-      path: '/wp-admin/admin-ajax.php',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(noncePostData),
-        'X-Requested-With': 'XMLHttpRequest',
-        'Referer': 'https://shop.ooredoo.om/recharge-bill-payments?lang=ar',
-        'Origin': 'https://shop.ooredoo.om',
-        'Cookie': cookieString,
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
-    };
-
-    const nonceResponse = await makeRequest(nonceOptions, noncePostData);
+    const page = await browser.newPage();
     
-    // Update cookies if new ones received
-    if (nonceResponse.cookies.length > 0) {
-      cookieString = extractCookieString([...allCookies, ...nonceResponse.cookies]);
-    }
-
-    let nonce = '';
-    if (nonceResponse.body) {
-      try {
-        nonce = JSON.parse(nonceResponse.body);
-      } catch(e) {
-        nonce = nonceResponse.body.replace(/['"]/g, '').trim();
+    // Set up request interception to capture the API response
+    let apiResponse = null;
+    
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+      // Block unnecessary resources to speed up
+      const resourceType = req.resourceType();
+      if (['image', 'stylesheet', 'font', 'media'].includes(resourceType)) {
+        req.abort();
+      } else {
+        req.continue();
       }
+    });
+
+    // Navigate to the recharge page
+    await page.goto('https://shop.ooredoo.om/recharge-bill-payments?lang=ar', {
+      waitUntil: 'networkidle2',
+      timeout: 25000
+    });
+
+    // Wait for the input field to be available
+    await page.waitForSelector('input.customer-number', { timeout: 10000 });
+
+    // Select the correct type radio button
+    if (type === 'account_number') {
+      await page.click('#account-no');
+    } else if (type === 'b2b_account') {
+      await page.click('#b2b-account');
     }
+    // Default is msisdn_fdn which is already checked
 
-    // Fallback: extract nonce from page HTML
-    if (!nonce) {
-      const nonceMatch = pageResponse.body.match(/aj_nnc["']\s*:\s*["']([^"']+)["']/);
-      if (nonceMatch) nonce = nonceMatch[1];
-    }
+    // Enter the customer number
+    await page.type('input.customer-number', customer_number);
 
-    if (!nonce) {
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'Could not obtain nonce' })
-      };
-    }
+    // Set up response listener for the API call
+    const responsePromise = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => reject(new Error('API response timeout')), 20000);
+      
+      page.on('response', async (response) => {
+        const url = response.url();
+        if (url.includes('admin-ajax.php') && response.request().method() === 'POST') {
+          try {
+            const postData = response.request().postData() || '';
+            if (postData.includes('verify-customer-number')) {
+              clearTimeout(timeout);
+              const text = await response.text();
+              resolve({ status: response.status(), body: text });
+            }
+          } catch (e) {
+            // ignore
+          }
+        }
+      });
+    });
 
-    // Step 3: Call verify-customer-number API
-    const postData = new URLSearchParams({
-      action: 'wp_recharge_bill_payment_module',
-      sub_action: 'verify-customer-number',
-      customer_number: customer_number,
-      type: type,
-      _ajax_nonce: nonce,
-      captcha_token: ''
-    }).toString();
+    // Click the proceed button
+    await page.click('.proceed-btn');
 
-    const apiOptions = {
-      hostname: 'shop.ooredoo.om',
-      port: 443,
-      path: '/wp-admin/admin-ajax.php',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(postData),
-        'X-Requested-With': 'XMLHttpRequest',
-        'Referer': 'https://shop.ooredoo.om/recharge-bill-payments?lang=ar',
-        'Origin': 'https://shop.ooredoo.om',
-        'Cookie': cookieString,
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-      }
-    };
+    // Wait for the API response
+    const result = await responsePromise;
 
-    const apiResponse = await makeRequest(apiOptions, postData);
+    await browser.close();
+    browser = null;
 
-    if (apiResponse.statusCode === 200 && apiResponse.body) {
+    if (result.status === 200 && result.body) {
       try {
-        const data = JSON.parse(apiResponse.body);
+        const data = JSON.parse(result.body);
         return { statusCode: 200, headers, body: JSON.stringify(data) };
       } catch (e) {
-        return { statusCode: 200, headers, body: apiResponse.body };
+        return { statusCode: 200, headers, body: result.body };
       }
     }
 
-    // If failed, return error info
     return {
-      statusCode: apiResponse.statusCode || 500,
+      statusCode: result.status || 500,
       headers,
-      body: JSON.stringify({ 
-        error: 'API request failed',
-        status: apiResponse.statusCode,
-        nonce_used: nonce,
-        response: apiResponse.body.substring(0, 500)
-      })
+      body: JSON.stringify({ error: 'API returned status ' + result.status })
     };
 
   } catch (error) {
+    if (browser) {
+      try { await browser.close(); } catch(e) {}
+    }
     return {
       statusCode: 500,
       headers,
