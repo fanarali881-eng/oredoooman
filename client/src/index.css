@@ -2,15 +2,14 @@
 @import "tw-animate-css";
 
 @theme inline {
-  --font-sans: "Rubik", "Cairo", sans-serif;
+  --font-sans: "Noto Kufi Arabic", "Rubik", "Cairo", sans-serif;
   --color-ooredoo-red: #ed1c24;
-  --color-ooredoo-dark: #333333;
+  --color-ooredoo-text: #221e20;
   --color-ooredoo-gray: #757575;
   --color-ooredoo-light-gray: #f5f5f5;
   
-  /* Define missing variables that were causing the build error */
   --color-background: #ffffff;
-  --color-foreground: #333333;
+  --color-foreground: #221e20;
   --color-primary: #ed1c24;
   --color-border: #e0e0e0;
 }
@@ -19,7 +18,7 @@
   --primary: #ed1c24;
   --primary-foreground: #ffffff;
   --background: #ffffff;
-  --foreground: #333333;
+  --foreground: #221e20;
   --border: #e0e0e0;
   --radius: 0.5rem;
 }
@@ -27,78 +26,79 @@
 @layer base {
   body {
     background-color: white;
-    color: #333333;
-    font-family: "Rubik", "Cairo", sans-serif;
+    color: #221e20;
+    font-family: "Noto Kufi Arabic", "Rubik", "Cairo", sans-serif;
     direction: rtl;
+    -webkit-font-smoothing: antialiased;
   }
 }
 
-/* Custom Ooredoo Styles */
+/* Pixel-Perfect Ooredoo Styles */
 .ooredoo-container {
   max-width: 1140px;
   margin: 0 auto;
   padding: 0 15px;
 }
 
-.ooredoo-btn-red {
-  background-color: #ed1c24;
-  color: white;
-  border-radius: 50px;
-  padding: 12px 40px;
-  font-weight: 700;
-  font-size: 18px;
-  transition: all 0.3s ease;
-  border: 2px solid #ed1c24;
-}
-
-.ooredoo-btn-red:hover {
-  background-color: white;
-  color: #ed1c24;
-}
-
-.ooredoo-input {
-  border: none;
-  border-bottom: 2px solid #e0e0e0;
-  padding: 10px;
+.ooredoo-header-text {
   font-size: 24px;
-  text-align: center;
-  width: 100%;
-  max-width: 400px;
-  outline: none;
-  transition: border-color 0.3s ease;
+  font-weight: 500;
+  color: #221e20;
+  line-height: 30px;
+  margin-bottom: 10px;
+  text-align: right;
 }
 
-.ooredoo-input:focus {
-  border-color: #ed1c24;
+.ooredoo-sub-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #221e20;
+  line-height: 20px;
+  text-align: right;
 }
 
 .ooredoo-radio-label {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
-  color: #333;
+  color: #221e20;
+  padding: 0 30px 0 10px;
+  line-height: 30px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
-.ooredoo-radio-input {
-  width: 20px;
-  height: 20px;
-  accent-color: #ed1c24;
+.ooredoo-btn-red {
+  background-color: #ed1c24;
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  padding: 4.2px 14px;
+  border-radius: 25px;
+  line-height: 30px;
+  text-align: center;
+  display: inline-block;
+  min-width: 120px;
+  transition: opacity 0.3s ease;
 }
 
-.ooredoo-header-text {
-  font-size: 32px;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 15px;
+.ooredoo-btn-red:hover {
+  opacity: 0.9;
 }
 
-.ooredoo-sub-text {
-  font-size: 16px;
-  color: #757575;
-  line-height: 1.6;
+.ooredoo-input {
+  border: 1px solid #ccc;
+  padding: 10px;
+  font-size: 14px;
+  width: 100%;
+  max-width: 300px;
+  border-radius: 4px;
+  outline: none;
+}
+
+.ooredoo-input:focus {
+  border-color: #ed1c24;
 }
 
 .ooredoo-top-bar {
@@ -115,10 +115,9 @@
   cursor: pointer;
   padding: 10px 0;
   border-bottom: 3px solid transparent;
-  transition: all 0.3s ease;
 }
 
-.ooredoo-nav-item:hover, .ooredoo-nav-item.active {
+.ooredoo-nav-item.active {
   color: #ed1c24;
   border-bottom-color: #ed1c24;
 }
