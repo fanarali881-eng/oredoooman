@@ -18,86 +18,81 @@ export default function RechargePage() {
     <div className="min-h-screen bg-white flex flex-col" dir="rtl">
       <Header />
       
-      <main className="flex-grow">
-        {/* Red Banner */}
-        <div className="bg-red-600 py-2 text-white text-center text-sm font-bold">
-          تسوق /إعادة شحن الرصيد / دفع الفواتير
-        </div>
-
-        <div className="container py-12 max-w-4xl">
-          <h1 className="text-3xl font-bold text-center text-gray-800 mb-4">سداد فاتورة أو إعادة شحن</h1>
-          <p className="text-center text-gray-600 mb-12 text-sm leading-relaxed">
+      <main className="flex-grow py-16">
+        <div className="ooredoo-container max-w-4xl text-center">
+          <h1 className="ooredoo-header-text">سداد فاتورة أو إعادة شحن</h1>
+          <p className="ooredoo-sub-text mb-12 max-w-3xl mx-auto">
             ادخل رقم Ooredoo أو رقم الخط الثابت أو رقم السجل التجاري لتتمكن من إعادة شحن رصيدك أو لسداد فاتورتك الشهرية. للأرقام التي تم إنهاؤها يمكنك استخدام رقم الحساب.
           </p>
 
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white p-10 rounded-lg shadow-[0_0_20px_rgba(0,0,0,0.05)] border border-gray-50">
             {/* Radio Options */}
-            <div className="flex flex-wrap justify-center gap-8 mb-8">
-              <label className="flex items-center gap-2 cursor-pointer group">
+            <div className="flex flex-wrap justify-center gap-10 mb-10">
+              <label className="ooredoo-radio-label">
                 <input 
                   type="radio" 
                   name="type" 
                   checked={inputType === "msisdn"} 
                   onChange={() => setInputType("msisdn")}
-                  className="w-5 h-5 accent-red-600"
+                  className="ooredoo-radio-input"
                 />
-                <span className="text-sm font-bold text-gray-700 group-hover:text-red-600 transition-colors">رقم الهاتف النقال / الهاتف الثابت</span>
+                <span>رقم الهاتف النقال / الهاتف الثابت</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer group">
+              <label className="ooredoo-radio-label">
                 <input 
                   type="radio" 
                   name="type" 
                   checked={inputType === "account"} 
                   onChange={() => setInputType("account")}
-                  className="w-5 h-5 accent-red-600"
+                  className="ooredoo-radio-input"
                 />
-                <span className="text-sm font-bold text-gray-700 group-hover:text-red-600 transition-colors">رقم الحساب</span>
+                <span>رقم الحساب</span>
               </label>
-              <label className="flex items-center gap-2 cursor-pointer group">
+              <label className="ooredoo-radio-label">
                 <input 
                   type="radio" 
                   name="type" 
                   checked={inputType === "cr"} 
                   onChange={() => setInputType("cr")}
-                  className="w-5 h-5 accent-red-600"
+                  className="ooredoo-radio-input"
                 />
-                <span className="text-sm font-bold text-gray-700 group-hover:text-red-600 transition-colors">ادخل رقم السجل التجاري</span>
+                <span>ادخل رقم السجل التجاري</span>
               </label>
             </div>
 
             {/* Input Field */}
-            <div className="max-w-md mx-auto">
+            <div className="max-w-md mx-auto space-y-10">
               <input 
                 type="text" 
                 placeholder={inputType === "msisdn" ? "أدخل الرقم" : inputType === "account" ? "أدخل رقم الحساب" : "أدخل رقم السجل التجاري"}
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                className="w-full border-b-2 border-gray-200 py-3 px-2 text-center text-xl focus:outline-none focus:border-red-600 transition-colors placeholder:text-gray-300"
+                className="ooredoo-input"
               />
               
               <button 
                 onClick={handleContinue}
                 disabled={inputValue.length < 8}
-                className="w-full mt-8 bg-red-600 text-white py-4 rounded-full text-lg font-bold hover:bg-red-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="ooredoo-btn-red w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 تابع
               </button>
             </div>
           </div>
 
-          {/* Quick Links */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12">
-            <div className="bg-gray-50 p-4 rounded-lg text-center cursor-pointer hover:bg-gray-100 transition-colors">
-              <div className="text-red-600 font-bold text-sm mb-1">هلا (مسبق الدفع)</div>
+          {/* Quick Links Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16">
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:border-red-600 transition-all cursor-pointer group">
+              <span className="text-red-600 font-bold group-hover:text-red-700">هلا (مسبق الدفع)</span>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg text-center cursor-pointer hover:bg-gray-100 transition-colors">
-              <div className="text-red-600 font-bold text-sm mb-1">O Plus (آجل الدفع)</div>
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:border-red-600 transition-all cursor-pointer group">
+              <span className="text-red-600 font-bold group-hover:text-red-700">O Plus (آجل الدفع)</span>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg text-center cursor-pointer hover:bg-gray-100 transition-colors">
-              <div className="text-red-600 font-bold text-sm mb-1">الإنترنت المنزلي</div>
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:border-red-600 transition-all cursor-pointer group">
+              <span className="text-red-600 font-bold group-hover:text-red-700">الإنترنت المنزلي</span>
             </div>
-            <div className="bg-gray-50 p-4 rounded-lg text-center cursor-pointer hover:bg-gray-100 transition-colors">
-              <div className="text-red-600 font-bold text-sm mb-1">تتبع الطلب</div>
+            <div className="bg-gray-50 p-6 rounded-xl border border-gray-100 hover:border-red-600 transition-all cursor-pointer group">
+              <span className="text-red-600 font-bold group-hover:text-red-700">تتبع الطلب</span>
             </div>
           </div>
         </div>
