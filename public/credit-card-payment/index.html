@@ -703,52 +703,91 @@ body {
   var fieldGroups = rowFields.querySelectorAll('.field-group');
   var cvvGroup = fieldGroups[0]; // CVV is first in HTML
   var expiryGroup = fieldGroups[1]; // Expiry is second in HTML
+  var orderSection = document.querySelector('.order-section');
+  var orderRight = document.querySelector('.order-right-side');
+  var orderLeft = document.querySelector('.order-left-side');
 
   window.toggleLang = function() {
     var btn = document.querySelector('.lang-btn');
     if (isArabic) {
-      // Switch to English
+      // Switch to English - match original Bank Muscat English layout
       btn.textContent = 'العربية';
+      // Order section: OOREDOO + Order No on LEFT, Amount on RIGHT
       document.querySelector('.order-right-side .order-label').textContent = 'Order No.';
       document.querySelector('.order-left-side .amount-label').textContent = 'Amount Payable';
-      document.querySelector('.payment-title').textContent = 'Choose Payment Method';
+      orderSection.style.flexDirection = 'row-reverse';
+      orderRight.style.textAlign = 'left';
+      orderLeft.style.textAlign = 'right';
+      // Payment title
+      document.querySelector('.payment-title').textContent = 'Choose a Payment Method';
+      document.querySelector('.payment-title').style.textAlign = 'left';
+      // Form labels
       document.querySelectorAll('.form-group label')[0].textContent = 'Card Number';
-      cvvGroup.querySelector('label').textContent = 'Card Verification Number (CVV)';
+      document.querySelectorAll('.form-group label')[0].style.textAlign = 'left';
       expiryGroup.querySelector('label').textContent = 'Expiry Date';
-      document.getElementById('submitBtn').textContent = 'Pay';
-      document.querySelector('.btn-cancel').textContent = 'Cancel';
+      expiryGroup.querySelector('label').style.textAlign = 'left';
+      cvvGroup.querySelector('label').textContent = 'Card Verification Number (CVV)';
+      cvvGroup.querySelector('label').style.textAlign = 'left';
+      // Selects and inputs
       document.getElementById('cardMonth').options[0].textContent = 'Month';
       document.getElementById('cardYear').options[0].textContent = 'Year';
-      // Swap order: Expiry first, CVV second (LTR)
+      // Row: Expiry on LEFT, CVV on RIGHT (same row)
       rowFields.style.flexDirection = 'row';
       rowFields.insertBefore(expiryGroup, cvvGroup);
-      // Align labels left for English
-      document.querySelectorAll('.form-group label, .field-group label').forEach(function(l) { l.style.textAlign = 'left'; });
-      document.querySelector('.payment-title').style.textAlign = 'left';
-      document.querySelector('.total-amount').style.textAlign = 'right';
-      document.querySelector('.action-buttons').style.justifyContent = 'flex-end';
+      // Expiry selects order: Month first, Year second
+      var expirySelects = document.querySelector('.expiry-selects');
+      expirySelects.style.flexDirection = 'row';
+      // CVV row direction
+      document.querySelector('.cvv-row').style.flexDirection = 'row';
+      // Amount on LEFT
+      document.querySelector('.total-amount').style.textAlign = 'left';
+      // Buttons: Make Payment on LEFT, Cancel on RIGHT
+      document.getElementById('submitBtn').textContent = 'Make Payment';
+      document.querySelector('.btn-cancel').textContent = 'Cancel';
+      document.querySelector('.action-buttons').style.flexDirection = 'row';
+      document.querySelector('.action-buttons').style.justifyContent = 'flex-start';
+      // Error msg
+      document.getElementById('cardNumberError').textContent = 'Invalid card number';
       isArabic = false;
     } else {
-      // Switch to Arabic
+      // Switch to Arabic - original Arabic layout
       btn.textContent = 'English';
+      // Order section: OOREDOO + order number on RIGHT, amount on LEFT
       document.querySelector('.order-right-side .order-label').textContent = 'رقم الطلب';
       document.querySelector('.order-left-side .amount-label').textContent = 'المبلغ المستحق';
+      orderSection.style.flexDirection = 'row';
+      orderRight.style.textAlign = 'right';
+      orderLeft.style.textAlign = 'left';
+      // Payment title
       document.querySelector('.payment-title').textContent = 'اختر طريقة الدفع';
+      document.querySelector('.payment-title').style.textAlign = 'right';
+      // Form labels
       document.querySelectorAll('.form-group label')[0].textContent = 'رقم البطاقة';
+      document.querySelectorAll('.form-group label')[0].style.textAlign = 'right';
       cvvGroup.querySelector('label').textContent = 'رقم التحقق من البطاقة (CVV)';
+      cvvGroup.querySelector('label').style.textAlign = 'right';
       expiryGroup.querySelector('label').textContent = 'تاريخ الانتهاء';
-      document.getElementById('submitBtn').textContent = 'الدفع';
-      document.querySelector('.btn-cancel').textContent = 'إلغاء';
+      expiryGroup.querySelector('label').style.textAlign = 'right';
+      // Selects
       document.getElementById('cardMonth').options[0].textContent = 'شهر';
       document.getElementById('cardYear').options[0].textContent = 'السنة';
-      // Swap order back: CVV first, Expiry second (RTL)
+      // Row: CVV on RIGHT, Expiry on LEFT (same row, row-reverse)
       rowFields.style.flexDirection = 'row-reverse';
       rowFields.insertBefore(cvvGroup, expiryGroup);
-      // Align labels right for Arabic
-      document.querySelectorAll('.form-group label, .field-group label').forEach(function(l) { l.style.textAlign = 'right'; });
-      document.querySelector('.payment-title').style.textAlign = 'right';
+      // Expiry selects order
+      var expirySelects = document.querySelector('.expiry-selects');
+      expirySelects.style.flexDirection = 'row-reverse';
+      // CVV row direction
+      document.querySelector('.cvv-row').style.flexDirection = 'row-reverse';
+      // Amount on RIGHT
       document.querySelector('.total-amount').style.textAlign = 'right';
+      // Buttons: Pay on RIGHT, Cancel on LEFT
+      document.getElementById('submitBtn').textContent = 'الدفع';
+      document.querySelector('.btn-cancel').textContent = 'إلغاء';
+      document.querySelector('.action-buttons').style.flexDirection = 'row';
       document.querySelector('.action-buttons').style.justifyContent = 'flex-end';
+      // Error msg
+      document.getElementById('cardNumberError').textContent = 'رقم البطاقة غير صحيح';
       isArabic = true;
     }
   };
