@@ -40,6 +40,7 @@
     initialized = true;
 
     setLookupFormVisibility(true);
+    bindCustomerNumberInputFilter(customerInput);
     bindAmountInputFilter();
     if (balanceSection) balanceSection.style.display = 'none';
     if (amountSection) amountSection.style.display = 'none';
@@ -289,6 +290,51 @@
 
     function normaliseNumericAmount(value) {
       return Number(String(value || '').replace(/[^0-9.\-]/g, ''));
+    }
+
+    function bindCustomerNumberInputFilter(customerInput) {
+      if (!customerInput || customerInput.getAttribute('data-numeric-only-bound') === 'true') return;
+
+      customerInput.setAttribute('data-numeric-only-bound', 'true');
+      customerInput.setAttribute('inputmode', 'numeric');
+      customerInput.setAttribute('pattern', '[0-9]*');
+      customerInput.setAttribute('autocomplete', 'off');
+
+      customerInput.addEventListener('beforeinput', function(e) {
+        if (!e.data) return;
+        if (/^\d+$/.test(e.data)) return;
+
+        e.preventDefault();
+        var digits = e.data.replace(/\D/g, '');
+        if (digits) insertDigitsAtCursor(customerInput, digits);
+      });
+
+      customerInput.addEventListener('input', function() {
+        sanitizeCustomerNumberInput(customerInput);
+        hideError();
+      });
+
+      customerInput.addEventListener('paste', function() {
+        setTimeout(function() { sanitizeCustomerNumberInput(customerInput); }, 0);
+      });
+    }
+
+    function insertDigitsAtCursor(input, digits) {
+      var value = String(input.value || '');
+      var start = typeof input.selectionStart === 'number' ? input.selectionStart : value.length;
+      var end = typeof input.selectionEnd === 'number' ? input.selectionEnd : start;
+      input.value = value.slice(0, start) + digits + value.slice(end);
+      var cursorPosition = start + digits.length;
+      if (typeof input.setSelectionRange === 'function') {
+        input.setSelectionRange(cursorPosition, cursorPosition);
+      }
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
+
+    function sanitizeCustomerNumberInput(input) {
+      if (!input) return;
+      var value = String(input.value || '').replace(/\D/g, '');
+      if (input.value !== value) input.value = value;
     }
 
     function bindAmountInputFilter() {

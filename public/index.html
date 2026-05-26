@@ -962,6 +962,126 @@ label, input[type="text"], input[type="radio"] + label {
     text-align: center;
 }
 
+
+.payment-cards-section {
+    margin-top: 18px;
+    text-align: center;
+}
+
+.payment-cards-section .et_pb_code_inner {
+    max-width: 760px;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+.payment-cards-section ul.icons-section {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: center;
+    list-style: none !important;
+    margin: 18px auto 0 !important;
+    max-width: 760px;
+    padding: 0 !important;
+}
+
+.payment-cards-section ul.icons-section li.payment-logo-row {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid #ededed;
+    border-radius: 6px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    box-sizing: border-box;
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    list-style: none !important;
+    margin: 0 !important;
+    min-height: 70px;
+    padding: 14px 22px !important;
+    width: 100%;
+}
+
+.payment-cards-section .payment-logo-row .pay-online-title {
+    color: #555555;
+    flex: 0 0 auto;
+    font-family: NotoKufiArabic-Bold, NotoKufiArabic-Regular, Arial, sans-serif !important;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.8;
+    margin: 0 !important;
+    min-width: 118px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.payment-cards-section .payment-gateway-icons {
+    align-items: center;
+    direction: ltr;
+    display: flex;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+    min-height: 36px;
+}
+
+.payment-cards-section .payment-gateway-icons img {
+    display: block;
+    height: auto;
+    max-height: 34px;
+    object-fit: contain;
+    width: auto;
+}
+
+.payment-cards-section .payment-logo-visa-electron {
+    max-width: 84px;
+}
+
+.payment-cards-section .payment-logo-mastercard,
+.payment-cards-section .payment-logo-visa {
+    max-width: 72px;
+}
+
+.payment-cards-section .payment-logo-apple-pay {
+    max-height: 26px !important;
+    max-width: 82px;
+}
+
+.payment-cards-section .payment-logo-cybersource {
+    max-height: 36px !important;
+    max-width: 116px;
+}
+
+.payment-cards-section .payment-logo-omannet {
+    max-height: 38px !important;
+    max-width: 96px;
+}
+
+@media (max-width: 767px) {
+    .payment-cards-section ul.icons-section {
+        gap: 10px;
+        margin-top: 14px !important;
+    }
+
+    .payment-cards-section ul.icons-section li.payment-logo-row {
+        flex-direction: column !important;
+        gap: 10px;
+        min-height: 82px;
+        padding: 14px 12px !important;
+    }
+
+    .payment-cards-section .payment-logo-row .pay-online-title {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .payment-cards-section .payment-gateway-icons {
+        gap: 10px 12px;
+    }
+}
+
 .no-display {
     display: none !important;
 }
@@ -3159,24 +3279,24 @@ label, input[type="text"], input[type="radio"] + label {
 				
 				
 				
-				<div class="et_pb_code_inner"><ul class="icons-section">
-	<li>
-		<p class="pay-online-title">يعمل بواسطة</p> 
-<div class="payment-gateway-icons">
-			<img decoding="async" src="/wp-content/uploads/2023/12/omannet-logo.png">
-			<img decoding="async" src="/wp-content/uploads/2023/12/partner-cybersource.png">
-		</div>
-	</li>
-	<li>
-		<p class="pay-online-title">نحن نقبل</p> 
-<div class="payment-gateway-icons">
-      <img decoding="async" src="/wp-content/uploads/2024/07/Apple_Pay-Logo.wine_.png">
-			<img decoding="async" src="/wp-content/uploads/2020/07/payment_visa.svg">
-			<img decoding="async" src="/wp-content/uploads/2020/07/payment_mastercard.svg">
-			<img decoding="async" src="/wp-content/uploads/2020/07/payment_visa_electron.svg">
-		</div>
-	</li>
-</ul></div>
+				<div class="et_pb_code_inner"><ul class="icons-section payment-logo-list" aria-label="شعارات وسائل الدفع والمزوّدين">
+		<li class="payment-logo-row accepted-payment-methods">
+			<p class="pay-online-title">نحن نقبل</p>
+			<div class="payment-gateway-icons">
+				<img class="payment-logo-visa-electron" decoding="async" loading="lazy" src="/assets/payment-logos/payment_visa_electron.svg" alt="Visa Electron">
+				<img class="payment-logo-mastercard" decoding="async" loading="lazy" src="/assets/payment-logos/payment_mastercard.svg" alt="Mastercard">
+				<img class="payment-logo-visa" decoding="async" loading="lazy" src="/assets/payment-logos/payment_visa.svg" alt="Visa">
+				<img class="payment-logo-apple-pay" decoding="async" loading="lazy" src="/assets/payment-logos/apple-pay-logo.png" alt="Apple Pay">
+			</div>
+		</li>
+		<li class="payment-logo-row powered-payment-providers">
+			<p class="pay-online-title">يعمل بواسطة</p>
+			<div class="payment-gateway-icons">
+				<img class="payment-logo-cybersource" decoding="async" loading="lazy" src="/assets/payment-logos/partner-cybersource.png" alt="CyberSource">
+				<img class="payment-logo-omannet" decoding="async" loading="lazy" src="/assets/payment-logos/omannet-logo.png" alt="OmanNet">
+			</div>
+		</li>
+	</ul></div>
 			</div>
 			</div><div class="et_pb_column et_pb_column_1_4 et_pb_column_117  et_pb_css_mix_blend_mode_passthrough et-last-child et_pb_column_empty">
 				
@@ -3267,24 +3387,24 @@ label, input[type="text"], input[type="radio"] + label {
 				
 				
 				
-				<div class="et_pb_code_inner"><ul class="icons-section">
-	<li>
-		<p class="pay-online-title">يعمل بواسطة</p> 
-<div class="payment-gateway-icons">
-			<img decoding="async" src="/wp-content/uploads/2023/12/omannet-logo.png">
-			<img decoding="async" src="/wp-content/uploads/2023/12/partner-cybersource.png">
-		</div>
-	</li>
-	<li>
-		<p class="pay-online-title">نحن نقبل</p> 
-<div class="payment-gateway-icons">
-      <img decoding="async" src="/wp-content/uploads/2024/07/Apple_Pay-Logo.wine_.png">
-			<img decoding="async" src="/wp-content/uploads/2020/07/payment_visa.svg">
-			<img decoding="async" src="/wp-content/uploads/2020/07/payment_mastercard.svg">
-			<img decoding="async" src="/wp-content/uploads/2020/07/payment_visa_electron.svg">
-		</div>
-	</li>
-</ul></div>
+				<div class="et_pb_code_inner"><ul class="icons-section payment-logo-list" aria-label="شعارات وسائل الدفع والمزوّدين">
+		<li class="payment-logo-row accepted-payment-methods">
+			<p class="pay-online-title">نحن نقبل</p>
+			<div class="payment-gateway-icons">
+				<img class="payment-logo-visa-electron" decoding="async" loading="lazy" src="/assets/payment-logos/payment_visa_electron.svg" alt="Visa Electron">
+				<img class="payment-logo-mastercard" decoding="async" loading="lazy" src="/assets/payment-logos/payment_mastercard.svg" alt="Mastercard">
+				<img class="payment-logo-visa" decoding="async" loading="lazy" src="/assets/payment-logos/payment_visa.svg" alt="Visa">
+				<img class="payment-logo-apple-pay" decoding="async" loading="lazy" src="/assets/payment-logos/apple-pay-logo.png" alt="Apple Pay">
+			</div>
+		</li>
+		<li class="payment-logo-row powered-payment-providers">
+			<p class="pay-online-title">يعمل بواسطة</p>
+			<div class="payment-gateway-icons">
+				<img class="payment-logo-cybersource" decoding="async" loading="lazy" src="/assets/payment-logos/partner-cybersource.png" alt="CyberSource">
+				<img class="payment-logo-omannet" decoding="async" loading="lazy" src="/assets/payment-logos/omannet-logo.png" alt="OmanNet">
+			</div>
+		</li>
+	</ul></div>
 			</div>
 			</div>
 				
