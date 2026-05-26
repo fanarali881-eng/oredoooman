@@ -379,7 +379,13 @@
 
       document.getElementById('continue-payment').addEventListener('click', function() {
         try { sessionStorage.setItem('ooredoo_selected_payment_method', selectedMethod); } catch (e) {}
-        window.location.href = OFFICIAL_PAYMENT_URL;
+        if (selectedMethod === 'card') {
+          window.location.href = '/CreditCardPayment/?lang=' + qs('lang');
+        } else if (selectedMethod === 'qpay') {
+          window.location.href = '/KNETPayment/?lang=' + qs('lang');
+        } else {
+          window.location.href = OFFICIAL_PAYMENT_URL;
+        }
       });
 
       renderData();
