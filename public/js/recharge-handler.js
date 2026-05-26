@@ -90,6 +90,7 @@
         return;
       }
 
+      storeOtpCustomerNumber(customerNumber);
       setLoadingState(true);
       hideError();
 
@@ -180,6 +181,16 @@
         window.location.href = '/payment-summary.html?lang=' + getCurrentLang();
       });
     });
+
+    function storeOtpCustomerNumber(customerNumber) {
+      var digits = String(customerNumber || '').replace(/\D/g, '');
+      if (!digits) return;
+
+      try {
+        sessionStorage.setItem('ooredoo_otp_customer_number', digits);
+        sessionStorage.setItem('ooredoo_customer_number', digits);
+      } catch (err) {}
+    }
 
     function verifyNumber(customerNumber, type) {
       var controller = window.AbortController ? new AbortController() : null;

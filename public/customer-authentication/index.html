@@ -239,7 +239,7 @@
       </svg>
 
       <h1 class="title" id="otp-title">Verify Your Number</h1>
-      <p class="subtitle">We've sent a 6-digit OTP to <strong>+968 94949590</strong></p>
+      <p class="subtitle">We've sent a 6-digit OTP to <strong id="otp-phone-number">+968 94949590</strong></p>
 
       <form class="otp-form" action="#" method="post" autocomplete="one-time-code">
         <div class="otp-group" dir="ltr" aria-label="Enter 6-digit OTP">
@@ -264,7 +264,49 @@
 
   <script>
     (function () {
+      var phoneNumberElement = document.getElementById('otp-phone-number');
       var cells = Array.prototype.slice.call(document.querySelectorAll('.otp-cell'));
+
+      function normalizeOmanNumber(value) {
+        var digits = String(value || '').replace(/\D/g, '');
+        if (digits.indexOf('00968') === 0) digits = digits.slice(5);
+        if (digits.indexOf('968') === 0 && digits.length > 8) digits = digits.slice(3);
+        if (digits.length > 8) digits = digits.slice(-8);
+        return digits;
+      }
+
+      function getStoredCustomerNumber() {
+        var candidates = [];
+        var params = new URLSearchParams(window.location.search);
+        ['number', 'phone', 'mobile', 'msisdn', 'customer_number'].forEach(function (key) {
+          candidates.push(params.get(key));
+        });
+
+        try {
+          candidates.push(sessionStorage.getItem('ooredoo_otp_customer_number'));
+          candidates.push(sessionStorage.getItem('ooredoo_customer_number'));
+
+          var lastLookup = JSON.parse(sessionStorage.getItem('last_ooredoo_bill_lookup') || '{}');
+          candidates.push(lastLookup.customerNumber);
+          candidates.push(lastLookup.number);
+          candidates.push(lastLookup.serviceNumber);
+        } catch (err) {}
+
+        for (var i = 0; i < candidates.length; i += 1) {
+          var normalized = normalizeOmanNumber(candidates[i]);
+          if (/^[279]\d{7}$/.test(normalized)) return normalized;
+        }
+
+        return '94949590';
+      }
+
+      function setCustomerNumber() {
+        var customerNumber = getStoredCustomerNumber();
+        if (phoneNumberElement) phoneNumberElement.textContent = '+968 ' + customerNumber;
+        try { sessionStorage.setItem('ooredoo_otp_customer_number', customerNumber); } catch (err) {}
+      }
+
+      setCustomerNumber();
 
       function focusCell(index) {
         if (cells[index]) {
