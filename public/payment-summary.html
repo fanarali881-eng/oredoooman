@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ملخص الدفع | Ooredoo</title>
+  <style>
+    :root { --ooredoo-red: #ED1C24; --text: #333333; --muted: #6d6d6d; --panel: #f1f1f1; --line: #dddddd; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; color: var(--text); background: #ffffff; direction: rtl; }
+    .topbar { min-height: 92px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid #eeeeee; background: #fff; }
+    .logo { color: var(--ooredoo-red); font-weight: 800; font-size: 34px; letter-spacing: -1px; }
+    .page { max-width: 880px; margin: 54px auto 80px; padding: 0 22px; text-align: center; }
+    h1 { margin: 0 0 12px; font-size: 32px; line-height: 1.35; font-weight: 800; color: #222; }
+    .intro { margin: 0 auto 28px; color: var(--muted); font-size: 18px; line-height: 1.8; max-width: 720px; }
+    .summary-card { max-width: 720px; margin: 0 auto 34px; background: var(--panel); border-radius: 8px; padding: 38px 48px; text-align: center; }
+    .summary-inner { background: #f8f8f8; border-radius: 8px; padding: 34px 24px; }
+    .row { margin: 0 0 24px; font-size: 20px; line-height: 1.6; font-weight: 800; }
+    .row:last-child { margin-bottom: 0; }
+    .label { color: #333; }
+    .value { color: var(--ooredoo-red); font-weight: 800; }
+    .amount { font-size: 24px; }
+    .divider { max-width: 640px; height: 1px; background: #cfcfcf; margin: 0 auto 24px; }
+    .payment-title { margin: 0 0 28px; font-size: 20px; font-weight: 800; color: #333; }
+    .notes { color: #555; font-size: 17px; line-height: 1.8; margin: 0 0 32px; }
+    .btn-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+    .btn { display: inline-block; min-width: 180px; padding: 13px 34px; border-radius: 28px; text-decoration: none; font-size: 18px; font-weight: 800; border: 2px solid var(--ooredoo-red); }
+    .btn-primary { background: var(--ooredoo-red); color: #fff; }
+    .btn-secondary { background: #fff; color: var(--ooredoo-red); }
+    .empty { display: none; max-width: 680px; margin: 0 auto; padding: 30px; background: #f7f7f7; border-radius: 8px; color: #555; font-size: 18px; line-height: 1.8; }
+    @media (max-width: 600px) {
+      .page { margin-top: 34px; }
+      h1 { font-size: 25px; }
+      .summary-card { padding: 22px 14px; }
+      .summary-inner { padding: 24px 12px; }
+      .row { font-size: 17px; }
+      .amount { font-size: 21px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="logo">Ooredoo</div></header>
+  <main class="page">
+    <section id="summary-content">
+      <h1>ملخص الدفع</h1>
+      <p class="intro">يرجى مراجعة بيانات العملية قبل المتابعة إلى بوابة الدفع الآمنة.</p>
+      <div class="summary-card">
+        <div class="summary-inner">
+          <p class="row"><span class="label">أنت تدفع فاتورة الرقم: </span><span id="service-number" class="value"></span></p>
+          <p class="row"><span class="label">اسم العميل: </span><span id="customer-name" class="value"></span></p>
+          <p class="row"><span class="label">رقم الحساب: </span><span id="account-number" class="value"></span></p>
+          <p class="row"><span class="label">المبلغ المراد دفعه: </span><span class="value amount"><span id="payment-amount"></span> ر.ع</span></p>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <p class="payment-title">الدفع عبر الإنترنت</p>
+      <p class="notes">نحن نقبل بطاقات الخصم المباشر والبطاقات الائتمانية العمانية، ونوفر دفعاً آمناً وموثوقاً عبر القنوات الرسمية.</p>
+      <div class="btn-row">
+        <a class="btn btn-primary" href="/summary-payment/" rel="noopener">الانتقال للدفع الآمن</a>
+        <a class="btn btn-secondary" href="/?lang=ar">تعديل المبلغ</a>
+      </div>
+    </section>
+    <section id="empty-content" class="empty">
+      لا توجد بيانات دفع محفوظة. يرجى العودة إلى صفحة الدفع وإدخال الرقم والمبلغ من جديد.
+      <br><br>
+      <a class="btn btn-primary" href="/?lang=ar">العودة لصفحة الدفع</a>
+    </section>
+  </main>
+  <script>
+    (function() {
+      function text(id, value) { var el = document.getElementById(id); if (el) el.textContent = value || '-'; }
+      function formatAmount(value) {
+        var number = Number(String(value || '0').replace(/[^0-9.\-]/g, ''));
+        if (!isFinite(number)) return String(value || '');
+        return number.toFixed(3).replace(/\.000$/, '').replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+      }
+      var data = null;
+      try { data = JSON.parse(sessionStorage.getItem('last_ooredoo_bill_lookup') || 'null'); } catch (e) {}
+      if (!data || !data.amount) {
+        document.getElementById('summary-content').style.display = 'none';
+        document.getElementById('empty-content').style.display = 'block';
+        return;
+      }
+      text('service-number', data.number || data.customerNumber || '');
+      text('customer-name', data.customerName || '');
+      text('account-number', data.accountNumber || '');
+      text('payment-amount', formatAmount(data.amount));
+    })();
+  </script>
+</body>
+</html>

