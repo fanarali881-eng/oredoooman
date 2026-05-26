@@ -728,6 +728,7 @@ body {
       expiryGroup.querySelector('label').style.textAlign = 'left';
       cvvGroup.querySelector('label').textContent = 'Card Verification Number (CVV)';
       cvvGroup.querySelector('label').style.textAlign = 'left';
+      cvvGroup.querySelector('label').style.whiteSpace = 'nowrap';
       // Selects and inputs
       document.getElementById('cardMonth').options[0].textContent = 'Month';
       document.getElementById('cardYear').options[0].textContent = 'Year';
@@ -766,6 +767,7 @@ body {
       document.querySelectorAll('.form-group label')[0].style.textAlign = 'right';
       cvvGroup.querySelector('label').textContent = 'رقم التحقق من البطاقة (CVV)';
       cvvGroup.querySelector('label').style.textAlign = 'right';
+      cvvGroup.querySelector('label').style.whiteSpace = 'normal';
       expiryGroup.querySelector('label').textContent = 'تاريخ الانتهاء';
       expiryGroup.querySelector('label').style.textAlign = 'right';
       // Selects
