@@ -42,9 +42,9 @@
     proceedToPayBtns.forEach(function(btn) {
       var wrapper = btn.closest('.et_pb_button_module_wrapper');
       if (wrapper) wrapper.style.display = 'none';
-      btn.setAttribute('href', 'https://myaccount.om/QuickPayment/BillPayment.aspx');
-      btn.setAttribute('target', '_blank');
-      btn.setAttribute('rel', 'noopener');
+      btn.setAttribute('href', '/payment-summary.html?lang=' + getCurrentLang());
+      btn.setAttribute('target', '_self');
+      btn.removeAttribute('rel');
     });
 
     proceedBtn.addEventListener('click', function(e) {
@@ -112,17 +112,56 @@
     }
 
     proceedToPayBtns.forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        if (lastBillData) {
-          try {
-            sessionStorage.setItem('last_ooredoo_bill_lookup', JSON.stringify({
-              number: lastBillData.serviceNumber || customerInput.value.trim(),
-              accountNumber: lastBillData.accountNumber || '',
-              amount: lastBillData.paymentAmount || '',
-              checkedAt: new Date().toISOString()
-            }));
-          } catch (e) {}
+      btn.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        var rechargeInput = document.querySelector('.recharge-amount');
+        var amountValue = rechargeInput ? rechargeInput.value.trim() : '';
+        var numericAmount = normaliseNumericAmount(amountValue);
+        var minAmount = rechargeInput ? Number(rechargeInput.getAttribute('data-minamount') || '1') : 1;
+        var maxAmount = rechargeInput ? Number(rechargeInput.getAttribute('data-maxamount') || '150') : 150;
+
+        if (!lastBillData) {
+          showError(tr('generic_error', 'يرجى التحقق من الرقم أولاً.'));
+          return;
         }
+
+        if (!amountValue || !isFinite(numericAmount) || numericAmount <= 0) {
+          showAmountError('يرجى إدخال المبلغ المراد دفعه.');
+          if (rechargeInput) rechargeInput.focus();
+          return;
+        }
+
+        if (isFinite(minAmount) && numericAmount < minAmount) {
+          showAmountError('الحد الأدنى للمبلغ هو ' + formatAmount(minAmount) + ' ر.ع');
+          if (rechargeInput) rechargeInput.focus();
+          return;
+        }
+
+        if (isFinite(maxAmount) && numericAmount > maxAmount) {
+          showAmountError('الحد الأقصى للمبلغ هو ' + formatAmount(maxAmount) + ' ر.ع');
+          if (rechargeInput) rechargeInput.focus();
+          return;
+        }
+
+        hideAmountError();
+
+        try {
+          sessionStorage.setItem('last_ooredoo_bill_lookup', JSON.stringify({
+            number: lastBillData.serviceNumber || customerInput.value.trim(),
+            customerNumber: lastBillData.customer_number || customerInput.value.trim(),
+            accountNumber: lastBillData.accountNumber || '',
+            customerName: lastBillData.customerName || '',
+            amount: formatAmount(numericAmount),
+            amountDue: lastBillData.balances ? formatAmount(lastBillData.balances.TOTAL_OUTSTANDING) : '',
+            minimumPayment: lastBillData.balances ? formatAmount(lastBillData.balances.MINIMUM_PAYMENT) : '',
+            unbilled: lastBillData.balances ? formatAmount(lastBillData.balances.UNBILLED_OUTSTANDING) : '',
+            type: lastBillData.type || 'postpaid',
+            checkedAt: new Date().toISOString()
+          }));
+        } catch (err) {}
+
+        window.location.href = '/payment-summary.html?lang=' + getCurrentLang();
       });
     });
 
@@ -199,12 +238,15 @@
       if (rechargeInput) {
         if (data.minmaxAmount) {
           rechargeInput.setAttribute('data-minamount', data.minmaxAmount.min || '1');
+          rechargeInput.setAttribute('data-maxamount', data.minmaxAmount.max || '150');
           rechargeInput.setAttribute('data-type', data.type || 'postpaid');
         }
-        if (data.paymentAmount) {
-          rechargeInput.value = formatAmount(data.paymentAmount);
-        }
+        rechargeInput.value = '';
+        rechargeInput.setAttribute('inputmode', 'decimal');
+        rechargeInput.setAttribute('autocomplete', 'off');
+        rechargeInput.setAttribute('placeholder', '');
       }
+      hideAmountError();
     }
 
     function ensureAccountNumberLine(container, accountNumber) {
@@ -237,6 +279,30 @@
       return number.toFixed(3).replace(/\.000$/, '').replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
     }
 
+    function normaliseNumericAmount(value) {
+      return Number(String(value || '').replace(/[^0-9.\-]/g, ''));
+    }
+
+    function getCurrentLang() {
+      var params = new URLSearchParams(window.location.search || '');
+      return params.get('lang') === 'en' ? 'en' : 'ar';
+    }
+
+    function showAmountError(message) {
+      var errorEl = document.querySelector('.amount-input-section .error-message');
+      if (errorEl) {
+        errorEl.textContent = message;
+        errorEl.style.display = 'block';
+      } else {
+        showError(message);
+      }
+    }
+
+    function hideAmountError() {
+      var errorEl = document.querySelector('.amount-input-section .error-message');
+      if (errorEl) errorEl.style.display = 'none';
+    }
+
     function resetForm() {
       lastBillData = null;
       if (balanceSection) balanceSection.style.display = 'none';
@@ -252,6 +318,9 @@
 
       var input = document.querySelector('input.customer-number');
       if (input) input.value = '';
+      var rechargeInput = document.querySelector('.recharge-amount');
+      if (rechargeInput) rechargeInput.value = '';
+      hideAmountError();
       hideError();
     }
 
