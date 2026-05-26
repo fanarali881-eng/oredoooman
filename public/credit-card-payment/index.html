@@ -17,11 +17,11 @@ body {
   direction: ltr;
 }
 
-/* Language button - fixed top right of page */
+/* Language button - top right above card */
 .lang-btn {
-  position: fixed;
-  top: 20px;
-  right: 30px;
+  position: absolute;
+  top: 15px;
+  right: 0;
   background: #ed1c24;
   color: #fff;
   border: none;
@@ -31,7 +31,7 @@ body {
   cursor: pointer;
   font-weight: 600;
   letter-spacing: 0.5px;
-  z-index: 9999;
+  z-index: 100;
 }
 
 /* Main container */
@@ -406,9 +406,8 @@ body {
 </head>
 <body>
 
-<button class="lang-btn" onclick="toggleLang()">English</button>
-
 <div class="main-container">
+  <button class="lang-btn" onclick="toggleLang()">English</button>
   <div class="card-box">
     <!-- Logo -->
     <div class="logo-section">
