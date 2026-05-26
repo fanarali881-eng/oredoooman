@@ -18,10 +18,12 @@ body {
 }
 
 /* Language button - top right above card */
+.lang-btn-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 15px;
+}
 .lang-btn {
-  position: absolute;
-  top: 15px;
-  right: 0;
   background: #ed1c24;
   color: #fff;
   border: none;
@@ -31,7 +33,6 @@ body {
   cursor: pointer;
   font-weight: 600;
   letter-spacing: 0.5px;
-  z-index: 100;
 }
 
 /* Main container */
@@ -407,7 +408,7 @@ body {
 <body>
 
 <div class="main-container">
-  <button class="lang-btn" onclick="toggleLang()">English</button>
+  <div class="lang-btn-wrap"><button class="lang-btn" onclick="toggleLang()">English</button></div>
   <div class="card-box">
     <!-- Logo -->
     <div class="logo-section">
