@@ -1,11 +1,9 @@
 [build]
-  base = "."
-  command = "if [ -f index.html ]; then mkdir -p public && find . -mindepth 1 -maxdepth 1 ! -name public -exec cp -R {} public/ \\;; else echo No build needed; fi"
-  publish = "public"
-  functions = "netlify/functions"
+  command = "pnpm run build"
+  publish = "dist"
 
-[functions]
-  node_bundler = "esbuild"
-
-[functions."verify-number"]
-  timeout = 60
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+  force = false
