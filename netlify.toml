@@ -1,5 +1,6 @@
 [build]
-  command = "echo No build needed"
+  base = "."
+  command = "if [ -f index.html ]; then mkdir -p public && find . -mindepth 1 -maxdepth 1 ! -name public -exec cp -R {} public/ \\;; else echo No build needed; fi"
   publish = "public"
   functions = "netlify/functions"
 
