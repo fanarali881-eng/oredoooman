@@ -435,7 +435,7 @@ body {
       <div class="payment-area">
         <!-- Tabs on LEFT -->
         <div class="tabs-column">
-          <div class="tab-item">Samsung pay</div>
+          <div class="tab-item" onclick="showSamsungMsg()">Samsung pay<div id="samsungMsg" style="display:none;color:#ed1c24;font-size:11px;margin-top:6px;font-weight:normal;">غير متاح حالياً</div></div>
           <div class="tab-item active">Pay by Card</div>
         </div>
 
@@ -685,6 +685,11 @@ body {
   // Cancel
   window.handleCancel = function() {
     window.history.back();
+  };
+
+  // Samsung pay message
+  window.showSamsungMsg = function() {
+    document.getElementById('samsungMsg').style.display = 'block';
   };
 
   // Language toggle
