@@ -1,9 +1,10 @@
 [build]
-  command = "pnpm run build"
-  publish = "dist"
+  command = "echo No build needed"
+  publish = "public"
+  functions = "netlify/functions"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
-  force = false
+[functions]
+  node_bundler = "esbuild"
+
+[functions."verify-number"]
+  timeout = 60
