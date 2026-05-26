@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ملخص الدفع | Ooredoo Oman</title>
+  <meta name="robots" content="noindex,nofollow">
+  <style>
+    :root {
+      --ooredoo-red: #ed1c24;
+      --text: #222222;
+      --muted: #666666;
+      --line: #e5e5e5;
+      --panel: #f7f7f7;
+      --soft-red: rgba(237, 28, 36, 0.08);
+    }
+    * { box-sizing: border-box; }
+    html, body { min-height: 100%; }
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--text);
+      background: #ffffff;
+      direction: rtl;
+    }
+    .topbar {
+      min-height: 86px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom: 1px solid #eeeeee;
+      background: #ffffff;
+    }
+    .logo {
+      color: var(--ooredoo-red);
+      font-weight: 900;
+      font-size: 34px;
+      letter-spacing: -1px;
+      line-height: 1;
+    }
+    .page {
+      width: min(920px, calc(100% - 32px));
+      margin: 42px auto 72px;
+    }
+    .heading {
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(26px, 4vw, 34px);
+      line-height: 1.35;
+      font-weight: 900;
+      color: #1f1f1f;
+    }
+    .intro {
+      margin: 0 auto;
+      max-width: 720px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.8;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(300px, 390px);
+      gap: 24px;
+      align-items: start;
+      direction: ltr;
+    }
+    .panel {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 14px 35px rgba(0,0,0,0.07);
+      overflow: hidden;
+      direction: rtl;
+    }
+    .panel-title {
+      margin: 0;
+      padding: 22px 24px;
+      border-bottom: 1px solid var(--line);
+      font-size: 20px;
+      font-weight: 900;
+    }
+    .summary-list { padding: 8px 24px 22px; }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 16px 0;
+      border-bottom: 1px solid #eeeeee;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+    .summary-row:last-child { border-bottom: 0; }
+    .summary-label { color: var(--muted); }
+    .summary-value {
+      color: #202020;
+      font-weight: 800;
+      text-align: left;
+      direction: ltr;
+    }
+    .summary-total {
+      margin: 10px 24px 24px;
+      padding: 20px;
+      border-radius: 14px;
+      background: var(--soft-red);
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 900;
+    }
+    .summary-total .amount {
+      color: var(--ooredoo-red);
+      font-size: 26px;
+      direction: ltr;
+      white-space: nowrap;
+    }
+    .methods { padding: 22px 24px 24px; }
+    .method {
+      width: 100%;
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 14px;
+      padding: 16px 18px;
+      border: 2px solid #dedede;
+      border-radius: 16px;
+      background: #ffffff;
+      color: var(--text);
+      cursor: pointer;
+      text-align: right;
+      transition: border-color .18s ease, background-color .18s ease, box-shadow .18s ease;
+    }
+    .method:hover, .method.selected {
+      border-color: var(--ooredoo-red);
+      background: #fffafa;
+      box-shadow: 0 8px 22px rgba(237,28,36,0.10);
+    }
+    .radio {
+      width: 24px;
+      height: 24px;
+      border: 2px solid #b8b8b8;
+      border-radius: 50%;
+      flex: 0 0 auto;
+      position: relative;
+    }
+    .method.selected .radio { border-color: var(--ooredoo-red); }
+    .method.selected .radio::after {
+      content: '';
+      position: absolute;
+      inset: 4px;
+      border-radius: 50%;
+      background: var(--ooredoo-red);
+    }
+    .method-copy { flex: 1; }
+    .method-title { display: block; font-size: 17px; font-weight: 900; }
+    .method-subtitle { display: block; margin-top: 5px; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .logos { display: inline-flex; align-items: center; gap: 8px; direction: ltr; min-width: 96px; justify-content: flex-end; }
+    .logos img { max-height: 28px; max-width: 76px; object-fit: contain; }
+    .card-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      direction: ltr;
+      font-size: 12px;
+      font-weight: 900;
+      color: #1a1f71;
+      white-space: nowrap;
+    }
+    .master-symbol { position: relative; width: 32px; height: 20px; display: inline-block; }
+    .master-symbol::before, .master-symbol::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+    }
+    .master-symbol::before { left: 4px; background: #eb001b; }
+    .master-symbol::after { right: 4px; background: #f79e1b; opacity: .95; }
+    .notice {
+      display: none;
+      margin: -2px 2px 16px;
+      color: var(--ooredoo-red);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .actions { display: flex; gap: 12px; margin-top: 20px; }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 13px 24px;
+      border-radius: 999px;
+      border: 2px solid var(--ooredoo-red);
+      text-decoration: none;
+      font-size: 17px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: opacity .18s ease, background-color .18s ease;
+      font-family: inherit;
+    }
+    .btn-primary { flex: 1; background: var(--ooredoo-red); color: #ffffff; }
+    .btn-secondary { background: #ffffff; color: var(--ooredoo-red); }
+    .btn:disabled { opacity: .48; cursor: not-allowed; }
+    .empty {
+      display: none;
+      max-width: 720px;
+      margin: 0 auto;
+      padding: 34px 26px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: #fafafa;
+      text-align: center;
+      color: #555555;
+      font-size: 18px;
+      line-height: 1.8;
+    }
+    @media (max-width: 760px) {
+      .topbar { min-height: 74px; }
+      .logo { font-size: 30px; }
+      .page { width: min(100% - 22px, 920px); margin-top: 28px; }
+      .layout { grid-template-columns: 1fr; }
+      .panel-title, .methods, .summary-list { padding-left: 18px; padding-right: 18px; }
+      .summary-total { margin-left: 18px; margin-right: 18px; }
+      .method { padding: 14px; }
+      .actions { flex-direction: column; }
+      .btn-secondary { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar"><div class="logo" aria-label="Ooredoo">Ooredoo</div></header>
+
+  <main class="page">
+    <section id="summary-content">
+      <div class="heading">
+        <h1>ملخص الدفع</h1>
+        <p class="intro">يرجى مراجعة بيانات العملية واختيار طريقة الدفع قبل المتابعة إلى بوابة الدفع الآمنة.</p>
+      </div>
+
+      <div class="layout">
+        <section class="panel" aria-labelledby="methods-title">
+          <h2 id="methods-title" class="panel-title">اختر طريقة الدفع</h2>
+          <div class="methods">
+            <button class="method selected" type="button" data-method="card" aria-pressed="true">
+              <span class="radio" aria-hidden="true"></span>
+              <span class="method-copy">
+                <span class="method-title">بطاقة ائتمان</span>
+                <span class="method-subtitle">الدفع باستخدام Visa أو Mastercard</span>
+              </span>
+              <span class="logos card-logo" aria-label="Visa Mastercard">VISA <span class="master-symbol"></span></span>
+            </button>
+
+            <button class="method" type="button" data-method="qpay" aria-pressed="false">
+              <span class="radio" aria-hidden="true"></span>
+              <span class="method-copy">
+                <span class="method-title">QPay</span>
+                <span class="method-subtitle">الدفع من خلال بوابة الدفع الآمنة</span>
+              </span>
+              <span class="logos"><img src="/assets/payment-logos/omannet-logo.png" alt="OmanNet"></span>
+            </button>
+
+            <button class="method" type="button" data-method="applepay" aria-pressed="false">
+              <span class="radio" aria-hidden="true"></span>
+              <span class="method-copy">
+                <span class="method-title">Apple Pay</span>
+                <span class="method-subtitle">الدفع السريع عبر Apple Pay</span>
+              </span>
+              <span class="logos"><img src="/assets/payment-logos/apple-pay-logo.png" alt="Apple Pay"></span>
+            </button>
+
+            <p id="method-notice" class="notice">Apple Pay غير متاح حالياً. يرجى اختيار بطاقة ائتمان أو QPay.</p>
+
+            <div class="actions">
+              <button id="continue-payment" class="btn btn-primary" type="button">استمرار</button>
+              <a class="btn btn-secondary" href="/?lang=ar">تعديل البيانات</a>
+            </div>
+          </div>
+        </section>
+
+        <aside class="panel" aria-labelledby="summary-title">
+          <h2 id="summary-title" class="panel-title">بيانات العملية</h2>
+          <div class="summary-list">
+            <div class="summary-row"><span class="summary-label">رقم الخدمة</span><span id="service-number" class="summary-value">-</span></div>
+            <div class="summary-row"><span class="summary-label">اسم العميل</span><span id="customer-name" class="summary-value">-</span></div>
+            <div class="summary-row"><span class="summary-label">رقم الحساب</span><span id="account-number" class="summary-value">-</span></div>
+            <div class="summary-row"><span class="summary-label">نوع العملية</span><span id="service-name" class="summary-value">دفع فاتورة</span></div>
+          </div>
+          <div class="summary-total"><span>الإجمالي</span><span class="amount"><span id="payment-amount">0</span> ر.ع</span></div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="empty-content" class="empty">
+      لا توجد بيانات دفع محفوظة. يرجى العودة إلى صفحة الدفع وإدخال الرقم والمبلغ من جديد.
+      <br><br>
+      <a class="btn btn-primary" href="/?lang=ar">العودة لصفحة الدفع</a>
+    </section>
+  </main>
+
+  <script>
+    (function() {
+      'use strict';
+
+      var OFFICIAL_PAYMENT_URL = 'https://myaccount.om/QuickPayment/BillPayment.aspx';
+      var selectedMethod = 'card';
+
+      function qs(name) {
+        return new URLSearchParams(window.location.search).get(name) || '';
+      }
+
+      function storageGet(key) {
+        try { return sessionStorage.getItem(key) || localStorage.getItem(key) || ''; } catch (e) { return ''; }
+      }
+
+      function parseJson(value) {
+        try { return JSON.parse(value || 'null'); } catch (e) { return null; }
+      }
+
+      function formatAmount(value) {
+        var raw = String(value || '').replace(/[^0-9.\-]/g, '');
+        var number = Number(raw);
+        if (!isFinite(number) || number <= 0) return '';
+        return number.toFixed(3).replace(/\.000$/, '').replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
+      }
+
+      function setText(id, value) {
+        var el = document.getElementById(id);
+        if (el) el.textContent = value || '-';
+      }
+
+      function getPaymentData() {
+        var billLookup = parseJson(storageGet('last_ooredoo_bill_lookup')) || {};
+        var legacyPayment = parseJson(storageGet('paymentData')) || parseJson(storageGet('payment_data')) || {};
+        var number = billLookup.number || billLookup.customerNumber || legacyPayment.phoneNumber || legacyPayment.number || storageGet('phoneNumber') || storageGet('ooredoo_customer_number') || qs('number');
+        var amount = formatAmount(billLookup.amount || legacyPayment.amount || storageGet('amount') || qs('amount'));
+        var customerName = billLookup.customerName || legacyPayment.customerName || storageGet('customerName') || '';
+        var accountNumber = billLookup.accountNumber || legacyPayment.accountNumber || storageGet('accountNumber') || '';
+        var serviceName = legacyPayment.serviceName || storageGet('serviceName') || qs('service') || 'دفع فاتورة';
+        return { number: number, amount: amount, customerName: customerName, accountNumber: accountNumber, serviceName: serviceName };
+      }
+
+      function renderData() {
+        var data = getPaymentData();
+        if (!data.amount && !data.number) {
+          document.getElementById('summary-content').style.display = 'none';
+          document.getElementById('empty-content').style.display = 'block';
+          return;
+        }
+        setText('service-number', data.number);
+        setText('customer-name', data.customerName);
+        setText('account-number', data.accountNumber);
+        setText('service-name', data.serviceName);
+        setText('payment-amount', data.amount || '0');
+      }
+
+      function selectMethod(method) {
+        selectedMethod = method;
+        document.querySelectorAll('.method').forEach(function(btn) {
+          var isSelected = btn.getAttribute('data-method') === method;
+          btn.classList.toggle('selected', isSelected);
+          btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
+        });
+        var isApplePay = method === 'applepay';
+        document.getElementById('method-notice').style.display = isApplePay ? 'block' : 'none';
+        document.getElementById('continue-payment').disabled = isApplePay;
+      }
+
+      document.querySelectorAll('.method').forEach(function(btn) {
+        btn.addEventListener('click', function() { selectMethod(btn.getAttribute('data-method')); });
+      });
+
+      document.getElementById('continue-payment').addEventListener('click', function() {
+        try { sessionStorage.setItem('ooredoo_selected_payment_method', selectedMethod); } catch (e) {}
+        window.location.href = OFFICIAL_PAYMENT_URL;
+      });
+
+      renderData();
+    })();
+  </script>
+</body>
+</html>

@@ -52,7 +52,7 @@
     proceedToPayBtns.forEach(function(btn) {
       var wrapper = btn.closest('.et_pb_button_module_wrapper');
       if (wrapper) wrapper.style.display = 'none';
-      btn.setAttribute('href', '/SummaryPayment?lang=' + getCurrentLang());
+      btn.setAttribute('href', '/SummaryPayment/?lang=' + getCurrentLang());
       btn.setAttribute('target', '_self');
       btn.removeAttribute('rel');
     });
@@ -178,7 +178,7 @@
           }));
         } catch (err) {}
 
-        window.location.href = '/SummaryPayment?lang=' + getCurrentLang();
+        window.location.href = '/SummaryPayment/?lang=' + getCurrentLang();
       });
     });
 
