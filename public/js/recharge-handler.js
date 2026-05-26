@@ -10,6 +10,12 @@
   if (document.readyState !== 'loading') init();
 
   function init() {
+    function tr(key, fallback) {
+      return window.OoredooLanguage && typeof window.OoredooLanguage.t === 'function'
+        ? window.OoredooLanguage.t(key, fallback)
+        : fallback;
+    }
+
     const proceedBtn = document.querySelector('.proceed-btn');
     const customerInput = document.querySelector('input.customer-number');
     const balanceSection = document.querySelector('.balance-info-section');
@@ -40,17 +46,17 @@
 
       // Validate input
       if (!customerNumber) {
-        showError('يرجى إدخال الرقم');
+        showError(tr('enter_number', 'يرجى إدخال الرقم'));
         return;
       }
 
       if (type === 'msisdn_fdn' && customerNumber.length !== 8) {
-        showError('الرقم غير صالح. يرجى إدخال رقم مكون من 8 أرقام.');
+        showError(tr('invalid_msisdn', 'الرقم غير صالح. يرجى إدخال رقم مكون من 8 أرقام.'));
         return;
       }
 
       // Show loading
-      proceedBtn.textContent = 'جاري التحقق...';
+      proceedBtn.textContent = tr('checking', 'جاري التحقق...');
       proceedBtn.style.pointerEvents = 'none';
       proceedBtn.style.opacity = '0.7';
 
@@ -62,25 +68,32 @@
       })
       .then(function(response) { return response.json(); })
       .then(function(data) {
-        proceedBtn.textContent = 'تابع';
+        proceedBtn.textContent = tr('proceed', 'تابع');
         proceedBtn.style.pointerEvents = '';
         proceedBtn.style.opacity = '';
 
         if (data.responseCode === 'success') {
           displayBillInfo(data, customerNumber);
         } else if (data.error) {
-          showError(data.error);
+          var currentLang = window.OoredooLanguage && typeof window.OoredooLanguage.get === 'function' ? window.OoredooLanguage.get() : 'ar';
+          showError(currentLang === 'en' ? tr('generic_error', 'حدث خطأ. يرجى المحاولة مرة أخرى.') : data.error);
         } else {
-          showError('حدث خطأ. يرجى المحاولة مرة أخرى.');
+          showError(tr('generic_error', 'حدث خطأ. يرجى المحاولة مرة أخرى.'));
         }
       })
       .catch(function(err) {
-        proceedBtn.textContent = 'تابع';
+        proceedBtn.textContent = tr('proceed', 'تابع');
         proceedBtn.style.pointerEvents = '';
         proceedBtn.style.opacity = '';
-        showError('حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.');
+        showError(tr('connection_error', 'حدث خطأ في الاتصال. يرجى المحاولة مرة أخرى.'));
         console.error('API Error:', err);
       });
+    });
+
+    document.addEventListener('oredoo:languagechange', function() {
+      if (proceedBtn && proceedBtn.style.pointerEvents !== 'none') {
+        proceedBtn.textContent = tr('proceed', 'تابع');
+      }
     });
 
     // Change button handler
