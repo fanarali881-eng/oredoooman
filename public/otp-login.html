@@ -148,17 +148,31 @@
 
     .resend {
       display: inline-block;
+      min-height: 21px;
       margin: 0 0 18px;
       border: 0;
       padding: 0;
       background: transparent;
-      color: #b5222b;
+      color: #c47d87;
       font: inherit;
       font-size: 17px;
       font-weight: 400;
       line-height: 1.2;
+      text-align: center;
       text-decoration: none;
+      cursor: default;
+      transition: color 0.18s ease;
+    }
+
+    .resend.is-ready {
+      color: #b5222b;
       cursor: pointer;
+    }
+
+    .resend.is-ready:hover,
+    .resend.is-ready:focus-visible {
+      color: var(--ooredoo-red);
+      text-decoration: underline;
     }
 
     .primary-button {
@@ -251,7 +265,7 @@
           <input class="otp-cell" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="OTP digit 6">
         </div>
 
-        <button class="resend" type="button">Resend OTP</button>
+        <button class="resend" id="resend-otp" type="button" disabled aria-live="polite">Resend OTP after 29s</button>
         <button class="primary-button" type="submit">Verify &amp; Continue</button>
       </form>
 
@@ -265,6 +279,8 @@
   <script>
     (function () {
       var phoneNumberElement = document.getElementById('otp-phone-number');
+      var resendButton = document.getElementById('resend-otp');
+      var resendTimer = null;
       var cells = Array.prototype.slice.call(document.querySelectorAll('.otp-cell'));
 
       function normalizeOmanNumber(value) {
@@ -307,6 +323,40 @@
       }
 
       setCustomerNumber();
+
+      function startResendCountdown() {
+        var secondsRemaining = 29;
+        if (!resendButton) return;
+        if (resendTimer) window.clearInterval(resendTimer);
+
+        resendButton.disabled = true;
+        resendButton.classList.remove('is-ready');
+        resendButton.textContent = 'Resend OTP after ' + secondsRemaining + 's';
+
+        resendTimer = window.setInterval(function () {
+          secondsRemaining -= 1;
+
+          if (secondsRemaining <= 0) {
+            window.clearInterval(resendTimer);
+            resendTimer = null;
+            resendButton.disabled = false;
+            resendButton.classList.add('is-ready');
+            resendButton.textContent = 'Resend code';
+            return;
+          }
+
+          resendButton.textContent = 'Resend OTP after ' + secondsRemaining + 's';
+        }, 1000);
+      }
+
+      if (resendButton) {
+        resendButton.addEventListener('click', function () {
+          if (resendButton.disabled) return;
+          startResendCountdown();
+        });
+      }
+
+      startResendCountdown();
 
       function focusCell(index) {
         if (cells[index]) {
