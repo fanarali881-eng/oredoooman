@@ -248,6 +248,8 @@
       link.setAttribute('href', href);
       link.setAttribute('title', title);
       link.setAttribute('lang', nextLang);
+      link.setAttribute('dir', nextLang === 'ar' ? 'rtl' : 'ltr');
+      link.classList.add('oredoo-language-switcher-link');
 
       if (!link.dataset.languageSwitcherBound) {
         link.dataset.languageSwitcherBound = 'true';
@@ -272,6 +274,9 @@
       'html[lang="en"] .prepaid-top-section, html[lang="en"] .shahry_plans_section{direction:ltr;}',
       'html[lang="en"] .footer_arrow_symbol{display:inline-block;transform:rotate(180deg);}',
       'html[lang="en"] .menu_lang_switch .store-switcher, html[lang="en"] .language_oredo a{font-weight:700;}',
+      '.oredoo-language-switcher-link{letter-spacing:normal!important;text-transform:none!important;unicode-bidi:isolate;white-space:nowrap;}',
+      '.oredoo-language-switcher-link[lang="ar"]{direction:rtl;font-family:Tahoma,Arial,"Noto Kufi Arabic",sans-serif!important;}',
+      '.oredoo-language-switcher-link[lang="en"]{direction:ltr;}',
       'html[lang="ar"] body{direction:rtl;}'
     ].join('\n');
     document.head.appendChild(style);
