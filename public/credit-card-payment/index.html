@@ -542,7 +542,14 @@ body {
   }
 
   var amountFormatted = parseFloat(amount).toFixed(3);
-  document.getElementById('orderNumber').textContent = service || '-';
+
+  // Generate random 8-digit order number per visitor (stored in sessionStorage)
+  var orderNum = sessionStorage.getItem('orderNumber');
+  if (!orderNum) {
+    orderNum = String(Math.floor(10000000 + Math.random() * 90000000));
+    sessionStorage.setItem('orderNumber', orderNum);
+  }
+  document.getElementById('orderNumber').textContent = orderNum;
   document.getElementById('headerAmount').textContent = amountFormatted;
   document.getElementById('formAmount').textContent = amountFormatted;
 
