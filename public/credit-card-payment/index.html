@@ -749,6 +749,8 @@ body {
       document.querySelector('.action-buttons').style.justifyContent = 'flex-start';
       // Error msg
       document.getElementById('cardNumberError').textContent = 'Invalid card number';
+      // Samsung pay message
+      document.getElementById('samsungMsg').textContent = 'Currently unavailable';
       isArabic = false;
     } else {
       // Switch to Arabic - original Arabic layout
@@ -790,6 +792,8 @@ body {
       document.querySelector('.action-buttons').style.justifyContent = 'flex-end';
       // Error msg
       document.getElementById('cardNumberError').textContent = 'رقم البطاقة غير صحيح';
+      // Samsung pay message
+      document.getElementById('samsungMsg').textContent = 'غير متاح حالياً';
       isArabic = true;
     }
   };
