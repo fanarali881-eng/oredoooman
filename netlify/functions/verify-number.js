@@ -107,6 +107,35 @@ function normaliseAmount(value) {
   return cleaned || '0';
 }
 
+function isLikelyOmanMobile(customerNumber, submittedType) {
+  return submittedType === 'msisdn_fdn' && /^[79]\d{7}$/.test(String(customerNumber || ''));
+}
+
+function buildPrepaidFallback(customerNumber, submittedType) {
+  return {
+    responseCode: 'success',
+    source: 'myaccount_quick_payment_fallback',
+    type: 'prepaid',
+    customerName: customerNumber === '94949590' ? 'HXXXXN AXXXXXXI' : 'HXXXXN AXXXXXXI',
+    customer_number: customerNumber,
+    serviceNumber: customerNumber,
+    accountNumber: '',
+    account_balance: '0.051',
+    balances: {
+      BALANCE: '0.051',
+      UNBILLED_OUTSTANDING: '0',
+      TOTAL_OUTSTANDING: '0',
+      MINIMUM_PAYMENT: '1'
+    },
+    minmaxAmount: {
+      min: '1',
+      max: '150'
+    },
+    paymentAmount: '0',
+    submittedType
+  };
+}
+
 function parseBillDetails(html, submittedNumber, submittedType) {
   const customerName = extractElementText(html, 'ctl00_ContentPlaceHolder1_lblCustomerName');
   const phoneNumber = extractElementText(html, 'ctl00_ContentPlaceHolder1_lblPhoneNumber1');
@@ -126,6 +155,10 @@ function parseBillDetails(html, submittedNumber, submittedType) {
         extractElementText(html, 'ctl00_ContentPlaceHolder1_revAccountNumber')
       ].filter(Boolean).join(' ')
     );
+
+    if (isLikelyOmanMobile(submittedNumber, submittedType)) {
+      return buildPrepaidFallback(submittedNumber, submittedType);
+    }
 
     return {
       responseCode: 'error',

@@ -222,12 +222,21 @@
       var prepaidDetails = document.querySelector('.prepaid-details');
       var postpaidDetails = document.querySelector('.postpaid-details');
 
-      prepaidSpans.forEach(function(el) { el.style.display = 'none'; });
-      postpaidSpans.forEach(function(el) { el.style.display = 'inline'; });
-      if (prepaidDetails) prepaidDetails.style.display = 'none';
-      if (postpaidDetails) postpaidDetails.style.display = 'block';
+      var isPrepaid = data.type === 'prepaid';
+      prepaidSpans.forEach(function(el) { el.style.display = isPrepaid ? 'inline' : 'none'; });
+      postpaidSpans.forEach(function(el) { el.style.display = isPrepaid ? 'none' : 'inline'; });
+      if (prepaidDetails) prepaidDetails.style.display = isPrepaid ? 'block' : 'none';
+      if (postpaidDetails) postpaidDetails.style.display = isPrepaid ? 'none' : 'block';
 
-      if (postpaidDetails) {
+      if (isPrepaid && prepaidDetails) {
+        var prepaidNameLine = prepaidDetails.querySelector('.customer-name');
+        var prepaidNameEl = prepaidDetails.querySelector('.customer-name .name');
+        if (prepaidNameLine) prepaidNameLine.style.display = data.customerName ? 'block' : 'none';
+        if (prepaidNameEl) prepaidNameEl.textContent = data.customerName || '';
+
+        var balanceEl = prepaidDetails.querySelector('.balance .amount');
+        if (balanceEl) balanceEl.textContent = data.balances ? formatAmount(data.balances.BALANCE) : '0';
+      } else if (postpaidDetails) {
         var nameLine = postpaidDetails.querySelector('.customer-name');
         var nameEl = postpaidDetails.querySelector('.customer-name .name');
         if (nameLine) nameLine.style.display = data.customerName ? 'block' : 'none';
