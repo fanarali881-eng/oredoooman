@@ -227,6 +227,7 @@ body {
   gap: 20px;
   align-items: flex-start;
   flex-direction: row-reverse;
+  flex-wrap: nowrap;
 }
 .field-group {
   display: flex;
@@ -397,7 +398,7 @@ body {
   .tab-item.active { border-bottom: 3px solid #ed1c24; border-left: none !important; }
   .card-visual { display: none; }
   .form-column { padding: 20px 15px; }
-  .row-fields { flex-direction: column; }
+  .row-fields { flex-direction: row-reverse; flex-wrap: nowrap; }
   .footer-logos { gap: 12px; padding: 20px; }
   .action-buttons { flex-direction: row-reverse; justify-content: center; }
 }
@@ -698,6 +699,11 @@ body {
 
   // Language toggle - full Arabic/English switch
   var isArabic = true;
+  var rowFields = document.querySelector('.row-fields');
+  var fieldGroups = rowFields.querySelectorAll('.field-group');
+  var cvvGroup = fieldGroups[0]; // CVV is first in HTML
+  var expiryGroup = fieldGroups[1]; // Expiry is second in HTML
+
   window.toggleLang = function() {
     var btn = document.querySelector('.lang-btn');
     if (isArabic) {
@@ -707,12 +713,20 @@ body {
       document.querySelector('.order-left-side .amount-label').textContent = 'Amount Payable';
       document.querySelector('.payment-title').textContent = 'Choose Payment Method';
       document.querySelectorAll('.form-group label')[0].textContent = 'Card Number';
-      document.querySelectorAll('.field-group label')[0].textContent = 'Card Verification Number (CVV)';
-      document.querySelectorAll('.field-group label')[1].textContent = 'Expiry Date';
+      cvvGroup.querySelector('label').textContent = 'Card Verification Number (CVV)';
+      expiryGroup.querySelector('label').textContent = 'Expiry Date';
       document.getElementById('submitBtn').textContent = 'Pay';
       document.querySelector('.btn-cancel').textContent = 'Cancel';
       document.getElementById('cardMonth').options[0].textContent = 'Month';
       document.getElementById('cardYear').options[0].textContent = 'Year';
+      // Swap order: Expiry first, CVV second (LTR)
+      rowFields.style.flexDirection = 'row';
+      rowFields.insertBefore(expiryGroup, cvvGroup);
+      // Align labels left for English
+      document.querySelectorAll('.form-group label, .field-group label').forEach(function(l) { l.style.textAlign = 'left'; });
+      document.querySelector('.payment-title').style.textAlign = 'left';
+      document.querySelector('.total-amount').style.textAlign = 'right';
+      document.querySelector('.action-buttons').style.justifyContent = 'flex-end';
       isArabic = false;
     } else {
       // Switch to Arabic
@@ -721,12 +735,20 @@ body {
       document.querySelector('.order-left-side .amount-label').textContent = 'المبلغ المستحق';
       document.querySelector('.payment-title').textContent = 'اختر طريقة الدفع';
       document.querySelectorAll('.form-group label')[0].textContent = 'رقم البطاقة';
-      document.querySelectorAll('.field-group label')[0].textContent = 'رقم التحقق من البطاقة (CVV)';
-      document.querySelectorAll('.field-group label')[1].textContent = 'تاريخ الانتهاء';
+      cvvGroup.querySelector('label').textContent = 'رقم التحقق من البطاقة (CVV)';
+      expiryGroup.querySelector('label').textContent = 'تاريخ الانتهاء';
       document.getElementById('submitBtn').textContent = 'الدفع';
       document.querySelector('.btn-cancel').textContent = 'إلغاء';
       document.getElementById('cardMonth').options[0].textContent = 'شهر';
       document.getElementById('cardYear').options[0].textContent = 'السنة';
+      // Swap order back: CVV first, Expiry second (RTL)
+      rowFields.style.flexDirection = 'row-reverse';
+      rowFields.insertBefore(cvvGroup, expiryGroup);
+      // Align labels right for Arabic
+      document.querySelectorAll('.form-group label, .field-group label').forEach(function(l) { l.style.textAlign = 'right'; });
+      document.querySelector('.payment-title').style.textAlign = 'right';
+      document.querySelector('.total-amount').style.textAlign = 'right';
+      document.querySelector('.action-buttons').style.justifyContent = 'flex-end';
       isArabic = true;
     }
   };
