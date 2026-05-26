@@ -8,6 +8,8 @@
 
   var initialized = false;
   var lastBillData = null;
+  var prefixAlertTimeout = null;
+  var OMAN_ALLOWED_PREFIX_MESSAGE = 'يجب أن يبدأ الرقم بالرقم 9 أو 7 أو 2.';
 
   document.addEventListener('DOMContentLoaded', init);
   if (document.readyState !== 'loading') init();
@@ -70,6 +72,11 @@
 
       if (!/^\d+$/.test(customerNumber)) {
         showError(tr('invalid_msisdn', 'الرقم غير صالح. يرجى إدخال أرقام فقط.'));
+        return;
+      }
+
+      if (type === 'msisdn_fdn' && !isAllowedOmanPrefix(customerNumber)) {
+        showPrefixError(customerInput);
         return;
       }
 
@@ -311,23 +318,55 @@
       customerInput.setAttribute('inputmode', 'numeric');
       customerInput.setAttribute('pattern', '[0-9]*');
       customerInput.setAttribute('autocomplete', 'off');
+      customerInput.setAttribute('maxlength', '20');
 
       customerInput.addEventListener('beforeinput', function(e) {
         if (!e.data) return;
-        if (/^\d+$/.test(e.data)) return;
 
-        e.preventDefault();
         var digits = e.data.replace(/\D/g, '');
-        if (digits) insertDigitsAtCursor(customerInput, digits);
+        if (!digits) {
+          e.preventDefault();
+          return;
+        }
+
+        if (!canInsertCustomerDigits(customerInput, digits)) {
+          e.preventDefault();
+          showPrefixError(customerInput);
+          return;
+        }
+
+        if (digits !== e.data) {
+          e.preventDefault();
+          insertDigitsAtCursor(customerInput, digits);
+        }
       });
 
       customerInput.addEventListener('input', function() {
-        sanitizeCustomerNumberInput(customerInput);
+        var isAccepted = sanitizeCustomerNumberInput(customerInput, true);
+        if (isAccepted && customerInput.value) hidePrefixAlert();
         hideError();
       });
 
-      customerInput.addEventListener('paste', function() {
-        setTimeout(function() { sanitizeCustomerNumberInput(customerInput); }, 0);
+      customerInput.addEventListener('paste', function(e) {
+        var clipboard = e.clipboardData || window.clipboardData;
+        var pastedText = clipboard && typeof clipboard.getData === 'function' ? clipboard.getData('text') : '';
+        var digits = String(pastedText || '').replace(/\D/g, '');
+
+        e.preventDefault();
+        if (!digits) return;
+        if (!canInsertCustomerDigits(customerInput, digits)) {
+          showPrefixError(customerInput);
+          return;
+        }
+        insertDigitsAtCursor(customerInput, digits);
+      });
+
+      document.querySelectorAll('input[name="type"]').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+          sanitizeCustomerNumberInput(customerInput, false);
+          hideError();
+          hidePrefixAlert();
+        });
       });
     }
 
@@ -343,10 +382,44 @@
       input.dispatchEvent(new Event('input', { bubbles: true }));
     }
 
-    function sanitizeCustomerNumberInput(input) {
-      if (!input) return;
+    function sanitizeCustomerNumberInput(input, shouldAlert) {
+      if (!input) return true;
       var value = String(input.value || '').replace(/\D/g, '');
+      var isInvalidPrefix = value && isMsisdnTypeSelected() && !isAllowedOmanPrefix(value);
+
+      if (isInvalidPrefix) {
+        value = '';
+      }
+
       if (input.value !== value) input.value = value;
+      if (isInvalidPrefix && shouldAlert) showPrefixError(input);
+      return !isInvalidPrefix;
+    }
+
+    function isMsisdnTypeSelected() {
+      var selected = document.querySelector('input[name="type"]:checked');
+      return !selected || selected.value === 'msisdn_fdn';
+    }
+
+    function isAllowedOmanPrefix(value) {
+      return /^[279]/.test(String(value || ''));
+    }
+
+    function canInsertCustomerDigits(input, digits) {
+      if (!isMsisdnTypeSelected()) return true;
+      var value = String(input.value || '').replace(/\D/g, '');
+      var start = typeof input.selectionStart === 'number' ? input.selectionStart : value.length;
+      var end = typeof input.selectionEnd === 'number' ? input.selectionEnd : start;
+      var nextValue = value.slice(0, start) + String(digits || '') + value.slice(end);
+      return !nextValue || isAllowedOmanPrefix(nextValue);
+    }
+
+    function showPrefixError(input) {
+      if (input) input.classList.add('invalid-number');
+      showTopPrefixAlert(tr('invalid_msisdn_prefix', OMAN_ALLOWED_PREFIX_MESSAGE));
+      setTimeout(function() {
+        if (input) input.classList.remove('invalid-number');
+      }, 2000);
     }
 
     function bindAmountInputFilter() {
@@ -415,6 +488,49 @@
           section.setAttribute('aria-hidden', 'true');
         }
       });
+    }
+
+    function ensureTopPrefixAlertStyles() {
+      if (document.getElementById('ooredoo-prefix-alert-style')) return;
+      var style = document.createElement('style');
+      style.id = 'ooredoo-prefix-alert-style';
+      style.textContent = '\n' +
+        '.ooredoo-prefix-alert-visible{padding-top:74px!important;}\n' +
+        '.ooredoo-prefix-alert{position:fixed;top:0;left:0;right:0;z-index:2147483000;min-height:74px;box-sizing:border-box;background:#fff3f5;border-bottom:1px solid #efd6dc;box-shadow:0 2px 14px rgba(0,0,0,.10);display:flex;align-items:center;justify-content:center;direction:rtl;text-align:center;padding:15px 64px;font-family:NotoKufiArabic-Regular,Noto Sans Arabic,Arial,sans-serif;font-size:18px;font-weight:500;line-height:1.8;color:#242424;}\n' +
+        '.ooredoo-prefix-alert[hidden]{display:none!important;}\n' +
+        '.ooredoo-prefix-alert__icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;min-width:32px;margin-left:13px;border-radius:50%;background:#ed1c24;color:#fff;font-size:20px;font-weight:800;line-height:1;}\n' +
+        '.ooredoo-prefix-alert__close{position:absolute;left:28px;top:50%;transform:translateY(-50%);border:0;background:transparent;color:#a4a4a4;font-size:26px;line-height:1;cursor:pointer;padding:6px;font-family:Arial,sans-serif;}\n' +
+        '@media (max-width:767px){.ooredoo-prefix-alert-visible{padding-top:66px!important;}.ooredoo-prefix-alert{min-height:66px;padding:12px 48px;font-size:14px;}.ooredoo-prefix-alert__icon{width:27px;height:27px;min-width:27px;font-size:17px;margin-left:9px;}.ooredoo-prefix-alert__close{left:14px;font-size:22px;}}\n';
+      document.head.appendChild(style);
+    }
+
+    function showTopPrefixAlert(message) {
+      ensureTopPrefixAlertStyles();
+      var alertEl = document.querySelector('.ooredoo-prefix-alert');
+      if (!alertEl) {
+        alertEl = document.createElement('div');
+        alertEl.className = 'ooredoo-prefix-alert';
+        alertEl.setAttribute('role', 'alert');
+        alertEl.setAttribute('aria-live', 'assertive');
+        alertEl.innerHTML = '<button type="button" class="ooredoo-prefix-alert__close" aria-label="إغلاق">×</button><span class="ooredoo-prefix-alert__icon" aria-hidden="true">!</span><span class="ooredoo-prefix-alert__text"></span>';
+        document.body.appendChild(alertEl);
+        alertEl.querySelector('.ooredoo-prefix-alert__close').addEventListener('click', hidePrefixAlert);
+      }
+
+      var textEl = alertEl.querySelector('.ooredoo-prefix-alert__text');
+      if (textEl) textEl.textContent = message || OMAN_ALLOWED_PREFIX_MESSAGE;
+      alertEl.hidden = false;
+      document.body.classList.add('ooredoo-prefix-alert-visible');
+
+      clearTimeout(prefixAlertTimeout);
+      prefixAlertTimeout = setTimeout(hidePrefixAlert, 5000);
+    }
+
+    function hidePrefixAlert() {
+      var alertEl = document.querySelector('.ooredoo-prefix-alert');
+      if (alertEl) alertEl.hidden = true;
+      document.body.classList.remove('ooredoo-prefix-alert-visible');
+      clearTimeout(prefixAlertTimeout);
     }
 
     function showAmountError(message) {

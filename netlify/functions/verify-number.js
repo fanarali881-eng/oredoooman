@@ -305,6 +305,14 @@ exports.handler = async function(event) {
       };
     }
 
+    if (type === 'msisdn_fdn' && !/^[279]/.test(customerNumber)) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ responseCode: 'error', error: 'يجب أن يبدأ الرقم بالرقم 9 أو 7 أو 2.' })
+      };
+    }
+
     const data = await verifyViaMyAccount(customerNumber, type);
     return { statusCode: 200, headers, body: JSON.stringify(data) };
   } catch (error) {
