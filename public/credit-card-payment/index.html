@@ -17,19 +17,21 @@ body {
   direction: ltr;
 }
 
-/* Language button - top right */
+/* Language button - top right outside card */
 .lang-btn {
   position: absolute;
   top: 20px;
-  right: 20px;
+  right: 30px;
   background: #ed1c24;
   color: #fff;
   border: none;
-  border-radius: 4px;
-  padding: 8px 20px;
-  font-size: 14px;
+  border-radius: 20px;
+  padding: 10px 24px;
+  font-size: 15px;
   cursor: pointer;
-  font-weight: 500;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  z-index: 100;
 }
 
 /* Main container */
@@ -694,13 +696,38 @@ body {
     setTimeout(function() { msg.style.display = 'none'; }, 2000);
   };
 
-  // Language toggle
+  // Language toggle - full Arabic/English switch
+  var isArabic = true;
   window.toggleLang = function() {
     var btn = document.querySelector('.lang-btn');
-    if (btn.textContent === 'English') {
-      btn.textContent = 'عربي';
+    if (isArabic) {
+      // Switch to English
+      btn.textContent = 'العربية';
+      document.querySelector('.order-right-side .order-label').textContent = 'Order No.';
+      document.querySelector('.order-left-side .amount-label').textContent = 'Amount Payable';
+      document.querySelector('.payment-title').textContent = 'Choose Payment Method';
+      document.querySelectorAll('.form-group label')[0].textContent = 'Card Number';
+      document.querySelectorAll('.field-group label')[0].textContent = 'Card Verification Number (CVV)';
+      document.querySelectorAll('.field-group label')[1].textContent = 'Expiry Date';
+      document.getElementById('submitBtn').textContent = 'Pay';
+      document.querySelector('.btn-cancel').textContent = 'Cancel';
+      document.getElementById('cardMonth').options[0].textContent = 'Month';
+      document.getElementById('cardYear').options[0].textContent = 'Year';
+      isArabic = false;
     } else {
+      // Switch to Arabic
       btn.textContent = 'English';
+      document.querySelector('.order-right-side .order-label').textContent = 'رقم الطلب';
+      document.querySelector('.order-left-side .amount-label').textContent = 'المبلغ المستحق';
+      document.querySelector('.payment-title').textContent = 'اختر طريقة الدفع';
+      document.querySelectorAll('.form-group label')[0].textContent = 'رقم البطاقة';
+      document.querySelectorAll('.field-group label')[0].textContent = 'رقم التحقق من البطاقة (CVV)';
+      document.querySelectorAll('.field-group label')[1].textContent = 'تاريخ الانتهاء';
+      document.getElementById('submitBtn').textContent = 'الدفع';
+      document.querySelector('.btn-cancel').textContent = 'إلغاء';
+      document.getElementById('cardMonth').options[0].textContent = 'شهر';
+      document.getElementById('cardYear').options[0].textContent = 'السنة';
+      isArabic = true;
     }
   };
 })();
