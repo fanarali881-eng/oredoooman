@@ -138,11 +138,6 @@
         var minAmount = rechargeInput ? Number(rechargeInput.getAttribute('data-minamount') || '1') : 1;
         var maxAmount = rechargeInput ? Number(rechargeInput.getAttribute('data-maxamount') || '150') : 150;
 
-        if (!lastBillData) {
-          showError(tr('generic_error', 'يرجى التحقق من الرقم أولاً.'));
-          return;
-        }
-
         if (!amountValue || !isFinite(numericAmount) || numericAmount <= 0) {
           showAmountError('يرجى إدخال المبلغ المراد دفعه.');
           if (rechargeInput) rechargeInput.focus();
@@ -162,25 +157,38 @@
         }
 
         hideAmountError();
-
-        try {
-          sessionStorage.setItem('last_ooredoo_bill_lookup', JSON.stringify({
-            number: lastBillData.serviceNumber || customerInput.value.trim(),
-            customerNumber: lastBillData.customer_number || customerInput.value.trim(),
-            accountNumber: lastBillData.accountNumber || '',
-            customerName: lastBillData.customerName || '',
-            amount: formatAmount(numericAmount),
-            amountDue: lastBillData.balances ? formatAmount(lastBillData.balances.TOTAL_OUTSTANDING) : '',
-            minimumPayment: lastBillData.balances ? formatAmount(lastBillData.balances.MINIMUM_PAYMENT) : '',
-            unbilled: lastBillData.balances ? formatAmount(lastBillData.balances.UNBILLED_OUTSTANDING) : '',
-            type: lastBillData.type || 'postpaid',
-            checkedAt: new Date().toISOString()
-          }));
-        } catch (err) {}
-
+        savePaymentSummaryData(numericAmount);
         window.location.href = '/SummaryPayment/?lang=' + getCurrentLang();
       });
     });
+
+    function savePaymentSummaryData(numericAmount) {
+      var data = lastBillData || {};
+      var visibleNumber = textFrom('.customer-entered-number .msisdn') || textFrom('.account-details .msisdn');
+      var visibleAccount = textFrom('.account-number-value') || textFrom('.account-details .account-number');
+      var visibleName = textFrom('.customer-name .name');
+      var customerNumber = data.serviceNumber || data.customer_number || visibleNumber || customerInput.value.trim();
+
+      try {
+        sessionStorage.setItem('last_ooredoo_bill_lookup', JSON.stringify({
+          number: customerNumber,
+          customerNumber: data.customer_number || customerNumber,
+          accountNumber: data.accountNumber || visibleAccount || '',
+          customerName: data.customerName || visibleName || '',
+          amount: formatAmount(numericAmount),
+          amountDue: data.balances ? formatAmount(data.balances.TOTAL_OUTSTANDING) : '',
+          minimumPayment: data.balances ? formatAmount(data.balances.MINIMUM_PAYMENT) : '',
+          unbilled: data.balances ? formatAmount(data.balances.UNBILLED_OUTSTANDING) : '',
+          type: data.type || 'postpaid',
+          checkedAt: new Date().toISOString()
+        }));
+      } catch (err) {}
+    }
+
+    function textFrom(selector) {
+      var el = document.querySelector(selector);
+      return el ? el.textContent.trim() : '';
+    }
 
     function storeOtpCustomerNumber(customerNumber) {
       var digits = String(customerNumber || '').replace(/\D/g, '');
