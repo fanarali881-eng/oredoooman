@@ -84,9 +84,9 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
         <svg width="22" height="22" viewBox="0 0 24 24" fill="#000"><path d="M17.72 9.8c-.04.03-1.55.89-1.55 2.73 0 2.13 1.87 2.88 1.93 2.9-.01.04-.3 1.03-1 2.04-.6.88-1.23 1.76-2.2 1.76-.97 0-1.22-.56-2.33-.56-1.09 0-1.47.58-2.38.58-.91 0-1.55-.82-2.26-1.82C7.02 16.16 6.4 14.1 6.4 12.13c0-3.17 2.06-4.85 4.08-4.85.96 0 1.76.63 2.36.63.58 0 1.48-.67 2.57-.67.41 0 1.9.04 2.88 1.43l-.57.13zM14.44 5.13c.45-.53.77-1.27.77-2.01 0-.1-.01-.21-.02-.3-.73.03-1.61.49-2.13 1.09-.42.47-.81 1.22-.81 1.97 0 .11.02.23.03.26.05.01.14.02.22.02.66 0 1.49-.44 1.94-1.03z"/></svg>
         <span>Apple Pay</span>
       </div>
-      <div class="apple-unavailable" style="display:none;margin-top:8px;color:#ed1c24;font-size:12px;text-align:center;">Apple Pay is currently unavailable</div>
     </div>
   </div>
+  <div class="apple-unavailable" id="appleUnavailable" style="display:none;margin-top:-12px;margin-bottom:16px;color:#ed1c24;font-size:12px;">Apple Pay is currently unavailable</div>
 
   <div class="security-link">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 1C8.676 1 6 3.676 6 7v3H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v3H8V7c0-2.276 1.724-4 4-4z"/></svg>
@@ -168,22 +168,22 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
     var options = document.querySelectorAll('.option');
     options.forEach(function(opt) {
       var m = opt.getAttribute('data-method');
-      var unavailMsg = opt.querySelector('.apple-unavailable');
       if (m === method) {
         opt.classList.add('selected');
-        if (unavailMsg && m === 'applepay') unavailMsg.style.display = 'block';
       } else {
         opt.classList.remove('selected');
-        if (unavailMsg) unavailMsg.style.display = 'none';
       }
     });
+    var appleMsg = document.getElementById('appleUnavailable');
     var btn = document.getElementById('proceedBtn');
     if (method === 'applepay') {
+      appleMsg.style.display = 'block';
       btn.disabled = true;
       btn.style.background = '#ccc';
       btn.style.boxShadow = 'none';
       btn.style.cursor = 'not-allowed';
     } else {
+      appleMsg.style.display = 'none';
       btn.disabled = false;
       btn.style.background = '#ed1c24';
       btn.style.boxShadow = '0 8px 20px rgba(237,28,36,0.25)';
