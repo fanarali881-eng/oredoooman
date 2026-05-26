@@ -300,6 +300,41 @@
     (function () {
       var form = document.querySelector('.login-form');
       if (!form) return;
+
+      var arabicLettersPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g;
+      var restrictedFields = form.querySelectorAll('#username, #password');
+
+      function stripArabicLetters(field) {
+        var cleanValue = field.value.replace(arabicLettersPattern, '');
+        if (field.value !== cleanValue) {
+          var previousPosition = field.selectionStart || cleanValue.length;
+          var removedBeforeCursor = (field.value.slice(0, previousPosition).match(arabicLettersPattern) || []).length;
+          field.value = cleanValue;
+          var nextPosition = Math.max(previousPosition - removedBeforeCursor, 0);
+          if (typeof field.setSelectionRange === 'function') {
+            field.setSelectionRange(nextPosition, nextPosition);
+          }
+        }
+      }
+
+      restrictedFields.forEach(function (field) {
+        field.setAttribute('dir', 'ltr');
+        field.addEventListener('beforeinput', function (event) {
+          if (event.data && arabicLettersPattern.test(event.data)) {
+            event.preventDefault();
+          }
+          arabicLettersPattern.lastIndex = 0;
+        });
+        field.addEventListener('input', function () {
+          stripArabicLetters(field);
+        });
+        field.addEventListener('paste', function () {
+          window.setTimeout(function () {
+            stripArabicLetters(field);
+          }, 0);
+        });
+      });
+
       form.addEventListener('submit', function (event) {
         event.preventDefault();
       });
