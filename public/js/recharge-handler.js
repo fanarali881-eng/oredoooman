@@ -28,7 +28,8 @@
     const lookupInputSection = document.querySelector('.mobile-number-input-section');
     const balanceSection = document.querySelector('.balance-info-section');
     const amountSection = document.querySelector('.amount-input-section');
-    const payOnlineSection = document.querySelector('.pay-online-text-section');
+    const payOnlineSections = document.querySelectorAll('.pay-online-text-section');
+    const paymentCardsSections = document.querySelectorAll('.payment-cards-section');
     const proceedToPayBtns = document.querySelectorAll('.proceed-to-pay-btn');
 
     if (!proceedBtn || !customerInput) {
@@ -44,7 +45,8 @@
     bindAmountInputFilter();
     if (balanceSection) balanceSection.style.display = 'none';
     if (amountSection) amountSection.style.display = 'none';
-    if (payOnlineSection) payOnlineSection.style.display = 'none';
+    payOnlineSections.forEach(function(section) { section.style.display = 'none'; });
+    paymentCardsSections.forEach(function(section) { section.style.display = 'none'; });
     proceedToPayBtns.forEach(function(btn) {
       var wrapper = btn.closest('.et_pb_button_module_wrapper');
       if (wrapper) wrapper.style.display = 'none';
@@ -201,7 +203,8 @@
       setLookupFormVisibility(false);
       if (balanceSection) balanceSection.style.display = 'block';
       if (amountSection) amountSection.style.display = 'block';
-      if (payOnlineSection) payOnlineSection.style.display = 'block';
+      payOnlineSections.forEach(function(section) { section.style.display = 'block'; });
+      paymentCardsSections.forEach(function(section) { section.style.display = 'block'; });
       proceedToPayBtns.forEach(function(btn) {
         var wrapper = btn.closest('.et_pb_button_module_wrapper');
         if (wrapper) wrapper.style.display = 'block';
@@ -425,7 +428,8 @@
       setLookupFormVisibility(true);
       if (balanceSection) balanceSection.style.display = 'none';
       if (amountSection) amountSection.style.display = 'none';
-      if (payOnlineSection) payOnlineSection.style.display = 'none';
+      payOnlineSections.forEach(function(section) { section.style.display = 'none'; });
+      paymentCardsSections.forEach(function(section) { section.style.display = 'none'; });
       proceedToPayBtns.forEach(function(btn) {
         var wrapper = btn.closest('.et_pb_button_module_wrapper');
         if (wrapper) wrapper.style.display = 'none';
