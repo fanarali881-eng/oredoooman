@@ -40,6 +40,7 @@
     initialized = true;
 
     setLookupFormVisibility(true);
+    bindAmountInputFilter();
     if (balanceSection) balanceSection.style.display = 'none';
     if (amountSection) amountSection.style.display = 'none';
     if (payOnlineSection) payOnlineSection.style.display = 'none';
@@ -120,6 +121,7 @@
         e.preventDefault();
 
         var rechargeInput = document.querySelector('.recharge-amount');
+        if (rechargeInput) sanitizeAmountInput(rechargeInput);
         var amountValue = rechargeInput ? rechargeInput.value.trim() : '';
         var numericAmount = normaliseNumericAmount(amountValue);
         var minAmount = rechargeInput ? Number(rechargeInput.getAttribute('data-minamount') || '1') : 1;
@@ -239,6 +241,7 @@
         if (amountDueEl) amountDueEl.textContent = data.balances ? formatAmount(data.balances.TOTAL_OUTSTANDING) : '0';
       }
 
+      bindAmountInputFilter();
       var rechargeInput = document.querySelector('.recharge-amount');
       if (rechargeInput) {
         if (data.minmaxAmount) {
@@ -288,17 +291,71 @@
       return Number(String(value || '').replace(/[^0-9.\-]/g, ''));
     }
 
+    function bindAmountInputFilter() {
+      var rechargeInput = document.querySelector('.recharge-amount');
+      if (!rechargeInput || rechargeInput.getAttribute('data-numeric-only-bound') === 'true') return;
+
+      rechargeInput.setAttribute('data-numeric-only-bound', 'true');
+      rechargeInput.setAttribute('inputmode', 'decimal');
+      rechargeInput.setAttribute('pattern', '[0-9.]*');
+      rechargeInput.setAttribute('autocomplete', 'off');
+
+      rechargeInput.addEventListener('beforeinput', function(e) {
+        if (!e.data) return;
+        if (!/^[0-9.]$/.test(e.data)) {
+          e.preventDefault();
+          return;
+        }
+        if (e.data === '.' && rechargeInput.value.indexOf('.') !== -1) {
+          e.preventDefault();
+        }
+      });
+
+      rechargeInput.addEventListener('input', function() {
+        sanitizeAmountInput(rechargeInput);
+        hideAmountError();
+      });
+
+      rechargeInput.addEventListener('paste', function() {
+        setTimeout(function() { sanitizeAmountInput(rechargeInput); }, 0);
+      });
+    }
+
+    function sanitizeAmountInput(input) {
+      if (!input) return;
+      var value = String(input.value || '').replace(/[^0-9.]/g, '');
+      var parts = value.split('.');
+      if (parts.length > 1) {
+        value = parts.shift() + '.' + parts.join('').replace(/\./g, '');
+      }
+      if (input.value !== value) input.value = value;
+    }
+
     function getCurrentLang() {
       var params = new URLSearchParams(window.location.search || '');
       return params.get('lang') === 'en' ? 'en' : 'ar';
     }
 
     function setLookupFormVisibility(isVisible) {
-      var display = isVisible ? '' : 'none';
-      [lookupTypeModule, lookupInputSection].forEach(function(section) {
-        if (!section) return;
-        section.style.display = display;
-        section.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+      var sections = [];
+      var currentTypeSection = document.querySelector('.type-radio-btn-section');
+      var currentTypeModule = currentTypeSection ? currentTypeSection.closest('.et_pb_module') : lookupTypeModule;
+      var currentInputSection = document.querySelector('.mobile-number-input-section') || lookupInputSection;
+
+      [currentTypeModule, currentTypeSection, currentInputSection].forEach(function(section) {
+        if (section && sections.indexOf(section) === -1) sections.push(section);
+      });
+
+      sections.forEach(function(section) {
+        if (isVisible) {
+          section.style.removeProperty('display');
+          section.removeAttribute('hidden');
+          section.setAttribute('aria-hidden', 'false');
+        } else {
+          section.style.setProperty('display', 'none', 'important');
+          section.setAttribute('hidden', 'hidden');
+          section.setAttribute('aria-hidden', 'true');
+        }
       });
     }
 
