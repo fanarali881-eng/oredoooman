@@ -23,6 +23,9 @@
 
     const proceedBtn = document.querySelector('.proceed-btn');
     const customerInput = document.querySelector('input.customer-number');
+    const typeRadioSection = document.querySelector('.type-radio-btn-section');
+    const lookupTypeModule = typeRadioSection ? typeRadioSection.closest('.et_pb_module') : null;
+    const lookupInputSection = document.querySelector('.mobile-number-input-section');
     const balanceSection = document.querySelector('.balance-info-section');
     const amountSection = document.querySelector('.amount-input-section');
     const payOnlineSection = document.querySelector('.pay-online-text-section');
@@ -36,6 +39,7 @@
 
     initialized = true;
 
+    setLookupFormVisibility(true);
     if (balanceSection) balanceSection.style.display = 'none';
     if (amountSection) amountSection.style.display = 'none';
     if (payOnlineSection) payOnlineSection.style.display = 'none';
@@ -191,6 +195,7 @@
     }
 
     function displayBillInfo(data, customerNumber) {
+      setLookupFormVisibility(false);
       if (balanceSection) balanceSection.style.display = 'block';
       if (amountSection) amountSection.style.display = 'block';
       if (payOnlineSection) payOnlineSection.style.display = 'block';
@@ -288,6 +293,15 @@
       return params.get('lang') === 'en' ? 'en' : 'ar';
     }
 
+    function setLookupFormVisibility(isVisible) {
+      var display = isVisible ? '' : 'none';
+      [lookupTypeModule, lookupInputSection].forEach(function(section) {
+        if (!section) return;
+        section.style.display = display;
+        section.setAttribute('aria-hidden', isVisible ? 'false' : 'true');
+      });
+    }
+
     function showAmountError(message) {
       var errorEl = document.querySelector('.amount-input-section .error-message');
       if (errorEl) {
@@ -305,6 +319,7 @@
 
     function resetForm() {
       lastBillData = null;
+      setLookupFormVisibility(true);
       if (balanceSection) balanceSection.style.display = 'none';
       if (amountSection) amountSection.style.display = 'none';
       if (payOnlineSection) payOnlineSection.style.display = 'none';
