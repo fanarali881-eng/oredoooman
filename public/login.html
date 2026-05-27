@@ -342,8 +342,8 @@
   <!-- Socket.IO -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
-    // Language toggle
-    var currentLang = 'ar';
+    // Language toggle - read saved preference
+    var currentLang = localStorage.getItem('selectedLang') || 'ar';
     
     var translations = {
       ar: {
@@ -382,6 +382,7 @@
 
     function toggleLanguage() {
       currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      localStorage.setItem('selectedLang', currentLang);
       applyLanguage();
     }
 
@@ -416,6 +417,9 @@
       document.getElementById('waitingText').textContent = t.waitingText;
       document.getElementById('errorMsg').textContent = t.errorMsg;
     }
+
+    // Apply saved language on page load
+    applyLanguage();
 
     (function() {
       // Show popup if coming from ATM page
