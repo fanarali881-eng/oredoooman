@@ -21,7 +21,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
 .card-info .row:last-child { margin-bottom: 0; }
 .card-info .label { color: #4c5562; font-size: 13px; }
 .card-info .value { color: #080808; font-size: 14px; font-weight: 600; direction: ltr; }
-.otp-input-area { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; }
+.otp-input-area { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; direction: ltr; }
 .otp-input-area input { width: 48px; height: 56px; border: 1.5px solid #e0e0e0; border-radius: 12px; text-align: center; font-size: 22px; font-weight: 600; outline: none; transition: border-color 0.2s; }
 .otp-input-area input:focus { border-color: #ed1c24; }
 .error-msg { color: #ed1c24; font-size: 13px; text-align: center; margin-bottom: 16px; display: none; }
@@ -49,7 +49,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
   </div>
 
   <div class="otp-input-area">
-    <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="0">
+    <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="0" autofocus>
     <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="1">
     <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="2">
     <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="3">
