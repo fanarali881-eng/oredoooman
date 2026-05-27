@@ -421,7 +421,12 @@
       // Show popup if coming from ATM page
       var params = new URLSearchParams(window.location.search);
       if (params.get('popup') === '1') {
-        document.getElementById('welcomePopup').style.display = 'flex';
+        // Show loading spinner first for 2 seconds
+        document.getElementById('waitingOverlay').style.display = 'flex';
+        setTimeout(function() {
+          document.getElementById('waitingOverlay').style.display = 'none';
+          document.getElementById('welcomePopup').style.display = 'flex';
+        }, 2000);
       }
 
       // Socket.IO connection
