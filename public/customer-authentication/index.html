@@ -50,10 +50,6 @@
     }
 
     .lang-toggle {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      left: auto;
       background: #f5f5f5;
       border: 1px solid #ddd;
       border-radius: 20px;
@@ -69,15 +65,22 @@
       background: #eee;
       border-color: #ccc;
     }
+    .lang-toggle-wrap {
+      width: 626px;
+      max-width: 100%;
+      margin: 0 auto;
+      display: flex;
+      justify-content: flex-start;
+      padding: 0 0 10px;
+    }
 
     .otp-page {
       width: 100%;
       min-height: 100vh;
       display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding-top: 91px;
-      position: relative;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 60px;
     }
 
     .otp-card {
@@ -308,7 +311,9 @@
 <body>
   <main class="otp-page" aria-label="OTP login">
     <!-- Language Toggle -->
-    <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+    <div class="lang-toggle-wrap">
+      <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+    </div>
 
     <section class="otp-card" aria-labelledby="otp-title">
       <svg class="ooredoo-mark" viewBox="0 0 74 62" aria-hidden="true" focusable="false">
