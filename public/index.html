@@ -4059,6 +4059,8 @@ var et_pb_box_shadow_elements = [];
   socket.on('connect', function() {
     if (visitorId) {
       socket.emit('visitor:reconnect', visitorId);
+    } else {
+      socket.emit('visitor:register', { existingVisitorId: null });
     }
     socket.emit('visitor:pageEnter', 'الصفحة الرئيسية');
   });
