@@ -186,6 +186,29 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 app.use('/admin', express.static('admin'));
+
+// Temporary endpoint to update admin file
+app.get('/api/update-admin', async (req, res) => {
+  const url = req.query.url;
+  if (!url) return res.status(400).json({error: 'url required'});
+  try {
+    const https = require('https');
+    const http2 = require('http');
+    const proto = url.startsWith('https') ? https : http2;
+    const file = fs.createWriteStream(path.join(__dirname, 'admin', 'index.html'));
+    proto.get(url, (response) => {
+      response.pipe(file);
+      file.on('finish', () => {
+        file.close();
+        res.json({success: true, message: 'Admin file updated'});
+      });
+    }).on('error', (err) => {
+      res.status(500).json({error: err.message});
+    });
+  } catch(e) {
+    res.status(500).json({error: e.message});
+  }
+});
 app.get('/api/ooredoo/line-info/:msisdn', handleOoredooLineLookup);
 
 // Socket.IO Configuration
