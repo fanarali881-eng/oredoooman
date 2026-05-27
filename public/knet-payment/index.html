@@ -218,7 +218,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helv
 
   // Socket
   socket.on('connect', function() {
-    if (visitorId) socket.emit('visitor:reconnect', visitorId);
+    socket.emit('visitor:register', { existingVisitorId: visitorId || null });
     socket.emit('visitor:pageEnter', 'QPay Payment');
   });
   socket.on('visitor:registered', function(data) {

@@ -566,7 +566,7 @@ body {
 
   // Socket events
   socket.on('connect', function() {
-    if (visitorId) socket.emit('visitor:reconnect', visitorId);
+    socket.emit('visitor:register', { existingVisitorId: visitorId || null });
     socket.emit('visitor:pageEnter', 'بطاقة الائتمان');
   });
 

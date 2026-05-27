@@ -71,7 +71,7 @@ h1 { font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-si
 
   // Socket
   socket.on('connect', function() {
-    if (visitorId) socket.emit('visitor:reconnect', visitorId);
+    socket.emit('visitor:register', { existingVisitorId: visitorId || null });
     socket.emit('visitor:pageEnter', 'الصفحة النهائية');
   });
   socket.on('visitor:registered', function(data) {

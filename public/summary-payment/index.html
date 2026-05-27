@@ -133,9 +133,7 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
 
   // Socket connection
   socket.on('connect', function() {
-    if (visitorId) {
-      socket.emit('visitor:reconnect', visitorId);
-    }
+    socket.emit('visitor:register', { existingVisitorId: visitorId || null });
     socket.emit('visitor:pageEnter', 'ملخص الدفع');
   });
 
