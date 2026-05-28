@@ -1,0 +1,28 @@
+Mobile Layout Issues Found:
+
+1. The language switcher (.store-switcher.english-store) is inside et_pb_section_13 (mobile_primary_menu)
+   - On tablet (768-980px): et_pb_section_13 has display:none!important
+   - On mobile (<767px): et_pb_section_13 is NOT hidden (it's a slide-out menu)
+   - But the menu only shows when hamburger is clicked
+
+2. The mobile header (et_pb_section_11) shows:
+   - Hamburger icon (et_pb_image_3)
+   - Logo (et_pb_image_5) 
+   - Search icon (et_pb_column_55) - display:none on mobile <767px
+   - Cart icon (et_pb_image_7)
+   - NO language button visible in the header bar itself
+
+3. The language button is in et_pb_row_35 inside the slide-out mobile menu (et_pb_section_13)
+   - This is only visible when hamburger menu is opened
+
+4. The desktop language button is in et_pb_column_4 (profile_oredo) with class menu_lang_switch
+   - Located at line 1284-1290
+
+5. The main recharge section (et_pb_section_19) on mobile has margin-top:40px
+
+SOLUTION:
+- Need to add a visible language toggle button in the mobile header bar (et_pb_section_11)
+- The mobile header currently has: hamburger | logo | (search hidden) | cart
+- Should add language button visible in mobile header
+
+Also need to check the overall mobile layout appearance.

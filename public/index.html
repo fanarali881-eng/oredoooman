@@ -1147,6 +1147,34 @@ label, input[type="text"], input[type="radio"] + label {
     }
 }
 </style>
+
+<style id="mobile-fix-css">
+/* Show language button on mobile */
+@media only screen and (max-width:767px) {
+  .et_pb_column_55 { display:block !important; width:auto !important; margin-bottom:0 !important; }
+  .et_pb_section_11 { position:fixed !important; top:0 !important; z-index:9999 !important; width:100% !important; background:#fff !important; box-shadow:0 2px 8px rgba(0,0,0,0.08) !important; }
+  .et_pb_row_20.mobile_header_row { display:flex !important; align-items:center !important; justify-content:space-between !important; padding:8px 16px !important; height:56px !important; max-width:100% !important; }
+  .et_pb_column_53 { width:auto !important; order:1; }
+  .et_pb_column_54.ooredoo_logo { width:auto !important; flex:1; order:2; text-align:center !important; margin:0 !important; }
+  .et_pb_column_55 { order:3; width:auto !important; }
+  .et_pb_column_56 { display:none !important; }
+  .et_pb_image_5 { margin:0 !important; padding:0 !important; }
+  .et_pb_image_5 .et_pb_image_wrap img { width:100px !important; height:auto !important; }
+  .et_pb_section_19.prepaid-top-section { margin-top:56px !important; }
+  .et_pb_section_18.breadcrumb_section { margin-top:56px !important; }
+}
+/* Tablet fix */
+@media only screen and (min-width:768px) and (max-width:980px) {
+  .et_pb_column_55 { display:block !important; width:auto !important; }
+  .et_pb_section_11 { position:fixed !important; top:0 !important; z-index:9999 !important; width:100% !important; }
+  .et_pb_row_20.mobile_header_row { display:flex !important; align-items:center !important; justify-content:space-between !important; padding:8px 20px !important; height:60px !important; }
+  .et_pb_column_56 { display:none !important; }
+}
+/* LTR adjustments for English */
+html[lang="en"] .et_pb_column_53 { order:1; }
+html[lang="en"] .et_pb_column_54.ooredoo_logo { order:2; }
+html[lang="en"] .et_pb_column_55 { order:3; }
+</style>
 </head>
 <body class="rtl page-template-default page page-id-44927 page-recharge-bill-payments page-recharge-bill-payments-ar is-iphone is-safari is-mobile et_pb_button_helper_class et_fixed_nav et_show_nav et_primary_nav_dropdown_animation_fade et_secondary_nav_dropdown_animation_fade et_header_style_left et_pb_footer_columns4 et_cover_background et_pb_gutter osx et_pb_gutters3 et_pb_pagebuilder_layout et_no_sidebar et_divi_theme et-db">
 
@@ -2113,20 +2141,14 @@ label, input[type="text"], input[type="radio"] + label {
 				
 				
 				
-				<a href="https://shop.ooredoo.om?lang=ar"><span class="et_pb_image_wrap "><img decoding="async" src="/wp-content/uploads/2022/05/menu_logo-2.svg" alt="" title="" /></span></a>
+				<span class="et_pb_image_wrap "><img decoding="async" src="/wp-content/uploads/2022/05/menu_logo-2.svg" alt="Ooredoo" title="Ooredoo" style="width:120px;height:auto;" /></span>
 			</div>
 			</div><div class="et_pb_column et_pb_column_1_4 et_pb_column_55  et_pb_css_mix_blend_mode_passthrough">
 				
 				
 				
 				
-				<div class="et_pb_module et_pb_image et_pb_image_6">
-				
-				
-				
-				
-				<span class="et_pb_image_wrap "><img loading="lazy" decoding="async" width="16" height="16" src="/wp-content/uploads/2019/10/search_white-1.png" alt="" title="" class="wp-image-10530" /></span>
-			</div>
+				<div class="et_pb_module mobile-lang-btn-wrap" style="display:flex;align-items:center;justify-content:center;height:100%;"><a class="store-switcher english-store mobile-lang-toggle" href="" style="font-size:12px;font-weight:700;color:#ed1c24;text-decoration:none;white-space:nowrap;">English</a></div>
 			</div><div class="et_pb_column et_pb_column_1_4 et_pb_column_56  et_pb_css_mix_blend_mode_passthrough et-last-child">
 				
 				

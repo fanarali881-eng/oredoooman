@@ -1,0 +1,23 @@
+Mobile Screenshot Findings:
+
+Arabic view:
+- Header has: broken image (top-left), hamburger menu (top-right)
+- No language button visible in header
+- Main form looks OK but no Ooredoo logo visible (broken image)
+- Layout is acceptable
+
+English view:
+- Header has: hamburger (top-left), broken image (top-right)
+- Direction is LTR
+- No language button visible in header
+- Layout is acceptable
+
+Issues to fix:
+1. Language button not visible in mobile header - need to add one
+2. Broken image in header (the Ooredoo logo image is broken)
+3. No language toggle visible on mobile at all (it's hidden in the hamburger menu)
+
+Solution:
+- Add a language toggle link directly in the mobile header bar (et_pb_section_11)
+- Fix the broken logo image if possible
+- The overall layout actually looks fine on mobile, the user's concern might be about the missing language button

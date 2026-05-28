@@ -1,0 +1,22 @@
+Desktop vs Mobile Comparison:
+
+DESKTOP:
+- Top bar: "Personal | Business | English | < Ooredoo website"
+- Nav bar: Ooredoo logo (red) + menu items + cart/profile icons
+- Red breadcrumb bar: "تسوق/إعادة شحن الرصيد / دفع الفواتير"
+- Main content: title, description, radio buttons inline, input, button
+- Footer: dark background with links
+
+MOBILE (current):
+- Header: broken image (logo) + hamburger icon
+- No top bar (Personal/Business/English)
+- No Ooredoo logo visible (broken)
+- No breadcrumb bar
+- No language button visible
+- Main content: title, description, radio buttons stacked vertically, input, button
+
+FIXES NEEDED:
+1. Fix Ooredoo logo in mobile header (currently broken image)
+2. Add language toggle button visible in mobile header
+3. The mobile layout is actually fine for the form content
+4. Maybe add the red breadcrumb or at least make it look more branded
