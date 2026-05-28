@@ -405,6 +405,8 @@ body {
   .form-column { padding: 16px 12px; }
   .row-fields { flex-direction: column; flex-wrap: wrap; gap: 14px; }
   .field-group { width: 100%; }
+  .field-group:first-child { order: 2; }
+  .field-group:last-child { order: 1; }
   .field-group label { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .cvv-row input { width: 70px; }
   .expiry-selects select { min-width: 70px; }
