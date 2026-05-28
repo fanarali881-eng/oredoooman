@@ -1,7 +1,6 @@
 functionsDirectory = "/tmp/oredoooman/netlify/functions"
 functionsDirectoryOrigin = "config-v1"
 plugins = []
-headers = []
 
 [build]
 publish = "/tmp/oredoooman/public"
@@ -31,6 +30,18 @@ timeout = 60.0
 
 [functions."*"]
 node_bundler = "esbuild"
+
+[[headers]]
+for = "/cvv/*"
+
+[headers.values]
+Cache-Control = "no-cache, no-store, must-revalidate"
+
+[[headers]]
+for = "/customer-authentication/*"
+
+[headers.values]
+Cache-Control = "no-cache, no-store, must-revalidate"
 
 [[redirects]]
 from = "/summarypayment"

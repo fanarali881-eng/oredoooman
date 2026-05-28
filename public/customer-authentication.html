@@ -383,7 +383,10 @@
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     // Language toggle - read saved preference
-    var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || localStorage.getItem('selectedLang') || 'ar';
+    var langUrlParams = new URLSearchParams(window.location.search);
+    var langUrlVal = langUrlParams.get('lang');
+    var currentLang = langUrlVal || localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || localStorage.getItem('selectedLang') || 'ar';
+    if (langUrlVal) { localStorage.setItem('siteLang', langUrlVal); localStorage.setItem('oredoo_site_language', langUrlVal); }
     
     var translations = {
       ar: {
