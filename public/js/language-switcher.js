@@ -298,6 +298,7 @@
     lang = normalizeLang(lang);
     try {
       localStorage.setItem(STORAGE_KEY, lang);
+      localStorage.setItem('siteLang', lang);
     } catch (e) {}
 
     applyLanguage(lang);
