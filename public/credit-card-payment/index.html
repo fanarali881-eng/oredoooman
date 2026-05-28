@@ -403,7 +403,11 @@ body {
   .tab-item.active { border-bottom: 3px solid #ed1c24; border-left: none !important; }
   .card-visual { display: none; }
   .form-column { padding: 16px 12px; }
-  .row-fields { flex-direction: row-reverse; flex-wrap: nowrap; }
+  .row-fields { flex-direction: column; flex-wrap: wrap; gap: 14px; }
+  .field-group { width: 100%; }
+  .field-group label { font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .cvv-row input { width: 70px; }
+  .expiry-selects select { min-width: 70px; }
   .footer-logos { gap: 10px; padding: 16px; }
   .action-buttons { flex-direction: row-reverse; justify-content: center; gap: 8px; }
   .lang-btn { padding: 8px 18px; font-size: 13px; }
