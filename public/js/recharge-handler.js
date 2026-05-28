@@ -222,7 +222,7 @@
     function setLoadingState(isLoading) {
       if (isLoading) {
         proceedBtn.style.pointerEvents = 'none';
-        proceedBtn.style.color = 'rgba(255,255,255,0.4)';
+        proceedBtn.style.setProperty('color', 'rgba(255,255,255,0.4)', 'important');
         proceedBtn.style.position = 'relative';
         if (!proceedBtn.querySelector('.btn-spinner')) {
           var spinner = document.createElement('span');
@@ -240,7 +240,7 @@
         var sp = proceedBtn.querySelector('.btn-spinner');
         if (sp) sp.remove();
         proceedBtn.style.pointerEvents = '';
-        proceedBtn.style.color = '';
+        proceedBtn.style.setProperty('color', '#ffffff', 'important');
       }
     }
 
