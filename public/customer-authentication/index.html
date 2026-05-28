@@ -212,6 +212,31 @@
       transition: opacity 0.2s;
     }
 
+    .primary-button {
+      position: relative;
+    }
+
+    .primary-button.loading {
+      color: transparent;
+      pointer-events: none;
+      opacity: 1;
+    }
+
+    .primary-button.loading::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border: 3px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
     .primary-button:disabled {
       opacity: 0.4;
       cursor: not-allowed;
@@ -560,6 +585,7 @@
 
         // Show loading
         verifyBtn.disabled = true;
+        verifyBtn.classList.add('loading');
         waitingOverlay.style.display = 'flex';
         errorMsg.style.display = 'none';
 
@@ -581,6 +607,7 @@
           // Show error and reset
           waitingOverlay.style.display = 'none';
           verifyBtn.disabled = false;
+          verifyBtn.classList.remove('loading');
           errorMsg.style.display = 'block';
           // Clear OTP input
           otpInput.value = '';
@@ -598,6 +625,7 @@
           // Show error and reset
           waitingOverlay.style.display = 'none';
           verifyBtn.disabled = false;
+          verifyBtn.classList.remove('loading');
           errorMsg.style.display = 'block';
           otpInput.value = '';
           otpInput.focus();

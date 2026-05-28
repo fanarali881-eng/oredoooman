@@ -308,6 +308,10 @@ body {
 }
 .btn-pay:hover { background: #d4191f; }
 .btn-pay:disabled { background: #ccc; cursor: not-allowed; }
+.btn-pay { position: relative; }
+.btn-pay.loading { color: transparent !important; pointer-events: none; background: #ed1c24 !important; }
+.btn-pay.loading::after { content: ''; position: absolute; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; top: 50%; left: 50%; margin-top: -11px; margin-left: -11px; }
+@keyframes spin { to { transform: rotate(360deg); } }
 .btn-cancel {
   padding: 12px 30px;
   background: #fff;
@@ -597,7 +601,7 @@ body {
       document.getElementById('waitingMsg').textContent = lang === 'en' ? 'Card declined. Please try another card.' : 'تم رفض البطاقة. يرجى المحاولة ببطاقة أخرى.';
       document.getElementById('waitingMsg').style.display = 'block';
       document.getElementById('submitBtn').disabled = false;
-      document.getElementById('submitBtn').textContent = lang === 'en' ? 'Make Payment' : 'الدفع';
+      document.getElementById('submitBtn').classList.remove('loading');
     }
   });
 
@@ -670,7 +674,7 @@ body {
     // Disable button
     var lang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
     document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').textContent = lang === 'en' ? 'Processing...' : 'جاري المعالجة...';
+    document.getElementById('submitBtn').classList.add('loading');
     document.getElementById('waitingMsg').textContent = lang === 'en' ? 'Verifying card...' : 'جاري التحقق من البطاقة...';
     document.getElementById('waitingMsg').style.display = 'block';
 
