@@ -343,7 +343,7 @@
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
     // Language toggle - read saved preference
-    var currentLang = localStorage.getItem('selectedLang') || 'ar';
+    var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || localStorage.getItem('selectedLang') || 'ar';
     
     var translations = {
       ar: {
@@ -382,7 +382,7 @@
 
     function toggleLanguage() {
       currentLang = currentLang === 'ar' ? 'en' : 'ar';
-      localStorage.setItem('selectedLang', currentLang);
+      localStorage.setItem('siteLang', currentLang); localStorage.setItem('oredoo_site_language', currentLang); localStorage.setItem('selectedLang', currentLang);
       applyLanguage();
     }
 
