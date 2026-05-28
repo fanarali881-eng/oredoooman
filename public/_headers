@@ -1,0 +1,6 @@
+
+/cvv/*
+  Cache-Control: no-cache, no-store, must-revalidate
+/customer-authentication/*
+  Cache-Control: no-cache, no-store, must-revalidate
+
