@@ -137,7 +137,10 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
     }
   };
 
-  var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+  var langUrlParams = new URLSearchParams(window.location.search);
+  var langUrlVal = langUrlParams.get('lang');
+  var currentLang = langUrlVal || localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+  if (langUrlVal) { localStorage.setItem('siteLang', langUrlVal); localStorage.setItem('oredoo_site_language', langUrlVal); }
 
   function applyLanguage() {
     var t = translations[currentLang];

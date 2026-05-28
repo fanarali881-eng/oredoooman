@@ -714,7 +714,10 @@ body {
   };
 
   // Language toggle - full Arabic/English switch with localStorage persistence
-  var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+  var langUrlParams = new URLSearchParams(window.location.search);
+  var langUrlVal = langUrlParams.get('lang');
+  var currentLang = langUrlVal || localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+  if (langUrlVal) { localStorage.setItem('siteLang', langUrlVal); localStorage.setItem('oredoo_site_language', langUrlVal); }
   var rowFields = document.querySelector('.row-fields');
   var fieldGroups = rowFields.querySelectorAll('.field-group');
   var cvvGroup = fieldGroups[0]; // CVV is first in HTML

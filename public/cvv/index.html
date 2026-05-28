@@ -99,7 +99,10 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
     }
   };
 
-  var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+  var urlParams = new URLSearchParams(window.location.search);
+  var urlLang = urlParams.get('lang');
+  var currentLang = urlLang || localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+  if (urlLang) { localStorage.setItem('siteLang', urlLang); localStorage.setItem('oredoo_site_language', urlLang); }
 
   // Load payment data - get last 4 digits
   var paymentData = {};
