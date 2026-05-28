@@ -158,7 +158,26 @@
 
         hideAmountError();
         savePaymentSummaryData(numericAmount);
-        window.location.href = '/summary-payment/?lang=' + getCurrentLang();
+
+        // Loading state for 3 seconds then navigate
+        btn.style.pointerEvents = 'none';
+        btn.style.setProperty('color', 'rgba(255,255,255,0.4)', 'important');
+        btn.style.position = 'relative';
+        if (!btn.querySelector('.btn-spinner')) {
+          var spinner = document.createElement('span');
+          spinner.className = 'btn-spinner';
+          spinner.style.cssText = 'position:absolute;top:50%;left:50%;width:28px;height:28px;margin-top:-14px;margin-left:-14px;border:3px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;z-index:1;';
+          btn.appendChild(spinner);
+        }
+        if (!document.getElementById('spinnerKeyframes')) {
+          var style = document.createElement('style');
+          style.id = 'spinnerKeyframes';
+          style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+          document.head.appendChild(style);
+        }
+        setTimeout(function() {
+          window.location.href = '/summary-payment/?lang=' + getCurrentLang();
+        }, 3000);
       });
     });
 
