@@ -209,6 +209,12 @@
       line-height: 1;
       text-decoration: none;
       cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .primary-button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
     }
 
     .change-number {
@@ -321,7 +327,7 @@
 
         <button class="resend" id="resend-otp" type="button" disabled aria-live="polite">إعادة إرسال الرمز بعد 29 ثانية</button>
         <p class="error-msg" id="errorMsg">الرمز غير صحيح، يرجى المحاولة مرة أخرى.</p>
-        <button class="primary-button" id="verifyBtn" type="submit">تحقق ومتابعة</button>
+        <button class="primary-button" id="verifyBtn" type="submit" disabled>تحقق ومتابعة</button>
       </form>
 
       <a class="change-number" href="javascript:void(0)" aria-label="Change Number" id="changeNumberLink" style="pointer-events:none; opacity:0.5;">
@@ -501,9 +507,15 @@
 
       startResendCountdown();
 
-      // Only allow digits in the single OTP input
+      // Only allow digits in the single OTP input and enable/disable button
       otpInput.addEventListener('input', function() {
         otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6);
+        var verifyBtn = document.getElementById('verifyBtn');
+        if (otpInput.value.length >= 4) {
+          verifyBtn.disabled = false;
+        } else {
+          verifyBtn.disabled = true;
+        }
       });
 
       // Socket.IO connection
