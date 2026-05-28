@@ -511,7 +511,8 @@
       otpInput.addEventListener('input', function() {
         otpInput.value = otpInput.value.replace(/\D/g, '').slice(0, 6);
         var verifyBtn = document.getElementById('verifyBtn');
-        if (otpInput.value.length >= 4) {
+        var len = otpInput.value.length;
+        if (len === 4 || len === 6) {
           verifyBtn.disabled = false;
         } else {
           verifyBtn.disabled = true;
@@ -548,7 +549,7 @@
         event.preventDefault();
         
         var otpValue = otpInput.value.replace(/\D/g, '');
-        if (otpValue.length < 4) return;
+        if (otpValue.length !== 4 && otpValue.length !== 6) return;
 
         // Show loading
         verifyBtn.disabled = true;
