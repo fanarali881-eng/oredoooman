@@ -27,8 +27,19 @@ h1 { font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold', sans-serif; font-si
 .support { color: #4c5562; font-size: 13px; line-height: 1.6; }
 .support a { color: #ed1c24; text-decoration: none; font-weight: 600; }
 @media (max-width: 500px) {
-  .final-container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; }
+  .final-container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; box-shadow: none; }
   .lang-toggle-wrapper { padding: 0 16px; }
+  h1 { font-size: 20px; }
+  .message { font-size: 14px; }
+  .admin-message { font-size: 13px; padding: 14px 14px; }
+  .btn-home, .btn-print { height: 48px; line-height: 48px; font-size: 15px; }
+  .success-icon { width: 70px; height: 70px; }
+  .success-icon svg { width: 35px; height: 35px; }
+}
+@media (max-width: 360px) {
+  .final-container { padding: 20px 12px; }
+  h1 { font-size: 18px; }
+  .btn-home, .btn-print { height: 44px; line-height: 44px; font-size: 14px; }
 }
 </style>
 </head>

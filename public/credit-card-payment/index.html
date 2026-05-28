@@ -388,20 +388,29 @@ body {
 }
 
 @media (max-width: 700px) {
-  .main-container { margin: 20px auto; width: 95%; }
-  .order-section { flex-direction: column; gap: 15px; padding: 20px 25px; text-align: right; }
+  .main-container { margin: 15px auto; width: 96%; }
+  .order-section { flex-direction: column; gap: 12px; padding: 16px 18px; text-align: right; }
   .order-left-side { text-align: right; }
-  .red-divider { margin: 0 25px; }
-  .payment-section { padding: 25px; }
+  .red-divider { margin: 0 18px; }
+  .payment-section { padding: 18px; }
   .payment-area { flex-direction: column; }
   .tabs-column { width: 100%; flex-direction: row; border-right: none; border-bottom: 1px solid #ddd; }
-  .tab-item { flex: 1; border-left: none !important; }
+  .tab-item { flex: 1; border-left: none !important; font-size: 13px; padding: 10px 5px; }
   .tab-item.active { border-bottom: 3px solid #ed1c24; border-left: none !important; }
   .card-visual { display: none; }
-  .form-column { padding: 20px 15px; }
+  .form-column { padding: 16px 12px; }
   .row-fields { flex-direction: row-reverse; flex-wrap: nowrap; }
-  .footer-logos { gap: 12px; padding: 20px; }
-  .action-buttons { flex-direction: row-reverse; justify-content: center; }
+  .footer-logos { gap: 10px; padding: 16px; }
+  .action-buttons { flex-direction: row-reverse; justify-content: center; gap: 8px; }
+  .lang-btn { padding: 8px 18px; font-size: 13px; }
+}
+@media (max-width: 400px) {
+  .main-container { margin: 10px auto; width: 100%; }
+  .order-section { padding: 12px 14px; gap: 10px; }
+  .payment-section { padding: 14px; }
+  .form-column { padding: 12px 10px; }
+  .tab-item { font-size: 12px; padding: 8px 4px; }
+  .action-buttons button { font-size: 13px; padding: 10px 16px; }
 }
 </style>
 </head>

@@ -47,8 +47,21 @@ h1 { text-align: center; font-family: 'Rubik-Medium', 'NotoKufiArabic-SemiBold',
 .submit-btn.active { background: #ed1c24; color: #fff; cursor: pointer; box-shadow: 0 8px 20px rgba(237,28,36,0.18); }
 .waiting-msg { text-align: center; color: #ed1c24; font-size: 14px; margin-top: 12px; display: none; }
 @media (max-width: 500px) {
-  .otp-container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; }
+  .otp-container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; box-shadow: none; }
   .lang-toggle-wrapper { padding: 0 16px; }
+  h1 { font-size: 18px; }
+  .subtitle { font-size: 13px; }
+  .otp-single-input { height: 50px; font-size: 24px; max-width: 240px; }
+  .submit-btn { height: 50px; font-size: 16px; }
+  .card-info { padding: 12px 14px; }
+  .card-info .label { font-size: 12px; }
+  .card-info .value { font-size: 13px; }
+}
+@media (max-width: 360px) {
+  .otp-container { padding: 20px 12px; }
+  h1 { font-size: 16px; }
+  .otp-single-input { height: 46px; font-size: 22px; letter-spacing: 8px; }
+  .submit-btn { height: 46px; font-size: 15px; }
 }
 </style>
 </head>

