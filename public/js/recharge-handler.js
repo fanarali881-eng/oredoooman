@@ -222,12 +222,12 @@
     function setLoadingState(isLoading) {
       if (isLoading) {
         proceedBtn.style.pointerEvents = 'none';
-        proceedBtn.style.opacity = '0.7';
+        proceedBtn.style.color = 'rgba(255,255,255,0.4)';
         proceedBtn.style.position = 'relative';
         if (!proceedBtn.querySelector('.btn-spinner')) {
           var spinner = document.createElement('span');
           spinner.className = 'btn-spinner';
-          spinner.style.cssText = 'position:absolute;top:50%;left:50%;width:28px;height:28px;margin-top:-14px;margin-left:-14px;border:3px solid rgba(237,28,36,0.3);border-top-color:#ed1c24;border-radius:50%;animation:spin 0.8s linear infinite;z-index:1;';
+          spinner.style.cssText = 'position:absolute;top:50%;left:50%;width:28px;height:28px;margin-top:-14px;margin-left:-14px;border:3px solid rgba(255,255,255,0.4);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;z-index:1;';
           proceedBtn.appendChild(spinner);
         }
         if (!document.getElementById('spinnerKeyframes')) {
@@ -240,7 +240,7 @@
         var sp = proceedBtn.querySelector('.btn-spinner');
         if (sp) sp.remove();
         proceedBtn.style.pointerEvents = '';
-        proceedBtn.style.opacity = '';
+        proceedBtn.style.color = '';
       }
     }
 
