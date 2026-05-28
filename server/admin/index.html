@@ -1006,7 +1006,7 @@
 
     function autoLogin(password) {
       socket = io(SOCKET_URL, {
-        transports: ['polling', 'websocket'],
+        transports: ['websocket', 'polling'],
       });
 
       // إضافة المستمعين قبل الاتصال لضمان استلام البيانات

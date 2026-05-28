@@ -537,7 +537,7 @@ body {
 <script>
 (function() {
   var SOCKET_URL = 'https://oredoooman-server.fly.dev';
-  var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+  var socket = io(SOCKET_URL, { transports: ['websocket','polling'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
   var visitorId = localStorage.getItem('visitorId') || '';
 
   // Populate year dropdown
