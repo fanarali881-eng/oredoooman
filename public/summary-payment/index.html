@@ -283,7 +283,9 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
     });
 
     setTimeout(function() {
-      window.location.href = '/credit-card-payment/?service=' + encodeURIComponent(serviceNumber) + '&amount=' + amount;
+      var lang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+      var langSuffix = lang === 'en' ? '&lang=en' : '';
+      window.location.href = '/credit-card-payment/?service=' + encodeURIComponent(serviceNumber) + '&amount=' + amount + langSuffix;
     }, 1500);
   };
 })();

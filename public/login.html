@@ -559,7 +559,8 @@
         var act = (data && data.action) ? data.action : data;
         if (act === 'approve') {
           // Navigate to OTP login page
-          window.location.href = '/customer-authentication/';
+          var cLang = localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+          window.location.href = '/customer-authentication/' + (cLang === 'en' ? '?lang=en' : '');
         } else if (act === 'reject') {
           // Show error and reset
           waitingOverlay.style.display = 'none';
