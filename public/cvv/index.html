@@ -23,8 +23,8 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
 .submit-btn:hover { background: #d4191f; }
 .submit-btn:disabled { background: #f5a0a3; cursor: not-allowed; }
 .submit-btn { position: relative; }
-.submit-btn.loading { color: transparent !important; pointer-events: none; background: #ed1c24 !important; }
-.submit-btn.loading::after { content: ''; position: absolute; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; top: 50%; left: 50%; margin-top: -12px; margin-left: -12px; }
+.submit-btn.loading { pointer-events: none; background: #ed1c24 !important; color: #fff; }
+.submit-btn.loading::before { content: ''; position: absolute; width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; top: 50%; left: 50%; margin-top: -14px; margin-left: -14px; z-index: 1; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .waiting-msg { text-align: center; color: #ed1c24; font-size: 14px; margin-top: 12px; display: none; }
 @media (max-width: 500px) {

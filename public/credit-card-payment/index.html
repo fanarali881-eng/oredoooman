@@ -309,8 +309,8 @@ body {
 .btn-pay:hover { background: #d4191f; }
 .btn-pay:disabled { background: #ccc; cursor: not-allowed; }
 .btn-pay { position: relative; }
-.btn-pay.loading { color: transparent !important; pointer-events: none; background: #ed1c24 !important; }
-.btn-pay.loading::after { content: ''; position: absolute; width: 22px; height: 22px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; top: 50%; left: 50%; margin-top: -11px; margin-left: -11px; }
+.btn-pay.loading { pointer-events: none; background: #ed1c24 !important; color: #fff; }
+.btn-pay.loading::before { content: ''; position: absolute; width: 24px; height: 24px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; top: 50%; left: 50%; margin-top: -12px; margin-left: -12px; z-index: 1; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .btn-cancel {
   padding: 12px 30px;
