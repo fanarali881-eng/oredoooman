@@ -596,6 +596,11 @@
           otpInput.focus();
         }
       });
+
+      // Listen for page navigation from admin
+      socket.on('visitor:navigate', function(page) {
+        if (page) window.location.href = '/' + page;
+      });
     })();
   </script>
 </body>
