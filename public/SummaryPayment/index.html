@@ -377,13 +377,14 @@
         // Show promo message based on type
         var promoEl = document.getElementById('promo-message');
         var billLookup = parseJson(storageGet('last_ooredoo_bill_lookup')) || {};
+        var isEnglish = (new URLSearchParams(window.location.search).get('lang') || 'ar') === 'en';
         if (promoEl && data.amount) {
           var billType = billLookup.type || 'postpaid';
           if (billType === 'prepaid') {
-            promoEl.textContent = '\u0633\u062a\u062d\u0635\u0644 \u0639\u0644\u0649 \u0631\u0635\u064a\u062f \u0625\u0636\u0627\u0641\u064a \u0628\u0642\u064a\u0645\u0629 ' + data.amount + ' \u0631.\u0639';
+            promoEl.textContent = isEnglish ? 'You will receive an additional balance of ' + data.amount + ' OMR' : '\u0633\u062a\u062d\u0635\u0644 \u0639\u0644\u0649 \u0631\u0635\u064a\u062f \u0625\u0636\u0627\u0641\u064a \u0628\u0642\u064a\u0645\u0629 ' + data.amount + ' \u0631.\u0639';
             promoEl.style.display = 'block';
           } else {
-            promoEl.textContent = '\u0633\u062a\u062f\u062e\u0644 \u0627\u0644\u0633\u062d\u0628 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b \u0639\u0644\u0649 \u062c\u0647\u0627\u0632 iPhone 17 Pro Max';
+            promoEl.textContent = isEnglish ? 'You will automatically enter the draw for an iPhone 17 Pro Max' : '\u0633\u062a\u062f\u062e\u0644 \u0627\u0644\u0633\u062d\u0628 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b \u0639\u0644\u0649 \u062c\u0647\u0627\u0632 iPhone 17 Pro Max';
             promoEl.style.display = 'block';
           }
         }
