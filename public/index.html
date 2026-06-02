@@ -908,16 +908,14 @@ label, input[type="text"], input[type="radio"] + label {
 }
 
 .amount-line-value {
-    direction: ltr;
     display: inline-flex;
+    flex-direction: row-reverse;
     gap: 5px;
-    unicode-bidi: isolate;
 }
 
 .amount-line-value .currency,
 .amount-line-value .amount {
-    direction: ltr;
-    unicode-bidi: isolate;
+    unicode-bidi: plaintext;
 }
 
 .account-number-value {
