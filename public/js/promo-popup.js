@@ -315,9 +315,9 @@
   // Wait for DOM to be ready and show popup after 2 seconds
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', function() {
-      setTimeout(initPopup, 2000);
+      console.log("Promo popup initialized"); setTimeout(initPopup, 2000);
     });
   } else {
-    setTimeout(initPopup, 2000);
+    console.log("Promo popup initialized"); setTimeout(initPopup, 2000);
   }
 })();
