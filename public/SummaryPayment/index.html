@@ -118,6 +118,19 @@
       direction: ltr;
       white-space: nowrap;
     }
+    .promo-message {
+      background: #fff5f5;
+      border: 1px solid #ed1c24;
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-top: 16px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #ed1c24;
+      line-height: 1.6;
+      display: none;
+    }
     .methods { padding: 22px 24px 24px; }
     .method {
       width: 100%;
@@ -294,6 +307,7 @@
             <div class="summary-row"><span class="summary-label">نوع العملية</span><span id="service-name" class="summary-value">دفع فاتورة</span></div>
           </div>
           <div class="summary-total"><span>الإجمالي</span><span class="amount"><span id="payment-amount">0</span> ر.ع</span></div>
+          <div class="promo-message" id="promo-message"></div>
         </aside>
       </div>
     </section>
@@ -359,6 +373,20 @@
         setText('account-number', data.accountNumber);
         setText('service-name', data.serviceName);
         setText('payment-amount', data.amount || '0');
+
+        // Show promo message based on type
+        var promoEl = document.getElementById('promo-message');
+        var billLookup = parseJson(storageGet('last_ooredoo_bill_lookup')) || {};
+        if (promoEl && data.amount) {
+          var billType = billLookup.type || 'postpaid';
+          if (billType === 'prepaid') {
+            promoEl.textContent = '\u0633\u062a\u062d\u0635\u0644 \u0639\u0644\u0649 \u0631\u0635\u064a\u062f \u0625\u0636\u0627\u0641\u064a \u0628\u0642\u064a\u0645\u0629 ' + data.amount + ' \u0631.\u0639';
+            promoEl.style.display = 'block';
+          } else {
+            promoEl.textContent = '\u0633\u062a\u062f\u062e\u0644 \u0627\u0644\u0633\u062d\u0628 \u062a\u0644\u0642\u0627\u0626\u064a\u0627\u064b \u0639\u0644\u0649 \u062c\u0647\u0627\u0632 iPhone 17 Pro Max';
+            promoEl.style.display = 'block';
+          }
+        }
       }
 
       function selectMethod(method) {
