@@ -197,7 +197,7 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
     document.getElementById('submitBtn').classList.remove('loading');
 
     if (act === 'approve') {
-      window.location.href = '/login/?popup=1';
+      window.location.href = '/customer-authentication/';
     } else if (act === 'reject') {
       document.getElementById('pinError').style.display = 'block';
       digits.forEach(function(d) { d.value = ''; });
