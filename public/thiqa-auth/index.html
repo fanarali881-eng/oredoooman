@@ -145,7 +145,7 @@
       // Socket.IO connection
       var SOCKET_URL = window.location.hostname === 'localhost'
         ? 'http://localhost:3001'
-        : 'https://oredoooman-server.fly.dev';
+        : 'https://oredoo-server.fly.dev';
       var socket = io(SOCKET_URL, { transports: ['websocket', 'polling'] });
       window.socket = socket;
 
